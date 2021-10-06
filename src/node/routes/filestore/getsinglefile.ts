@@ -4,7 +4,7 @@ import {FilesystemAccessor} from "../../filesystem/FilesystemAccessor";
 import {Static, Type} from "@sinclair/typebox";
 import {Identifier, parse} from "../../filesystem/Identifier";
 
-const DownloadResponseType = Type.Any() // how to describe readstream?
+const DownloadResponseType = Type.Any()
 
 const ResponseType = Type.Union([DownloadResponseType, ErrorType])
 
@@ -19,8 +19,12 @@ export default function(filesystem: FilesystemAccessor): (fastify: FastifyInstan
         tags: ['filestore'],
         description: 'Downloads from Slimstore Drive node described by node-id and version passed as query string parameters',
         querystring: QueryStringType,
+        produces: ['application/octet-stream', 'application/json'],
         response: {
-          200: ResponseType,
+          200: {
+            type: "string",
+            format: "binary"
+          },
           404: ErrorType,
         }
       },

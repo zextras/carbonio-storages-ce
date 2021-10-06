@@ -21,8 +21,10 @@ export function createApp(config: Config):FastifyInstance<Server, IncomingMessag
 
   const loggerTransports = LoggerTransports.createTransports(config)
   const winstonLogger: Logger = createLogger(config, loggerTransports);
-  
-  const server = require('fastify')({logger: winstonLogger});
+
+  const server = require('fastify')({
+    logger: winstonLogger,
+  })
 
   server.setNotFoundHandler((request: any, reply: any) => {
     server.log.debug('Route not found: ', request.req.url)
@@ -41,7 +43,7 @@ export function createApp(config: Config):FastifyInstance<Server, IncomingMessag
   })
 
   server.register(fastifyMultipart);
-  server.register(fastifySwagger, oasSchema(config.baseURL + "/swagger", "localhost"));
+  server.register(fastifySwagger, oasSchema(config.servingURLPrefix, config.baseURL, "localhost"));
 
   server.register(router(config, filesystem, loggerTransports));
   

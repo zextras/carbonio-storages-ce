@@ -11,7 +11,7 @@ const { pipeline } = require('stream')
 const pump = util.promisify(pipeline)
 
 const UploadResponseType = Type.Object({
-  query: QueryStringType,
+  query: Type.Object({}, {additionalProperties: true}),
   resource: Type.String()
 })
 
@@ -23,12 +23,17 @@ export default function(filesystem: FilesystemAccessor, urls: Urls): (fastify: F
   return fastify => {
     return fastify.route<{Querystring: QueryString, Reply: Response}>({
       method: ["PUT", "POST"],
+      validatorCompiler: () => () => true,
       url: "/upload",
       schema: {
         tags: ['filestore'],
         description: 'Uploads to Slimstore Drive node using the node-id and version passed as query string parameters and the ',
-        consumes: ['multipart/form-data'],
         querystring: QueryStringType,
+        consumes: ['multipart/form-data'],
+        body: {
+          type: "string",
+          format: "binary"
+        },
         response: {
           200: UploadResponseType,
           500: ErrorType

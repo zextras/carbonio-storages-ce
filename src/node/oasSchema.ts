@@ -1,7 +1,8 @@
-export default function oasSchema(url:string, host:string) {
+export default function oasSchema(url:string, prefix:string, host:string) {
+  console.log(url)
   return {
-    routePrefix: url,
-    swagger: {
+    routePrefix: prefix + "/swagger",
+    openapi: {
       info: {
         title: 'Slimstore Server',
         description: 'Slimstore server',
