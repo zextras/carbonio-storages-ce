@@ -1,0 +1,14 @@
+{
+  "path": "/tmp/slimstore/store",
+  "port": 5794,
+  "baseURL": "slimstore",
+  "servingURLPrefix": "http://localhost:5794",
+  "compress": false,
+  "logging": {
+    "defaultLevel": "debug",
+    "frequency": "1d",
+    "datePattern": "YYYY-MM-DD",
+    "filename": "slimstore-%DATE%.log",
+    "dirname": "/tmp/slimstore/"
+  }
+}
