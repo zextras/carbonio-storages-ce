@@ -6,9 +6,9 @@
   "compress": false,
   "logging": {
     "defaultLevel": "debug",
-    "frequency": "1d",
-    "datePattern": "YYYY-MM-DD",
+    "datePattern": "YYYY-MM-DD-HH",
     "filename": "slimstore-%DATE%.log",
-    "dirname": "/tmp/slimstore/"
+    "dirname": "/tmp/slimstore/logs",
+    "zippedArchive": true
   }
 }

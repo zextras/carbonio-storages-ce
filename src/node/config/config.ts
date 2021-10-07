@@ -8,7 +8,6 @@ export type Config = {
   compress: boolean,
   logging: {
     defaultLevel: string,
-    frequency: string,
     datePattern: string,
     zippedArchive?: boolean,
     filename: string,

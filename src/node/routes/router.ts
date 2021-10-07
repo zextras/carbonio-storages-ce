@@ -10,6 +10,7 @@ import {Urls} from "../urls";
 import getloglevel from "./config/getloglevel";
 import {LoggerTransports} from "../LoggerTransports";
 import setloglevel from "./config/setloglevel";
+import getconfig from "./config/getconfig";
 
 export default function (config: Config, filesystem: FilesystemAccessor, transports: LoggerTransports) : (fastify : FastifyInstance) => Promise<void> {
   return async fastify => {
@@ -21,6 +22,7 @@ export default function (config: Config, filesystem: FilesystemAccessor, transpo
     await fastify.register(getsinglefile(filesystem), base);
     await fastify.register(deletesinglefile(filesystem), base);
 
+    await fastify.register(getconfig(config), base);
     await fastify.register(getloglevel(transports), base);
     await fastify.register(setloglevel(transports), base);
   }
