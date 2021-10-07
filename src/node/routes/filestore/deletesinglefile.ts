@@ -2,7 +2,6 @@ import {FastifyInstance} from "fastify";
 import {QueryString, QueryStringType} from "../types";
 import {FilesystemAccessor} from "../../filesystem/FilesystemAccessor";
 import {Identifier, parse} from "../../filesystem/Identifier";
-import {logRequestReceived} from "./loggingutils";
 
 export default function(filesystem: FilesystemAccessor): (fastify: FastifyInstance) => FastifyInstance {
   return fastify => {
@@ -15,8 +14,6 @@ export default function(filesystem: FilesystemAccessor): (fastify: FastifyInstan
         querystring: QueryStringType
       },
       async handler(req, reply) {
-        logRequestReceived(fastify, req, "Delete request")
-
         const identifier: Identifier = parse(req.query)
 
         if (await filesystem.deleteFile(identifier)) {

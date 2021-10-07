@@ -35,8 +35,6 @@ export default function(filesystem: FilesystemAccessor, urls: Urls): (fastify: F
         }
       },
       handler: async function (req, reply) {
-        fastify.log.info(`[id=${req.id}, hostname=${req.hostname}, ip=${req.ip}] Upload request`)
-
         const identifier: Identifier = parse(req.query)
 
         const data = await req.file()

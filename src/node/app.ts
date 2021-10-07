@@ -7,12 +7,12 @@ import {LocalFilesystemAccessor} from "./filesystem/LocalFilesystemAcessor";
 import {LocalPathStrategy} from "./filesystem/FilePathStategy";
 import winston, {Logger} from "winston";
 import 'winston-daily-rotate-file';
-import {FastifyInstance, FastifyRequest} from "fastify";
+import {FastifyInstance} from "fastify";
 import {IncomingMessage, Server, ServerResponse} from "http";
 import {LoggerTransports} from "./LoggerTransports";
 import {GzipWrapperFilesystemAccessor} from "./filesystem/GzipWrapperFilesystemAccessor";
-import {logRequestError} from "./routes/filestore/loggingutils";
-import {FastifyError} from "fastify-error";
+import {FastifyRequest} from "fastify/types/request";
+import {logRequestError, logRequestReceived} from "./routes/filestore/loggingutils";
 
 export function createApp(config: Config):FastifyInstance<Server, IncomingMessage, ServerResponse> {
 
@@ -28,19 +28,17 @@ export function createApp(config: Config):FastifyInstance<Server, IncomingMessag
     logger: winstonLogger,
   })
 
-  server.setNotFoundHandler((request: any, reply: any) => {
-    server.log.debug('Route not found: ', request.req.url)
-
+  server.setNotFoundHandler((request: FastifyRequest, reply: any) => {
+    server.log.warn('Route not found: ' +  request.url)
     reply.status(404).send({ message: 'Not found' })
   })
 
-  server.errorHandler((error: FastifyError, request: FastifyRequest, reply: any) => {
+  server.addHook('onRequest', async (request: FastifyRequest) => {
+    logRequestReceived(server, request, "Request received")
+  });
+
+  server.addHook('onError', async (request: FastifyRequest, __: any, error: Error) => {
     logRequestError(server, request, error)
-    reply.send({
-      statusCode: 500,
-      error: "Internal server error",
-      message: error.message
-    })
   })
 
   server.ready(async (err:any) => {
