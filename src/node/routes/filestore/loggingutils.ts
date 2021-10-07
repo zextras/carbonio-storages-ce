@@ -1,0 +1,13 @@
+import {FastifyInstance, FastifyRequest} from "fastify";
+
+function createContext(req: FastifyRequest) {
+  return `id=${req.id}, hostname=${req.hostname}, ip=${req.ip}`
+}
+
+export function logRequestReceived(fastify: FastifyInstance, req: FastifyRequest, message: string) {
+  fastify.log.info(`[${createContext(req)}] ${message}`)
+}
+
+export function logRequestError(fastify: FastifyInstance, req: FastifyRequest, e: Error) {
+  fastify.log.error(`[${createContext(req)}] ${e.stack}`)
+}

@@ -7,10 +7,12 @@ import {LocalFilesystemAccessor} from "./filesystem/LocalFilesystemAcessor";
 import {LocalPathStrategy} from "./filesystem/FilePathStategy";
 import winston, {Logger} from "winston";
 import 'winston-daily-rotate-file';
-import {FastifyInstance} from "fastify";
+import {FastifyInstance, FastifyRequest} from "fastify";
 import {IncomingMessage, Server, ServerResponse} from "http";
 import {LoggerTransports} from "./LoggerTransports";
 import {GzipWrapperFilesystemAccessor} from "./filesystem/GzipWrapperFilesystemAccessor";
+import {logRequestError} from "./routes/filestore/loggingutils";
+import {FastifyError} from "fastify-error";
 
 export function createApp(config: Config):FastifyInstance<Server, IncomingMessage, ServerResponse> {
 
@@ -30,6 +32,15 @@ export function createApp(config: Config):FastifyInstance<Server, IncomingMessag
     server.log.debug('Route not found: ', request.req.url)
 
     reply.status(404).send({ message: 'Not found' })
+  })
+
+  server.errorHandler((error: FastifyError, request: FastifyRequest, reply: any) => {
+    logRequestError(server, request, error)
+    reply.send({
+      statusCode: 500,
+      error: "Internal server error",
+      message: error.message
+    })
   })
 
   server.ready(async (err:any) => {
@@ -69,7 +80,7 @@ function createLogger(config: Config, loggerTransports: LoggerTransports) {
     format: winston.format.combine(
       winston.format.timestamp(),
       winston.format.errors(),
-      winston.format.printf(({ message, timestamp, level }) => `${timestamp} ${level} ${message}`)
+      winston.format.printf(({ message, timestamp, level }) => `[${timestamp}] [${level}] ${message}`)
     ),
     transports: loggerTransports.transports
   });

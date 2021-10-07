@@ -35,23 +35,17 @@ export default function(filesystem: FilesystemAccessor, urls: Urls): (fastify: F
         }
       },
       handler: async function (req, reply) {
+        fastify.log.info(`[id=${req.id}, hostname=${req.hostname}, ip=${req.ip}] Upload request`)
+
         const identifier: Identifier = parse(req.query)
 
-        try {
-          const data = await req.file()
+        const data = await req.file()
+        await pump(data.file, await filesystem.openWriterStream(identifier, true))
 
-          await pump(data.file, await filesystem.openWriterStream(identifier, true))
-          reply.send({
-            query: req.query,
-            resource: urls.downloadURL(req.query)
-          })
-        } catch (e) {
-          reply.send({
-            statusCode: 500,
-            error: "Internal server error",
-            message: (e instanceof Error) ? e.message : "unknown"
-          })
-        }
+        reply.send({
+          query: req.query,
+          resource: urls.downloadURL(req.query)
+        })
       },
     })
   };

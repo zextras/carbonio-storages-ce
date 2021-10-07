@@ -7,7 +7,7 @@ const server = createApp(config);
 const start = async () => {
   try {
     await server.listen(config.port);
-    console.log('Server started successfully');
+    server.log.info('Server started successfully');
   } catch (err) {
     server.log.error(err);
     process.exit(1);

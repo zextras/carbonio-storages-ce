@@ -1,5 +1,4 @@
 export default function oasSchema(url:string, prefix:string, host:string) {
-  console.log(url)
   return {
     routePrefix: prefix + "/swagger",
     openapi: {

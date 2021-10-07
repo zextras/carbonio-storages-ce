@@ -3,6 +3,7 @@ import {ErrorType, QueryString, QueryStringType} from "../types";
 import {FilesystemAccessor} from "../../filesystem/FilesystemAccessor";
 import {Static, Type} from "@sinclair/typebox";
 import {Identifier, parse} from "../../filesystem/Identifier";
+import {logRequestReceived} from "./loggingutils";
 
 const DownloadResponseType = Type.Any()
 
@@ -29,10 +30,10 @@ export default function(filesystem: FilesystemAccessor): (fastify: FastifyInstan
         }
       },
       handler: async function (req, reply) {
+        logRequestReceived(fastify, req, "Download request")
+
         const identifier: Identifier = parse(req.query)
         const fileName = identifier.toFilename();
-
-        console.log(identifier)
 
         if (!await filesystem.fileExists(identifier)) {
           const error = {
@@ -42,8 +43,8 @@ export default function(filesystem: FilesystemAccessor): (fastify: FastifyInstan
           }
 
           reply.status(404)
-            .type('application/json')
-            .send(error)
+          .type('application/json')
+          .send(error)
         } else {
           reply.type('application/octet-stream')
           .send(await filesystem.openReadStream(identifier))

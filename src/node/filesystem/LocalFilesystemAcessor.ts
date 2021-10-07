@@ -21,7 +21,6 @@ export class LocalFilesystemAccessor implements FilesystemAccessor {
   }
 
   fileExists(identifier: Identifier): Promise<boolean> {
-    console.log(this.calculateFilePath(identifier))
     return LocalFilesystemAccessor.exists(this.calculateFilePath(identifier))
   }
 
