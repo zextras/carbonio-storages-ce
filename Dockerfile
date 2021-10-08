@@ -33,4 +33,5 @@ COPY --chown=node:node . .
 
 EXPOSE 5794
 
-RUN npm run build && npm run start
+RUN npm run build
+ENTRYPOINT npm run start
