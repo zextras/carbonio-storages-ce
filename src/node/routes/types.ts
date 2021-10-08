@@ -2,7 +2,7 @@ import {Static, Type} from "@sinclair/typebox";
 
 export const DriveQueryStringType = Type.Object({
   type: Type.Optional(Type.Literal("drive")),
-  node: Type.String(),
+  node: Type.String({pattern: '^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$'}),
   version: Type.Number()
 })
 
