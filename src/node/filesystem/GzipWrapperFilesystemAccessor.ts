@@ -13,14 +13,17 @@ export class GzipWrapperFilesystemAccessor implements FilesystemAccessor {
   }
 
   async openReadStream(identifier: Identifier): Promise<Readable> {
-    return this.filesystem.openReadStream(identifier)//(await this.filesystem.openReadStream(identifier)).pipe(createDeflate()).pipe(new ReadStream())
+    const readable = await this.filesystem.openReadStream(identifier);
+    const gunzip = zlib.createGunzip();
+    readable.pipe(gunzip)
+    return gunzip
   }
 
   async openWriterStream(identifier: Identifier, overwrite: boolean = true): Promise<Writable> {
-    console.log("compress")
-    let writable = await this.filesystem.openWriterStream(identifier, overwrite);
-    let gzip = zlib.createGzip();
-    return gzip.pipe(writable)
+    const writable = await this.filesystem.openWriterStream(identifier, overwrite);
+    const gzip = zlib.createGzip();
+    gzip.pipe(writable)
+    return gzip
   }
 
   async deleteFile(identifier: Identifier): Promise<boolean> {
