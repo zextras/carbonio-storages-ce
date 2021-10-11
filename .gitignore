@@ -6,6 +6,8 @@
 # Node artifact files
 node_modules/
 dist/
+coverage/
+.nyc_output/
 
 # Compiled Java class files
 *.class
