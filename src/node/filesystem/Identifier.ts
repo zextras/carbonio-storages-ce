@@ -14,8 +14,8 @@ export function parse(queryString: QueryString): Identifier {
     switch (queryString.type) {
       case "drive":
         return new DriveIdentifier(queryString)
-      case "mail":
-        throw new Error("unuspported");
+      default:
+        throw new Error("unsupported");
     }
   }
 }

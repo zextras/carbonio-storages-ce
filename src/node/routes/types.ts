@@ -6,14 +6,7 @@ export const DriveQueryStringType = Type.Object({
   version: Type.Number()
 })
 
-export const MailQueryStringType = Type.Object({
-  type: Type.Literal("mail"),
-  mailboxId: Type.Number(),
-  id: Type.Number(),
-  revision: Type.Number()
-})
-
-export const QueryStringType = Type.Union([DriveQueryStringType, MailQueryStringType])
+export const QueryStringType = Type.Union([DriveQueryStringType])
 
 export type QueryString = Static<typeof QueryStringType>
 export type DriveQueryString = Static<typeof DriveQueryStringType>

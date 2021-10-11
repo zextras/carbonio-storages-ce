@@ -5,7 +5,16 @@ tap.test("liveness check", async t => {
   const server = await testApplication(t)
   const response = await server.inject({
     method: "GET",
+    url: "slimstore/livenesscheck"
+  });
+  t.equal(200, response.statusCode)
+})
+
+tap.test("stats check", async t => {
+  const server = await testApplication(t)
+  const response = await server.inject({
+    method: "GET",
     url: "slimstore/stats"
-  });  
+  });
   t.equal(200, response.statusCode)
 })

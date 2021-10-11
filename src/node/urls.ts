@@ -25,7 +25,7 @@ export class Urls {
             version: queryString.version.toString(),
             type: "drive"
           }
-        case "mail":
+        default:
           throw new Error("Unsupported");
       }
     }
