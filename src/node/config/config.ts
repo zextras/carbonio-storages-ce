@@ -12,6 +12,10 @@ export type Config = {
     zippedArchive?: boolean,
     filename: string,
     dirname?: string
+  },
+  https?: {
+    keyPath: string,
+    certPath: string
   }
 }
 

@@ -13,6 +13,7 @@ import {LoggerTransports} from "./LoggerTransports";
 import {GzipWrapperFilesystemAccessor} from "./filesystem/GzipWrapperFilesystemAccessor";
 import {FastifyRequest} from "fastify/types/request";
 import {logRequestError, logRequestReceived} from "./routes/filestore/loggingutils";
+import * as fs from "fs";
 
 export function createApp(config: Config):FastifyInstance<Server, IncomingMessage, ServerResponse> {
 
@@ -24,9 +25,22 @@ export function createApp(config: Config):FastifyInstance<Server, IncomingMessag
   const loggerTransports = LoggerTransports.createTransports(config)
   const winstonLogger: Logger = createLogger(config, loggerTransports);
 
-  const server = require('fastify')({
-    logger: winstonLogger,
-  })
+  // fastify basic common configuration
+  let fastifyConfig: any = {logger: winstonLogger}
+
+  // enables https on fastify
+  if (config.https) {
+    fastifyConfig = {
+      ... fastifyConfig,
+      http2: true,
+      https: {
+        key: fs.readFileSync(config.https.keyPath),
+        cert: fs.readFileSync(config.https.certPath)
+      }
+    }
+  }
+
+  const server = require('fastify')(fastifyConfig)
 
   server.setNotFoundHandler((request: FastifyRequest, reply: any) => {
     server.log.warn('Route not found: ' +  request.url)
