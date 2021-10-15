@@ -15,7 +15,10 @@ export default function(config: Config): (fastify: FastifyInstance) => FastifyIn
         }
       },
       handler: async function (__, reply) {
-        reply.send(config)
+        const incompleteConfig: any = {... config}
+        // remove awsv4signature access-keys and secrets for security
+        delete incompleteConfig.awsv4signature
+        reply.send(incompleteConfig)
       },
     })
   };

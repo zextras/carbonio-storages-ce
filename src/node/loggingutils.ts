@@ -1,6 +1,6 @@
 import {FastifyInstance, FastifyRequest} from "fastify";
 
-function createContext(req: FastifyRequest) {
+export function createContext(req: FastifyRequest) {
   return `id=${req.id}, hostname=${req.hostname}, ip=${req.ip} url=${req.url}`
 }
 

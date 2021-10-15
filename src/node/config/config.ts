@@ -16,7 +16,8 @@ export type Config = {
   https?: {
     keyPath: string,
     certPath: string
-  }
+  },
+  awsv4signature?: any
 }
 
 export function read(): Config {
