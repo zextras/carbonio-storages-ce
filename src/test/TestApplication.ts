@@ -11,7 +11,7 @@ export async function testApplication(t:Test, configPatch: RecursivePartial<Conf
   // not using https certificates by default
   delete defaultTestConfig.https
 
-  // not using https certificates by default
+  // not using aws v4 signature by default
   delete defaultTestConfig.awsv4signature
 
   const testDir: string = await mkTempFolder("slimstoreTests");
