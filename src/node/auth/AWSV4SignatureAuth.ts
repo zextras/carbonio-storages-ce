@@ -30,11 +30,6 @@ export class AWSV4SignatureAuth implements Auth {
       throw new AuthError()
     }
 
-    // if (new Date(longDate).toISOString() !== longDate) {
-    //   server.log.error(`[${createContext(request)}] Invalid date header`)
-    //   throw new AuthError()
-    // }
-
     const shortDate = longDate.split("T")[0]
     const scope = AWSV4SignatureAuth.getScope(shortDate, AWSV4SignatureAuth.REGION, AWSV4SignatureAuth.SERVICE)
 
