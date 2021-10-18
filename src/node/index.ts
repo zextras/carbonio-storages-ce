@@ -1,10 +1,9 @@
 import {createApp} from "./app";
 import {Config, read} from "./config/config";
 
-const config: Config = read();
-const server = createApp(config);
-
 const start = async () => {
+  const config: Config = await read();
+  const server = createApp(config);
   try {
     await server.listen(config.port, "0.0.0.0");
     server.log.info('Server started successfully');
