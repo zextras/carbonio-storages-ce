@@ -1,7 +1,7 @@
 import {Identifier} from "./Identifier";
 import * as path from "path";
 import {PathLike} from "fs";
-import {Config} from "../config/config";
+import {Config} from "../config/configuration";
 
 export interface FilePathStrategy {
   calculateFilePath(identifier: Identifier): PathLike

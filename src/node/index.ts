@@ -1,5 +1,5 @@
 import {createApp} from "./app";
-import {Config, read} from "./config/config";
+import {Config, read} from "./config/configuration";
 
 const start = async () => {
   const config: Config = await read();

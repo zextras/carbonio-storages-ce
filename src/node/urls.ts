@@ -1,4 +1,4 @@
-import {Config} from "./config/config";
+import {Config} from "./config/configuration";
 import {QueryString} from "./routes/types";
 
 export class Urls {

@@ -1,6 +1,6 @@
 import tap from "tap";
 import {AWSV4SignatureAuth} from "../../node/auth/AWSV4SignatureAuth";
-import {Config} from "../../node/config/config";
+import {Config} from "../../node/config/configuration";
 import {Auth} from "../../node/auth/Auth";
 import {NoChecksAuth} from "../../node/auth/NoChecksAuth";
 import {AuthFactory} from "../../node/auth/AuthFactory";

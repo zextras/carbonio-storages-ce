@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import {PathLike} from 'fs';
 import {Identifier} from "./Identifier";
-import {Config} from "../config/config";
+import {Config} from "../config/configuration";
 import * as path from "path";
 import {FilesystemAccessor} from "./FilesystemAccessor";
 import {FilePathStrategy} from "./FilePathStategy";

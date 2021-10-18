@@ -1,6 +1,6 @@
 import * as Transport from "winston-transport";
 import winston from "winston";
-import {Config} from "./config/config";
+import {Config} from "./config/configuration";
 import {LogLevel} from "./routes/types";
 
 export class LoggerTransports {
