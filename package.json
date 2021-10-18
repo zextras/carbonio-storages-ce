@@ -19,7 +19,8 @@
   "scripts": {
     "build": "rimraf dist && tsc --build",
     "start": "node dist/node/index.js",
-    "test": "NODE_ENV='test'; NODE_DEBUG=*; tap 'src/test/**/*Test.ts' --timeout=10 --node-arg=--loader=ts-node/esm --coverage-report=html --no-browser"
+    "test": "NODE_ENV='test'; NODE_DEBUG=*; tap 'src/test/**/*Test.ts' --timeout=10 --node-arg=--loader=ts-node/esm --coverage-report=html --no-browser",
+    "test:single": "NODE_ENV='test'; NODE_DEBUG=*; tap --timeout=0 --node-arg=--loader=ts-node/esm --coverage-report=html --no-browser"
   },
   "author": "",
   "license": "ISC",
