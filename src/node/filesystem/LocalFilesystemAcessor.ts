@@ -1,17 +1,16 @@
 import * as fs from 'fs';
-import {PathLike} from 'fs';
-import {Identifier} from "./Identifier";
-import {Config} from "../config/configuration";
+import { Identifier } from "./Identifier";
+import { Config } from "../config/configuration";
 import * as path from "path";
-import {FilesystemAccessor} from "./FilesystemAccessor";
-import {FilePathStrategy} from "./FilePathStategy";
+import { FilesystemAccessor } from "./FilesystemAccessor";
+import { FilePathStrategy } from "./FilePathStategy";
 import checkDiskSpace from 'check-disk-space';
 
 export class LocalFilesystemAccessor implements FilesystemAccessor {
 
   constructor(readonly config: Config, readonly pathStrategy: FilePathStrategy) {}
 
-  private static async exists (path: PathLike): Promise<boolean> {
+  private static async exists (path: fs.PathLike): Promise<boolean> {
     try {
       await fs.promises.access(path)
       return true
@@ -29,7 +28,7 @@ export class LocalFilesystemAccessor implements FilesystemAccessor {
   }
 
   async openWriterStream(identifier: Identifier, overwrite: boolean = true): Promise<fs.WriteStream> {
-    const parent: PathLike = this.calculateFileParent(identifier);
+    const parent: fs.PathLike = this.calculateFileParent(identifier);
     if (!await LocalFilesystemAccessor.exists(parent)) {
       await fs.promises.mkdir(parent, {recursive: true})
     } else if (overwrite && await this.fileExists(identifier)) {
@@ -50,7 +49,7 @@ export class LocalFilesystemAccessor implements FilesystemAccessor {
     return path.join(this.config.path, identifier.path().toString())
   }
 
-  calculateFilePath(identifier: Identifier): PathLike {
+  calculateFilePath(identifier: Identifier): fs.PathLike {
     return path.join(this.calculateFileParent(identifier), identifier.toFilename())
   }
 
