@@ -33,6 +33,17 @@ export async function postFile(app: FastifyInstance, path: string, node: string,
   });
 }
 
+export async function putFile(app: FastifyInstance, path: string, node: string, version: number): Promise<ServerResponse> {
+  const form = new FormData();
+  form.append("", fs.createReadStream(path));
+  return await app.inject({
+    method: "PUT",
+    url: uploadURL(node, version),
+    headers: form.getHeaders(),
+    payload: form,
+  });
+}
+
 export async function downloadFile(app: FastifyInstance, node: string, version: number): Promise<LightMyRequestResponse> {
   return await app.inject({
     method: "GET",
@@ -90,7 +101,7 @@ for(const environmentProviderConfig of testEnvironmentProviders) {
     t.equal(200, deleteResponse.statusCode)
   })
 
-  tap.test(`upload twice the same node/version`, async t => {
+  tap.test(`POST: expect 409 error for same node/version`, async t => {
     const server = await provider(t)
     const filePath = `${process.cwd()}/src/test/resources/file.txt`
 
@@ -98,6 +109,17 @@ for(const environmentProviderConfig of testEnvironmentProviders) {
     t.equal(200, uploadResponse.statusCode)
 
     const upload2Response = await postFile(server, filePath, node, version);
+    t.equal(409, upload2Response.statusCode)
+  })
+
+  tap.test(`PUT: upload twice the same node/version`, async t => {
+    const server = await provider(t)
+    const filePath = `${process.cwd()}/src/test/resources/file.txt`
+
+    const uploadResponse = await putFile(server, filePath, node, version);
+    t.equal(200, uploadResponse.statusCode)
+
+    const upload2Response = await putFile(server, filePath, node, version);
     t.equal(200, upload2Response.statusCode)
   })
 

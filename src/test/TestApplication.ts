@@ -1,12 +1,11 @@
-import config from "../node/config/config.json"
+import { Config, read } from "../node/config/configuration"
 import {createApp} from "../node/app"
 import * as fs from "fs";
-import {Config} from "../node/config/configuration";
 import {mergeDeep, RecursivePartial, Test} from "./TestUtils";
 
 export async function testApplication(t:Test, configPatch: RecursivePartial<Config> = {}) {
 
-  const defaultTestConfig: Config = {... config}
+  const defaultTestConfig: Config = {... await read()}
 
   // not using https certificates by default
   delete defaultTestConfig.https

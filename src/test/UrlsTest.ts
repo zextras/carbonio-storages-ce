@@ -1,12 +1,12 @@
 import tap from "tap";
 import {Urls} from "../node/urls";
-import config from "../node/config/config.json"
+import { read } from "../node/config/configuration";
 
 tap.test("build default type url", async t => {
   const node = "443c815e-6b88-47b1-800f-d74d2d3004bf"
   const version = 1
 
-  const urls = new Urls(config)
+  const urls = new Urls(await read())
 
   const downloadURL = urls.downloadURL({
     node,
@@ -22,7 +22,7 @@ tap.test("build drive download url", async t => {
   const node = "443c815e-6b88-47b1-800f-d74d2d3004bf"
   const version = 1
 
-  const urls = new Urls(config)
+  const urls = new Urls(await read())
 
   const downloadURL = urls.downloadURL({
     type,
