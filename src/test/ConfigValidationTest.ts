@@ -39,8 +39,8 @@ tap.test('reject missing non existing certpath', async t => {
               "zippedArchive": true
             },
             "https": {
-              "keyPath": "./package.json",
-              "certPath": "./package.json"
+              "keyPath": "./bla.json",
+              "certPath": "./bla.json"
             }
           })
     );

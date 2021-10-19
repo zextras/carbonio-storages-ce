@@ -2,7 +2,7 @@ import {FastifyInstance} from "fastify";
 import {Config} from "../config/configuration";
 import livenessCheck from "./checks/livenesscheck";
 import stats from "./checks/stats";
-import uploadsinglefile from "./filestore/uploadsinglefile"
+import updatesinglefile from "./filestore/updatesinglefile"
 import getsinglefile from "./filestore/getsinglefile"
 import deletesinglefile from "./filestore/deletesinglefile";
 import {FilesystemAccessor} from "../filesystem/FilesystemAccessor";
@@ -11,6 +11,7 @@ import getloglevel from "./config/getloglevel";
 import {LoggerTransports} from "../LoggerTransports";
 import setloglevel from "./config/setloglevel";
 import getconfig from "./config/getconfig";
+import createsinglefile from "./filestore/createsinglefile";
 
 export default function (config: Config, filesystem: FilesystemAccessor, transports: LoggerTransports) : (fastify : FastifyInstance) => Promise<void> {
   return async fastify => {
@@ -18,7 +19,8 @@ export default function (config: Config, filesystem: FilesystemAccessor, transpo
     await fastify.register(livenessCheck, base);
     await fastify.register(stats(filesystem), base);
 
-    await fastify.register(uploadsinglefile(filesystem, new Urls(config)), base);
+    await fastify.register(updatesinglefile(filesystem, new Urls(config)), base);
+    await fastify.register(createsinglefile(filesystem, new Urls(config)), base);
     await fastify.register(getsinglefile(filesystem), base);
     await fastify.register(deletesinglefile(filesystem), base);
 

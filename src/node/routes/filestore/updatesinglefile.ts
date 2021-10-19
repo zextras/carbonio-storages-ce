@@ -1,10 +1,10 @@
-import {FastifyInstance} from "fastify";
+import { FastifyInstance } from "fastify";
 import "fastify-multipart";
-import {ErrorType, QueryString, QueryStringType} from "../types";
-import {Static, Type} from "@sinclair/typebox";
-import {FilesystemAccessor} from "../../filesystem/FilesystemAccessor";
-import {Identifier, parse} from "../../filesystem/Identifier";
-import {Urls} from "../../urls";
+import { Static, Type } from "@sinclair/typebox";
+import { ErrorType, QueryString, QueryStringType } from "../types";
+import { FilesystemAccessor } from "../../filesystem/FilesystemAccessor";
+import { Identifier, parse } from "../../filesystem/Identifier";
+import { Urls } from "../../urls";
 
 const util = require('util')
 const { pipeline } = require('stream')
@@ -22,7 +22,7 @@ type Response = Static<typeof ResponseType>
 export default function(filesystem: FilesystemAccessor, urls: Urls): (fastify: FastifyInstance) => FastifyInstance {
   return fastify => {
     return fastify.route<{Querystring: QueryString, Reply: Response}>({
-      method: ["PUT", "POST"],
+      method: ["PUT"],
       url: "/upload",
       schema: {
         tags: ['filestore'],
