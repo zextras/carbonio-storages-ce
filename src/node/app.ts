@@ -7,13 +7,15 @@ import {LocalFilesystemAccessor} from "./filesystem/LocalFilesystemAcessor";
 import {LocalPathStrategy} from "./filesystem/FilePathStategy";
 import winston, {Logger} from "winston";
 import 'winston-daily-rotate-file';
-import {FastifyInstance} from "fastify";
+import {FastifyInstance, FastifyReply} from "fastify";
 import {IncomingMessage, Server, ServerResponse} from "http";
 import {LoggerTransports} from "./LoggerTransports";
 import {GzipWrapperFilesystemAccessor} from "./filesystem/GzipWrapperFilesystemAccessor";
 import {FastifyRequest} from "fastify/types/request";
-import {logRequestError, logRequestReceived} from "./routes/filestore/loggingutils";
+import {createContext, logRequestError, logRequestReceived} from "./loggingutils";
 import * as fs from "fs";
+import {AuthFactory} from "./auth/AuthFactory";
+import {AuthError} from "./auth/AuthError";
 
 export function createApp(config: Config):FastifyInstance<Server, IncomingMessage, ServerResponse> {
 
@@ -29,10 +31,9 @@ export function createApp(config: Config):FastifyInstance<Server, IncomingMessag
   let fastifyConfig: any = {logger: winstonLogger}
 
   // enables https on fastify
-  if (config.https) {
+  if (config.https && Object.keys(config.https).length > 0) {
     fastifyConfig = {
       ... fastifyConfig,
-      http2: true,
       https: {
         key: fs.readFileSync(config.https.keyPath),
         cert: fs.readFileSync(config.https.certPath)
@@ -47,8 +48,20 @@ export function createApp(config: Config):FastifyInstance<Server, IncomingMessag
     reply.status(404).send({ message: 'Not found' })
   })
 
-  server.addHook('onRequest', async (request: FastifyRequest) => {
+  const auth = AuthFactory.create(config)
+  server.addHook('onRequest', async (request: FastifyRequest, reply: FastifyReply) => {
     logRequestReceived(server, request, "Request received")
+    try {
+      await auth.check(server, request)
+    } catch(e) {
+      if (e instanceof AuthError) {
+        server.log.error(`[${createContext(request)}] Authentication failed`)
+        reply.status(401).send()
+      }
+      else {
+        throw e
+      }
+    }
   });
 
   server.addHook('onError', async (request: FastifyRequest, __: any, error: Error) => {
