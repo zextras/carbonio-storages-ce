@@ -1,11 +1,10 @@
 import tap from "tap"
-import {testApplication} from "../TestApplication";
-import {FastifyInstance} from "fastify";
+import { testApplication } from "../TestApplication";
+import { FastifyInstance } from "fastify";
 import * as fs from "fs";
 import FormData from "form-data"
-import {ServerResponse} from "http";
-import {Response as LightMyRequestResponse} from "light-my-request";
-import {Readable} from "stream";
+import { Response as LightMyRequestResponse } from "light-my-request";
+import { Readable } from "stream";
 
 const node: string = "443c815e-6b88-47b1-800f-d74d2d3004bf"
 const version: number = 2
@@ -22,7 +21,7 @@ function deleteURL(node: string, version: number) {
   return `slimstore/delete?node=${node}&version=${version}`
 }
 
-export async function postFile(app: FastifyInstance, path: string, node: string, version: number): Promise<ServerResponse> {
+export async function postFile(app: FastifyInstance, path: string, node: string, version: number): Promise<LightMyRequestResponse> {
   const form = new FormData();
   form.append("", fs.createReadStream(path));
   return await app.inject({
@@ -33,7 +32,7 @@ export async function postFile(app: FastifyInstance, path: string, node: string,
   });
 }
 
-export async function putFile(app: FastifyInstance, path: string, node: string, version: number): Promise<ServerResponse> {
+export async function putFile(app: FastifyInstance, path: string, node: string, version: number): Promise<LightMyRequestResponse> {
   const form = new FormData();
   form.append("", fs.createReadStream(path));
   return await app.inject({
@@ -58,7 +57,7 @@ export async function deleteFile(app: FastifyInstance, node: string, version: nu
   });
 }
 
-async function streamToString (stream: Readable): Promise<string> {
+export async function streamToString (stream: Readable): Promise<string> {
   const chunks: any = [];
   return new Promise((resolve, reject) => {
     stream.on('data', (chunk) => chunks.push(Buffer.from(chunk)));
@@ -122,6 +121,23 @@ for(const environmentProviderConfig of testEnvironmentProviders) {
     const upload2Response = await putFile(server, filePath, node, version);
     t.equal(200, upload2Response.statusCode)
   })
+
+  const calls = [putFile, postFile];
+  for (const c of calls){
+    tap.test('upload file response contains hash and size', async t => {
+      const server = await provider(t)
+      const filePath = `${process.cwd()}/src/test/resources/file.txt`
+
+      const uploadResponse = await c(server, filePath, node, version);
+      t.equal(uploadResponse.statusCode, 200)
+      const responseBody = JSON.parse(uploadResponse.body);
+      const digest = responseBody.digest
+      t.equal(digest, '4f5937de8e24e473df43503273b78e6e')
+
+      const size = responseBody.size
+      t.equal(size, 17)
+    })
+  }
 
   tap.test(`download missing resource`, async t => {
     const server = await provider(t)

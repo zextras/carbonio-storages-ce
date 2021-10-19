@@ -5,6 +5,7 @@ import { ErrorType, QueryString, QueryStringType } from "../types";
 import { FilesystemAccessor } from "../../filesystem/FilesystemAccessor";
 import { Identifier, parse } from "../../filesystem/Identifier";
 import { Urls } from "../../urls";
+import StreamHash from "../../filesystem/utils/StreamHash";
 
 const util = require('util')
 const {pipeline} = require('stream')
@@ -12,9 +13,11 @@ const pump = util.promisify(pipeline)
 
 const UploadResponseType = Type.Object({
 	query: Type.Object({}, {additionalProperties: true}),
-	resource: Type.String()
+	resource: Type.String(),
+	size: Type.Number(),
+	digest: Type.String(),
+	algo: Type.String()
 })
-
 const ResponseType = Type.Union([UploadResponseType, ErrorType])
 
 type Response = Static<typeof ResponseType>
@@ -22,7 +25,7 @@ type Response = Static<typeof ResponseType>
 export default function (filesystem: FilesystemAccessor, urls: Urls): (fastify: FastifyInstance) => FastifyInstance {
 	return fastify => {
 		return fastify.route<{ Querystring: QueryString, Reply: Response }>({
-			method: ["POST"],
+			method: ["POST", "PUT"],
 			url: "/upload",
 			schema: {
 				tags: ['filestore'],
@@ -38,7 +41,7 @@ export default function (filesystem: FilesystemAccessor, urls: Urls): (fastify: 
 			handler: async function (req, reply) {
 				const identifier: Identifier = parse(req.query)
 
-				if (await filesystem.fileExists(identifier)) {
+				if (await filesystem.fileExists(identifier) && req.method === 'POST') {
 					reply.code(409).send({
 						statusCode: 409,
 						error: 'Conflict',
@@ -46,11 +49,18 @@ export default function (filesystem: FilesystemAccessor, urls: Urls): (fastify: 
 					})
 				} else {
 					const data = await req.file()
-					await pump(data.file, await filesystem.openWriterStream(identifier, true))
+					const hashTransform = new StreamHash();
+
+					hashTransform.pipe(await filesystem.openWriterStream(identifier, true))
+
+					await pump(data.file, hashTransform);
 
 					reply.send({
 						query: req.query,
-						resource: urls.downloadURL(req.query)
+						resource: urls.downloadURL(req.query),
+						algo: hashTransform.algo,
+						size: hashTransform.byteCount,
+						digest: hashTransform.computedHash()
 					})
 				}
 			},
