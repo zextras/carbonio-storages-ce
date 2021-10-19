@@ -1,4 +1,4 @@
-import {Config} from "../config/config";
+import {Config} from "../config/configuration";
 import {Auth} from "./Auth";
 import {NoChecksAuth} from "./NoChecksAuth";
 import {AWSV4SignatureAuth} from "./AWSV4SignatureAuth";

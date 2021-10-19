@@ -1,5 +1,5 @@
 import {FastifyInstance} from "fastify";
-import {Config} from "../config/config";
+import {Config} from "../config/configuration";
 import livenessCheck from "./checks/livenesscheck";
 import stats from "./checks/stats";
 import uploadsinglefile from "./filestore/uploadsinglefile"

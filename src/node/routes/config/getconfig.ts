@@ -1,5 +1,5 @@
 import {FastifyInstance} from "fastify";
-import {Config} from "../../config/config";
+import {Config} from "../../config/configuration";
 import {Type} from "@sinclair/typebox";
 
 export default function(config: Config): (fastify: FastifyInstance) => FastifyInstance {

@@ -1,7 +1,7 @@
 import config from "../node/config/config.json"
 import {createApp} from "../node/app"
 import * as fs from "fs";
-import {Config} from "../node/config/config";
+import {Config} from "../node/config/configuration";
 import {mergeDeep, RecursivePartial, Test} from "./TestUtils";
 
 export async function testApplication(t:Test, configPatch: RecursivePartial<Config> = {}) {
