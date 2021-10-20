@@ -1,9 +1,10 @@
-import { Config, read } from "../node/config/configuration"
-import {createApp} from "../node/app"
 import * as fs from "fs";
-import {mergeDeep, RecursivePartial, Test} from "./TestUtils";
+import { createApp } from "../node/app";
+import { Config, read } from "../node/config/configuration";
+import { Test } from "./TestUtils";
+import { DeepPartial, mergeDeep } from "../node/utils/mergeDeep";
 
-export async function testApplication(t:Test, configPatch: RecursivePartial<Config> = {}) {
+export async function testApplication(t:Test, configPatch: DeepPartial<Config> = {}) {
 
   const defaultTestConfig: Config = {... await read()}
 
