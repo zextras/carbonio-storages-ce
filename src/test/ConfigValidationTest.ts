@@ -1,5 +1,5 @@
-import { read } from "../node/config/configuration";
-import tap from "tap";
+import { defaultConfiguration, read } from "../node/config/configuration";
+import tap                            from "tap";
 
 tap.test('config validation', async t => {
     const c = await read();
@@ -44,4 +44,35 @@ tap.test('reject missing non existing certpath', async t => {
             }
           })
     );
+})
+
+tap.test('custom logging dirname', async t => {
+  const c = {
+    "SLIMSTORE_LOGGING_DIRNAME": 'bla'
+  };
+
+  const configuration = defaultConfiguration(c);
+
+  t.equal(configuration.logging.dirname, 'bla');
+});
+
+tap.test('expect error if custom Aws conf incomplete', async t => {
+  const c = {
+    "SLIMSTORE_AUTH_AWSV4SIGNATURE_KEY": 'bla'
+  };
+
+  t.throws(() => {
+    defaultConfiguration(c);
+  });
+})
+
+tap.test('custom Aws conf valid', async t => {
+  const c = {
+    "SLIMSTORE_AUTH_AWSV4SIGNATURE_KEY": 'bla',
+    "SLIMSTORE_AUTH_AWSV4SIGNATURE_VALUE": 'bla'
+  };
+
+  const configuration = defaultConfiguration(c);
+
+  t.not(configuration, null);
 })
