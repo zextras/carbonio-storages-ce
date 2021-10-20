@@ -1,4 +1,4 @@
-import { defaultConfiguration, read } from "../node/config/configuration";
+import { defaultConfiguration, read, SLIMSTORE_CONF } from "../node/config/configuration";
 import tap                            from "tap";
 
 tap.test('config validation', async t => {
@@ -58,7 +58,7 @@ tap.test('custom logging dirname', async t => {
 
 tap.test('expect error if custom Aws conf incomplete', async t => {
   const c = {
-    "SLIMSTORE_AUTH_AWSV4SIGNATURE_KEY": 'bla'
+    [SLIMSTORE_CONF.AUTH.AWS4_ACCESS_KEY]: 'bla'
   };
 
   t.throws(() => {
@@ -68,8 +68,8 @@ tap.test('expect error if custom Aws conf incomplete', async t => {
 
 tap.test('custom Aws conf valid', async t => {
   const c = {
-    "SLIMSTORE_AUTH_AWSV4SIGNATURE_KEY": 'bla',
-    "SLIMSTORE_AUTH_AWSV4SIGNATURE_VALUE": 'bla'
+    [SLIMSTORE_CONF.AUTH.AWS4_ACCESS_KEY]: 'bla',
+    [SLIMSTORE_CONF.AUTH.AWS4_ACCESS_SECRET]: 'bla'
   };
 
   const configuration = defaultConfiguration(c);

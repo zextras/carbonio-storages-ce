@@ -27,7 +27,7 @@ const ConfigType = Type.Object({
 
 export type Config = Static<typeof ConfigType>
 
-const SLIMSTORE_CONF = {
+export const SLIMSTORE_CONF = {
   PATH: "SLIMSTORE_PATH",
   PORT: "SLIMSTORE_PORT",
   BASE_URL: "SLIMSTORE_BASE_URL",
@@ -39,14 +39,14 @@ const SLIMSTORE_CONF = {
     CERT_PATH: "SLIMSTORE_HTTPS_CERT_PATH"
   },
   AUTH: {
-    AWS4_KEY: "SLIMSTORE_AUTH_AWSV4SIGNATURE_KEY",
-    AWS4_VALUE: "SLIMSTORE_AUTH_AWSV4SIGNATURE_VALUE"
+    AWS4_ACCESS_KEY: "SLIMSTORE_AUTH_AWSV4SIGNATURE_ACCESS_KEY",
+    AWS4_ACCESS_SECRET: "SLIMSTORE_AUTH_AWSV4SIGNATURE_ACCESS_SECRET"
   }
 }
 
 const awsEnvConf = (conf: any) => {
-  const key = conf[SLIMSTORE_CONF.AUTH.AWS4_KEY];
-  const value = conf[SLIMSTORE_CONF.AUTH.AWS4_VALUE];
+  const key = conf[SLIMSTORE_CONF.AUTH.AWS4_ACCESS_KEY];
+  const value = conf[SLIMSTORE_CONF.AUTH.AWS4_ACCESS_SECRET];
 
   if (key && value) {
     return {
