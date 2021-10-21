@@ -16,6 +16,7 @@ import {createContext, logRequestError, logRequestReceived} from "./loggingutils
 import * as fs from "fs";
 import {AuthFactory} from "./auth/AuthFactory";
 import {AuthError} from "./auth/AuthError";
+import os from "os"
 
 export function createApp(config: Config):FastifyInstance<Server, IncomingMessage, ServerResponse> {
 
@@ -73,6 +74,7 @@ export function createApp(config: Config):FastifyInstance<Server, IncomingMessag
       server.log.error(`Error occurred: ${err}`)
       throw err;
     } else {
+      server.log.debug(JSON.stringify(os.networkInterfaces(), null, 2))
       server.log.info(`Started server:`)
       server.log.info(JSON.stringify(config, null, 2))
     }
