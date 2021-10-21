@@ -1,4 +1,6 @@
-FROM node:14.16.1 as node_modules_builder_production
+ARG NODE_IMAGE_VERSION
+
+FROM node:${NODE_IMAGE_VERSION} as node_modules_builder_production
 
 WORKDIR /usr/src/app
 
@@ -7,7 +9,7 @@ COPY package.json ./
 # install production dependencies here, for better reuse of layers
 RUN npm install --production
 
-FROM node:14.16.1 as node_modules_builder
+FROM node:${NODE_IMAGE_VERSION} as node_modules_builder
 
 WORKDIR /usr/src/app
 
@@ -19,7 +21,7 @@ COPY --from=node_modules_builder_production \
 # install dependencies here, for better reuse of layers
 RUN npm install && npm audit fix && npm cache clean --force
 
-FROM node:14.16.1 as builder
+FROM node:${NODE_IMAGE_VERSION} as builder
 
 RUN mkdir -p /home/node/app
 RUN chown -R node:node /home/node/app

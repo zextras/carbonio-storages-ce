@@ -1,0 +1,1 @@
+docker build --build-arg "NODE_IMAGE_VERSION=$(cat .nvmrc)" . -t $1
