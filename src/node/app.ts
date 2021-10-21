@@ -84,8 +84,24 @@ export function createApp(config: Config):FastifyInstance<Server, IncomingMessag
   server.register(fastifySwagger, oasSchema(config.servingURLPrefix, config.baseURL, "localhost"));
 
   server.register(router(config, filesystem, loggerTransports));
-  
+
   return server;
+}
+
+function censor(obj: any) {
+  let i = 0;
+
+  return function(_key: any, value: any) {
+    if(i !== 0 && typeof(obj) === 'object' && typeof(value) == 'object' && obj == value)
+      return '[Circular]';
+
+    if(i >= 29) // seems to be a harded maximum of 30 serialized objects?
+      return '[Unknown]';
+
+    ++i; // so we know we aren't using the original object anymore
+
+    return value;
+  }
 }
 
 function createLogger(config: Config, loggerTransports: LoggerTransports) {
@@ -107,7 +123,12 @@ function createLogger(config: Config, loggerTransports: LoggerTransports) {
     format: winston.format.combine(
       winston.format.timestamp(),
       winston.format.errors(),
-      winston.format.printf(({ message, timestamp, level }) => `[${timestamp}] [${level}] ${message}`)
+      winston.format.printf(
+          ({ message, timestamp, level }) => {
+            const messageStr = (typeof message === 'object') ?
+                JSON.stringify(message, censor(message)) : message;
+            return `[${timestamp}] [${level}] ${messageStr}`;
+          })
     ),
     transports: loggerTransports.transports
   });
