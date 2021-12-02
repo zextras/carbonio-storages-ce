@@ -16,7 +16,7 @@ const UploadResponseType = Type.Object({
 	resource: Type.String(),
 	size: Type.Number(),
 	digest: Type.String(),
-	algo: Type.String()
+	digest_algorithm: Type.String()
 })
 const ResponseType = Type.Union([UploadResponseType, ErrorType])
 
@@ -58,7 +58,7 @@ export default function (filesystem: FilesystemAccessor, urls: Urls): (fastify: 
 					reply.send({
 						query: req.query,
 						resource: urls.downloadURL(req.query),
-						algo: hashTransform.algo,
+						digest_algorithm: hashTransform.algo,
 						size: hashTransform.byteCount,
 						digest: hashTransform.computedHash()
 					})
