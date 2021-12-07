@@ -1,0 +1,86 @@
+targets=(
+  "centos"
+  "ubuntu"
+)
+pkgname="carbonio-slimstore"
+pkgver="1.0.0"
+pkgrel="1"
+pkgdesc="External store for Drive CE"
+pkgdesclong=(
+  "External store for Drive CE"
+)
+arch="amd64"
+maintainer="Zextras <packages@zextras.com"
+url="https://zextras.com"
+section="libs"
+priority="important"
+sources=(
+  "slimstore.service"
+)
+hashsums=(
+  "b3de776c542be4c938766cdaf4919b7d5d5a24e935fc0c59f55a9055dd4e7039"
+)
+
+build() {
+  cd "${srcdir}"/../../project
+  npm install
+  npm run build
+  npm run pkg
+}
+
+package:apt() {
+  cd "${srcdir}"/../../project
+  install -Dm755 "${srcdir}/slimstore.service" \
+    "${pkgdir}"/lib/systemd/system/slimstore.service
+  install -Dm755 slimstore \
+    "${pkgdir}/opt/zextras/common/bin/slimstore"
+}
+
+package:yum() {
+  cd "${srcdir}"/../../project
+  install -Dm755 "${srcdir}/slimstore.service" \
+    "${pkgdir}"/usr/lib/systemd/system/slimstore.service
+  install -Dm755 slimstore \
+    "${pkgdir}/opt/zextras/common/bin/slimstore"
+}
+
+preinst:apt() {
+  if [ -d /run/systemd/system ]; then
+    deb-systemd-invoke stop 'slimstore.service' >/dev/null || true
+  fi
+}
+
+postinst:apt() {
+  if [ "$1" = "configure" ]; then
+    # creating zextras group if it isn't already there
+    if ! getent group zextras >/dev/null; then
+      addgroup --system --force-badname --quiet zextras
+    fi
+
+    # creating zextras user if it isn't already there
+    if ! getent passwd zextras >/dev/null; then
+      adduser --system --force-badname --quiet \
+        --ingroup zextras \
+        --home /opt/zextras \
+        --shell /bin/bash \
+        zextras
+      usermod -c "zextras user" zextras
+    fi
+  fi
+}
+
+postinst:yum() {
+  # creating zextras group if it isn't already there
+  if ! getent group zextras >/dev/null; then
+    addgroup --system --force-badname --quiet zextras
+  fi
+  # creating zextras user if it isn't already there
+  if ! getent passwd zextras >/dev/null; then
+    adduser --system --force-badname --quiet \
+      --ingroup zextras \
+      --home /opt/zextras \
+      --shell /bin/bash \
+      zextras
+    usermod -c "zextras user" zextras
+  fi
+}

@@ -1,0 +1,11 @@
+{
+  "name": "carbonio-slimstore",
+  "description": "Zextras Carbonio Slimstore",
+  "build_dir": "/tmp/",
+  "output": "artifacts",
+  "projects": [
+    {
+      "name": "package"
+    }
+  ]
+}

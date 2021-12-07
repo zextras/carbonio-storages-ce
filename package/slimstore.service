@@ -1,0 +1,13 @@
+[Unit]
+Description=Carbonio Slimstore daemon
+Wants=network.target
+
+[Service]
+Type=simple
+ExecStart=/opt/zextras/common/bin/slimstore
+User=zextras
+Group=zextras
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

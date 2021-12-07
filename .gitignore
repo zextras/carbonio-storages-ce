@@ -8,6 +8,7 @@ node_modules/
 dist/
 coverage/
 .nyc_output/
+slimstore
 
 # Compiled Java class files
 *.class
