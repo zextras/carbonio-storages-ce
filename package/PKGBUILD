@@ -5,20 +5,31 @@ targets=(
 pkgname="carbonio-slimstore"
 pkgver="1.0.0"
 pkgrel="1"
-pkgdesc="External store for Drive CE"
+pkgdesc="External store for Carbonio Drive CE"
 pkgdesclong=(
-  "External store for Drive CE"
+  "External store for Carbonio Drive CE"
 )
 arch="amd64"
 maintainer="Zextras <packages@zextras.com"
 url="https://zextras.com"
 section="libs"
 priority="important"
+depends=(
+  "pending-setups"
+  "service-discover"
+  "jq"
+)
 sources=(
+  "slimstore.sh"
+  "slimstore.hcl"
   "slimstore.service"
+  "slimstore-sidecar.service"
 )
 hashsums=(
+  "1d504fcdda279cd7f3bc532c3fa5820fb727b1b653dae567cfd57cf95f00f412"
+  "e83c4c17ca4d6b9bb84676baf2a6e4e74a77a8ea67729c7460778aef4f277ba5"
   "b3de776c542be4c938766cdaf4919b7d5d5a24e935fc0c59f55a9055dd4e7039"
+  "16005384d619273d5024ca1b67b3cfb3cae05fb289b7f4e6df0c9c0ece15c1f0"
 )
 
 build() {
@@ -30,18 +41,36 @@ build() {
 
 package:apt() {
   cd "${srcdir}"/../../project
+
+  install -Dm755 "${srcdir}/slimstore.sh" \
+    "${pkgdir}/usr/bin/slimstore"
   install -Dm755 "${srcdir}/slimstore.service" \
     "${pkgdir}"/lib/systemd/system/slimstore.service
+  install -Dm755 "${srcdir}/slimstore-sidecar.service" \
+    "${pkgdir}"/lib/systemd/system/slimstore-sidecar.service
   install -Dm755 slimstore \
     "${pkgdir}/opt/zextras/common/bin/slimstore"
+  install -Dm644 "${srcdir}/slimstore.hcl" \
+    "${pkgdir}/etc/zextras/service-discover/slimstore.hcl"
+
+  mkdir -p "${pkgdir}/etc/zextras/slimstore"
 }
 
 package:yum() {
   cd "${srcdir}"/../../project
+
+  install -Dm755 "${srcdir}/slimstore.sh" \
+    "${pkgdir}/usr/bin/slimstore"
   install -Dm755 "${srcdir}/slimstore.service" \
     "${pkgdir}"/usr/lib/systemd/system/slimstore.service
+  install -Dm755 "${srcdir}/slimstore-sidecar.service" \
+    "${pkgdir}"/usr/lib/systemd/system/slimstore-sidecar.service
   install -Dm755 slimstore \
     "${pkgdir}/opt/zextras/common/bin/slimstore"
+  install -Dm644 "${srcdir}/slimstore.hcl" \
+    "${pkgdir}/etc/zextras/service-discover/slimstore.hcl"
+
+  mkdir -p "${pkgdir}/etc/zextras/slimstore"
 }
 
 preinst:apt() {
@@ -67,6 +96,20 @@ postinst:apt() {
       usermod -c "zextras user" zextras
     fi
   fi
+
+  if [ -d /run/systemd/system ]; then
+    systemctl daemon-reload >/dev/null 2>&1 || :
+    systemctl enable slimstore.service >/dev/null 2>&1 || :
+    systemctl enable slimstore-sidecar.service >/dev/null 2>&1 || :
+  fi
+  echo ""
+  echo "Only one Slimstore is allowed in a multiserver environment"
+  echo "Installed, you must now run as root:"
+  echo "pending-setups"
+  cat >/etc/zextras/pending-setups.d/slimstore-setup.sh <<EOF
+#!/usr/bin/env bash
+slimstore setup
+EOF
 }
 
 postinst:yum() {
@@ -82,5 +125,35 @@ postinst:yum() {
       --shell /bin/bash \
       zextras
     usermod -c "zextras user" zextras
+  fi
+
+  if [ -d /run/systemd/system ]; then
+    systemctl daemon-reload >/dev/null 2>&1 || :
+    systemctl enable slimstore.service >/dev/null 2>&1 || :
+    systemctl enable slimstore-sidecar.service >/dev/null 2>&1 || :
+  fi
+  echo ""
+  echo "Only one Slimstore is allowed in a multiserver environment"
+  echo "Installed, you must now run as root:"
+  echo "pending-setups"
+  cat >/etc/zextras/pending-setups.d/slimstore-setup.sh <<EOF
+#!/usr/bin/env bash
+slimstore setup
+EOF
+}
+
+prerm() {
+  if [ -d /run/systemd/system ]; then
+    systemctl --no-reload disable slimstore.service >/dev/null 2>&1 || :
+    systemctl --no-reload disable slimstore-sidecar.service >/dev/null 2>&1 || :
+    systemctl stop slimstore.service >/dev/null 2>&1 || :
+    systemctl stop slimstore-sidecar.service >/dev/null 2>&1 || :
+  fi
+}
+
+postrm() {
+  rm -f /etc/zextras/pending-setups.d/slimstore-setup.sh
+  if [ -d /run/systemd/system ]; then
+    systemctl daemon-reload >/dev/null 2>&1 || :
   fi
 }

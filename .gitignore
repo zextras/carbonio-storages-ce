@@ -26,8 +26,9 @@ slimstore
 target/
 dist/
 
-# JetBrains IDE
+# IDE
 .idea/
+.vscode-ctags
 
 # Unit test reports
 TEST*.xml
