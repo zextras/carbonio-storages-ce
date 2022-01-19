@@ -40,11 +40,11 @@ export default function(filesystem: FilesystemAccessor): (fastify: FastifyInstan
           }
 
           reply.status(404)
-          .type('application/json')
-          .send(error)
+            .type('application/json')
+            .send(error)
         } else {
           reply.type('application/octet-stream')
-          .send(await filesystem.openReadStream(identifier))
+            .send(await filesystem.openReadStream(identifier))
         }
       },
     })

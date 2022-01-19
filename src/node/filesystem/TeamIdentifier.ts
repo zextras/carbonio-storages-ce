@@ -1,14 +1,14 @@
-import {DriveQueryString} from "../routes/types";
+import {TeamQueryString} from "../routes/types";
 import {PathLike} from "fs";
 import {Identifier} from "./Identifier";
 import path from "path"
 
-export class DriveIdentifier implements Identifier{
-  constructor(private readonly queryString: DriveQueryString) {
+export class TeamIdentifier implements Identifier{
+  constructor(private readonly queryString: TeamQueryString) {
   }
 
   toFilename(): string {
-    return this.queryString.node + "-" + this.queryString.version;
+    return this.queryString.node;
   }
 
   path(): PathLike {

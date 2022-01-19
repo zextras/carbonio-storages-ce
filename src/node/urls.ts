@@ -11,23 +11,16 @@ export class Urls {
   }
 
   private static transform(queryString: QueryString): Record<string, string> {
-    if (queryString.type === undefined) {
-      return {
-        ... queryString,
-        version: queryString.version.toString(),
-        type: "drive"
-      }
-    } else {
-      switch (queryString.type) {
-        case "drive":
-          return {
-            ... queryString,
-            version: queryString.version.toString(),
-            type: "drive"
-          }
-        default:
-          throw new Error("Unsupported");
-      }
+    switch (queryString.type) {
+      case "drive":
+        return {
+          ... queryString,
+          version: queryString.version.toString()
+        }
+      default:
+        return {
+          ... queryString
+        }
     }
   }
 

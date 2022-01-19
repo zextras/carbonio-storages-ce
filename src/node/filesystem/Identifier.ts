@@ -1,6 +1,7 @@
 import {PathLike} from "fs";
 import {QueryString} from "../routes/types";
 import {DriveIdentifier} from "./DriveIdentifier";
+import { TeamIdentifier } from "./TeamIdentifier";
 
 export interface Identifier {
   path(): PathLike
@@ -8,14 +9,10 @@ export interface Identifier {
 }
 
 export function parse(queryString: QueryString): Identifier {
-  if (queryString.type === undefined) { // default
-    return new DriveIdentifier({... queryString, type: "drive"})
-  } else {
-    switch (queryString.type) {
-      case "drive":
-        return new DriveIdentifier(queryString)
-      default:
-        throw new Error("unsupported");
-    }
+  switch (queryString.type) {
+    case "drive":
+      return new DriveIdentifier(queryString)
+    case "team":
+      return new TeamIdentifier(queryString)
   }
 }
