@@ -1,3 +1,7 @@
+def nodeCmd(String cmd) {
+	sh '. load_nvm && nvm install && nvm use && ' + cmd
+}
+
 pipeline {
     parameters {
         booleanParam defaultValue: false, description: 'Whether to upload the packages in playground repositories', name: 'PLAYGROUND'
@@ -22,6 +26,17 @@ pipeline {
             steps {
                 checkout scm
                 stash includes: '**', name: 'project'
+            }
+        }
+        stage('Launch tests') {
+            agent {
+                node {
+                    label 'nodejs-agent-v2'
+                }
+            }
+            steps {
+                unstash 'project'
+                nodeCmd 'npm install && npm run build && npm run test'
             }
         }
         stage('Packaging...') {
