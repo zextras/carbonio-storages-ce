@@ -7,17 +7,17 @@ tap.test("get config", async t => {
   const server = await testApplication(t)
   const response = await server.inject({
     method: "GET",
-    url: "slimstore/config"
+    url: "config"
   });
   t.equal(200, response.statusCode)
 })
 
 function getLogLevelURL() {
-  return `slimstore/loglevel`
+  return `loglevel`
 }
 
 function setLogLevelURL(level: string) {
-  return `slimstore/loglevel?level=${level}`
+  return `loglevel?level=${level}`
 }
 
 export async function getLogLevel(app: FastifyInstance): Promise<LightMyRequestResponse> {

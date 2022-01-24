@@ -18,7 +18,7 @@ export default function(filesystem: FilesystemAccessor): (fastify: FastifyInstan
       method: "GET",
       url: "/stats",
       schema: {
-        tags: ['checks'],
+        tags: ['health'],
         description: 'Returns statistics on the Slimstore server memory usage.',
         response: {
           200: StatsType

@@ -81,7 +81,7 @@ export function createApp(config: Config):FastifyInstance<Server, IncomingMessag
   })
 
   server.register(fastifyMultipart);
-  server.register(fastifySwagger, oasSchema(config.servingURLPrefix, config.baseURL, "localhost"));
+  server.register(fastifySwagger, oasSchema(config.servingURLPrefix, config.baseURL, config.bindAddress));
 
   server.register(router(config, filesystem, loggerTransports));
 

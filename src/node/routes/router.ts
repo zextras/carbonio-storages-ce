@@ -11,10 +11,13 @@ import { LoggerTransports } from "../LoggerTransports";
 import setloglevel from "./config/setloglevel";
 import getconfig from "./config/getconfig";
 import uploadsinglefile from "./filestore/uploadsinglefile";
+import redirectToSwagger from "./redirectToSwagger";
 
 export default function (config: Config, filesystem: FilesystemAccessor, transports: LoggerTransports) : (fastify : FastifyInstance) => Promise<void> {
   return async fastify => {
     const base = { prefix: config.baseURL.length == 0 ? "" : "/" + config.baseURL }
+    await fastify.register(redirectToSwagger, base);
+
     await fastify.register(livenessCheck, base);
     await fastify.register(stats(filesystem), base);
 

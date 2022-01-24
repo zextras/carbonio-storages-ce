@@ -5,7 +5,7 @@ const start = async () => {
   const config: Config = await read();
   const server = createApp(config);
   try {
-    await server.listen(config.port, "127.0.0.1");
+    await server.listen(config.port, config.bindAddress);
     server.log.info('Server started successfully');
   } catch (err) {
     server.log.error(err);

@@ -120,7 +120,7 @@ for(const environmentProviderConfig of testEnvironmentProviders) {
     const server = await testApplication(t, {awsv4signature: credentials});
     const response = await server.inject({
       method: "GET",
-      url: `slimstore/download?node=${node}&version=${version}`,
+      url: `download?node=${node}&version=${version}`,
       headers: getHeaders()
     });
     t.equal(response.statusCode,401)

@@ -5,6 +5,7 @@ Wants=network.target
 [Service]
 Type=simple
 ExecStart=/opt/zextras/common/bin/slimstore
+Environment="SLIMSTORE_CONF_PATH=/etc/carbonio/storages/config.json"
 User=zextras
 Group=zextras
 Restart=on-failure

@@ -1,4 +1,4 @@
-import { defaultConfiguration, read, SLIMSTORE_CONF } from "../node/config/configuration";
+import {startupConfiguration, read, SLIMSTORE_CONF} from "../node/config/configuration";
 import tap                            from "tap";
 
 tap.test('config validation', async t => {
@@ -7,26 +7,28 @@ tap.test('config validation', async t => {
 })
 
 tap.test('reject invalid log level', async t => {
-    t.rejects(read({
-            "path": "/tmp/slimstore/store",
+    await t.rejects(read( Promise.resolve<any>({
+            "bindAddress": "0.0.0.0",
+            "path": "/tmp/storages/store",
             "port": 5794,
-            "baseURL": "slimstore",
+            "baseURL": "",
             "servingURLPrefix": "http://localhost:5794",
             "compress": false,
             "logging": {
               "defaultLevel": 42,
               "datePattern": "YYYY-MM-DD",
               "filename": "slimstore-%DATE%.log",
-              "dirname": "/tmp/slimstore/logs",
+              "dirname": "/tmp/storages/logs",
               "zippedArchive": true
             }
-          })
+          }))
     );
 })
 
 tap.test('reject missing non existing certpath', async t => {
-    t.rejects(read({
-            "path": "/tmp/slimstore/store",
+  await t.rejects(read( Promise.resolve({
+            "bindAddress": "0.0.0.0",
+            "path": "/tmp/storages/store",
             "port": 5794,
             "baseURL": "slimstore",
             "servingURLPrefix": "http://localhost:5794",
@@ -34,15 +36,15 @@ tap.test('reject missing non existing certpath', async t => {
             "logging": {
               "defaultLevel": "debug",
               "datePattern": "YYYY-MM-DD",
-              "filename": "slimstore-%DATE%.log",
-              "dirname": "/tmp/slimstore/logs",
+              "filename": "storages-%DATE%.log",
+              "dirname": "/tmp/storages/logs",
               "zippedArchive": true
             },
             "https": {
               "keyPath": "./bla.json",
               "certPath": "./bla.json"
             }
-          })
+        }))
     );
 })
 
@@ -51,7 +53,7 @@ tap.test('custom logging dirname', async t => {
     "SLIMSTORE_LOGGING_DIRNAME": 'bla'
   };
 
-  const configuration = defaultConfiguration(c);
+  const configuration = await startupConfiguration(c);
 
   t.equal(configuration.logging.dirname, 'bla');
 });
@@ -60,10 +62,7 @@ tap.test('expect error if custom Aws conf incomplete', async t => {
   const c = {
     [SLIMSTORE_CONF.AUTH.AWS4_ACCESS_KEY]: 'bla'
   };
-
-  t.throws(() => {
-    defaultConfiguration(c);
-  });
+  await startupConfiguration(c).then(() => t.fail("config is valid")).catch(() => {});
 })
 
 tap.test('custom Aws conf valid', async t => {
@@ -72,7 +71,7 @@ tap.test('custom Aws conf valid', async t => {
     [SLIMSTORE_CONF.AUTH.AWS4_ACCESS_SECRET]: 'bla'
   };
 
-  const configuration = defaultConfiguration(c);
+  const configuration = await startupConfiguration(c);
 
   t.not(configuration, null);
 })

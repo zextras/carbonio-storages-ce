@@ -1,14 +1,15 @@
 {
-  "path": "/tmp/slimstore/store",
+  "bindAddress" : "127.0.0.1",
+  "path": "/opt/zextras/store/slimstore",
   "port": 5794,
-  "baseURL": "slimstore",
+  "baseURL": "",
   "servingURLPrefix": "http://localhost:5794",
   "compress": false,
   "logging": {
     "defaultLevel": "debug",
     "datePattern": "YYYY-MM-DD",
-    "filename": "slimstore-%DATE%.log",
-    "dirname": "/tmp/slimstore/logs",
+    "filename": "storages-%DATE%.log",
+    "dirname": "/var/log/carbonio/storages/",
     "zippedArchive": true
   }
 }

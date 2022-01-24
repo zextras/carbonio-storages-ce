@@ -2,10 +2,10 @@ import { Static, Type } from "@sinclair/typebox";
 import Ajv from "ajv";
 import fs from "fs";
 import { LogLevelType } from "../routes/types";
-import defaultJsonConfiguration from "./config.json";
 import { mergeDeep, DeepPartial } from "../utils/mergeDeep";
 
 const ConfigType = Type.Object({
+  bindAddress: Type.String(),
   path: Type.String(),
   port: Type.Number(),
   baseURL: Type.String(),
@@ -28,6 +28,8 @@ const ConfigType = Type.Object({
 export type Config = Static<typeof ConfigType>
 
 export const SLIMSTORE_CONF = {
+  CONF_PATH: "SLIMSTORE_CONF_PATH",
+  BIND_ADDRESS: "SLIMSTORE_BIND_ADDRESS",
   PATH: "SLIMSTORE_PATH",
   PORT: "SLIMSTORE_PORT",
   BASE_URL: "SLIMSTORE_BASE_URL",
@@ -64,6 +66,9 @@ const loadEnvironmentConf = (conf: any = process.env) : DeepPartial<Config> => {
 
   const result: DeepPartial<Config> = {}
 
+  if (conf[SLIMSTORE_CONF.BIND_ADDRESS] != undefined)
+    result.bindAddress = conf[SLIMSTORE_CONF.BIND_ADDRESS]
+
   if (conf[SLIMSTORE_CONF.PATH] != undefined)
     result.path = conf[SLIMSTORE_CONF.PATH]
 
@@ -91,22 +96,29 @@ const loadEnvironmentConf = (conf: any = process.env) : DeepPartial<Config> => {
   return result;
 }
 
-export function defaultConfiguration(conf: any = process.env) {
-  return mergeDeep(defaultJsonConfiguration, loadEnvironmentConf(conf));
+export async function startupConfiguration(conf: any = process.env): Promise<Config> {
+  return mergeDeep(
+      await import((conf[SLIMSTORE_CONF.CONF_PATH] !== undefined) ? conf[SLIMSTORE_CONF.CONF_PATH] : './config.json')
+        .then(({default: startupConfig}) => startupConfig),
+      await import('./config.json').then(({default: startupConfig}) => startupConfig as any),
+      loadEnvironmentConf(conf)
+  );
 }
 
-export async function read( configuration: any = defaultConfiguration() ): Promise<Config> {
+export async function read( startupConf: Promise<Config> = startupConfiguration() ): Promise<Config> {
   const validator = new Ajv();
 
-  await validator.validate(ConfigType, configuration);
+  const config:Config = await startupConf
+
+  await validator.validate(ConfigType, config);
 
   if (validator.errors == undefined) {
-    if ('https' in configuration) {
-      const { keyPath, certPath } = configuration.https;
+    if (config.https !== undefined) {
+      const { keyPath, certPath } = config.https;
       await fs.promises.access(keyPath, fs.constants.R_OK)
       await fs.promises.access(certPath, fs.constants.R_OK)
     }
-    return configuration as any;
+    return config;
   } else {
     throw new Error(JSON.stringify(validator.errors, null, 2));
   };

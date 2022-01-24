@@ -10,15 +10,15 @@ const node: string = "443c815e-6b88-47b1-800f-d74d2d3004bf"
 const version: number = 2
 
 function uploadURL(node: string, version: number) {
-  return `slimstore/upload?node=${node}&version=${version}&type=drive`
+  return `upload?node=${node}&version=${version}&type=files`
 }
 
 function downloadURL(node: string, version: number) {
-  return `slimstore/download?node=${node}&version=${version}&type=drive`
+  return `download?node=${node}&version=${version}&type=files`
 }
 
 function deleteURL(node: string, version: number) {
-  return `slimstore/delete?node=${node}&version=${version}&type=drive`
+  return `delete?node=${node}&version=${version}&type=files`
 }
 
 export async function postFile(app: FastifyInstance, path: string, node: string, version: number): Promise<LightMyRequestResponse> {

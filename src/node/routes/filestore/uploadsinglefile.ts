@@ -6,9 +6,9 @@ import { FilesystemAccessor } from "../../filesystem/FilesystemAccessor";
 import { Identifier, parse } from "../../filesystem/Identifier";
 import { Urls } from "../../urls";
 import StreamHash from "../../filesystem/utils/StreamHash";
+import util from 'util';
+import { pipeline } from 'stream';
 
-const util = require('util')
-const {pipeline} = require('stream')
 const pump = util.promisify(pipeline)
 
 const UploadResponseType = Type.Object({
@@ -29,7 +29,7 @@ export default function (filesystem: FilesystemAccessor, urls: Urls): (fastify: 
 			url: "/upload",
 			schema: {
 				tags: ['filestore'],
-				description: 'Creates a Drive resource node (if not existent) using the node-id and version passed as query string parameters and the ',
+				description: 'Creates a resource node (if not existent) using the node-id and version passed as query string parameters and the ',
 				querystring: QueryStringType,
 				consumes: ['multipart/form-data'],
 				response: {

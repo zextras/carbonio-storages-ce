@@ -5,7 +5,7 @@ tap.test("liveness check", async t => {
   const server = await testApplication(t)
   const response = await server.inject({
     method: "GET",
-    url: "slimstore/livenesscheck"
+    url: "health/live"
   });
   t.equal(200, response.statusCode)
 })
@@ -14,7 +14,7 @@ tap.test("stats check", async t => {
   const server = await testApplication(t)
   const response = await server.inject({
     method: "GET",
-    url: "slimstore/stats"
+    url: "stats"
   });
   t.equal(200, response.statusCode)
 })

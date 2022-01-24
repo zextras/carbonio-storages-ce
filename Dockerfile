@@ -25,6 +25,10 @@ FROM node:${NODE_IMAGE_VERSION} as builder
 
 RUN mkdir -p /home/node/app
 RUN chown -R node:node /home/node/app
+RUN mkdir -p /var/log/carbonio/storages/
+RUN chown -R node:node /var/log/carbonio/storages/
+RUN mkdir -p /opt/zextras/store/slimstore
+RUN chown -R node:node /opt/zextras/store/slimstore
 
 USER node
 

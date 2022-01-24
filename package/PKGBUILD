@@ -53,6 +53,8 @@ package:apt() {
   install -Dm644 "${srcdir}/slimstore.hcl" \
     "${pkgdir}/etc/zextras/service-discover/slimstore.hcl"
 
+  mkdir -p "${pkgdir}/etc/carbonio/storages"
+  cp "src/node/config/config.json" "${pkgdir}/etc/carbonio/storages"
   mkdir -p "${pkgdir}/etc/zextras/slimstore"
 }
 
@@ -70,6 +72,8 @@ package:yum() {
   install -Dm644 "${srcdir}/slimstore.hcl" \
     "${pkgdir}/etc/zextras/service-discover/slimstore.hcl"
 
+  mkdir -p "${pkgdir}/etc/carbonio/storages"
+  cp "src/node/config/config.json" "${pkgdir}/etc/carbonio/storages"
   mkdir -p "${pkgdir}/etc/zextras/slimstore"
 }
 

@@ -7,12 +7,14 @@ export class Urls {
   }
 
   downloadURL(identifier: QueryString): string {
-    return this.config.servingURLPrefix + "/" + this.config.baseURL + "/download" + Urls.buildQueryString(Urls.transform(identifier))
+    return this.config.servingURLPrefix +
+        (this.config.baseURL.length == 0 ? "" :  "/" + this.config.baseURL) +
+        "/download" + Urls.buildQueryString(Urls.transform(identifier))
   }
 
   private static transform(queryString: QueryString): Record<string, string> {
     switch (queryString.type) {
-      case "drive":
+      case "files":
         return {
           ... queryString,
           version: queryString.version.toString()

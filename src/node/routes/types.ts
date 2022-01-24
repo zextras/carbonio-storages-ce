@@ -1,21 +1,21 @@
 import {Static, Type} from "@sinclair/typebox";
 
-export const DriveQueryStringType = Type.Object({
-  type: Type.Literal("drive"),
+export const FilesQueryStringType = Type.Object({
+  type: Type.Literal("files"),
   node: Type.String({pattern: '^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$'}),
   version: Type.Number()
 })
 
-export const TeamQueryStringType = Type.Object({
-  type: Type.Literal("team"),
+export const ChatsQueryStringType = Type.Object({
+  type: Type.Literal("chats"),
   node: Type.String({pattern: '^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$'})
 })
 
-export const QueryStringType = Type.Union([DriveQueryStringType, TeamQueryStringType])
+export const QueryStringType = Type.Union([FilesQueryStringType, ChatsQueryStringType])
 
 export type QueryString = Static<typeof QueryStringType>
-export type DriveQueryString = Static<typeof DriveQueryStringType>
-export type TeamQueryString = Static<typeof TeamQueryStringType>
+export type FilesQueryString = Static<typeof FilesQueryStringType>
+export type ChatsQueryString = Static<typeof ChatsQueryStringType>
 
 export const ErrorType = Type.Object({
   statusCode: Type.Number(),
