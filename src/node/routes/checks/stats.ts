@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2022 2021 Zextras <https://www.zextras.com>
+//
+// SPDX-License-Identifier: AGPL-3.0-only
+
 import {FastifyInstance} from "fastify";
 import {Static, Type} from "@sinclair/typebox";
 import {FilesystemAccessor} from "../../filesystem/FilesystemAccessor";
