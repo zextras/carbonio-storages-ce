@@ -6,14 +6,14 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 
 <div align="center">
-  <h1>Slimstore</h1>
+  <h1>Storages-CE</h1>
 </div>
 
 <p align="center">
-  <a href="https://github.com/zextras/slimstore/graphs/contributors" alt="Contributors">
-  <img src="https://img.shields.io/github/contributors/zextras/slimstore" /></a>
-  <a href="https://github.com/zextras/slimstore/pulse" alt="Activity">
-  <img src="https://img.shields.io/github/commit-activity/m/zextras/slimstore" /></a>
+  <a href="https://github.com/zextras/storages-ce/graphs/contributors" alt="Contributors">
+  <img src="https://img.shields.io/github/contributors/zextras/storages-ce" /></a>
+  <a href="https://github.com/zextras/storages-ce/pulse" alt="Activity">
+  <img src="https://img.shields.io/github/commit-activity/m/zextras/storages-ce" /></a>
   <img src="https://img.shields.io/badge/license-AGPL%203-green" alt="License AGPL 3">
   <img src="https://img.shields.io/badge/project-carbonio-informational" alt="Project Carbonio">
   <a href="https://twitter.com/intent/follow?screen_name=zextras">
@@ -44,18 +44,18 @@ Server can be started using:
 
 `npm run build && npm run start`
 
-Then slimstore server will be available at `http://localhost:5794/`
+Then Storages-CE server will be available at `http://localhost:5794/`
 
 <h3>Docker</h3>
 
 A docker image is available on [Docker Hub](https://hub.docker.com/r/zextras/slimstore).
 To run the application:
 
-`docker run -it --rm -d -p 5794:5794 --name slimstore zextras/slimstore`
+`docker run -it --rm -d -p 5794:5794 --name storages-ce zextras/slimstore`
 
 <h2>Configuration</h2>
 
-The following environment variables can be provided when starting the slimstore server
+The following environment variables can be provided when starting the Storages-CE server
 
 - `SLIMSTORE_CONF_PATH`
 
@@ -63,7 +63,7 @@ The path to the configuration file
 
 - `SLIMSTORE_BIND_ADDRESS`
 
-Address on which Slimstore will listen for API calls (default 127.0.0.1)
+Address on which Storages-CE will listen for API calls (default 127.0.0.1)
 
 - `SLIMSTORE_PATH`
 
@@ -72,18 +72,18 @@ The folder inside which all file are stored
 
 - `SLIMSTORE_PORT`
 
-The port the slimstore is listening for http connections.
+The port the Storages-CE is listening for http connections.
 
 - `SLIMSTORE_BASE_URL`
 
-The suffix path at which the slimstore is served.
+The suffix path at which the Storages-CE is served.
 The full url is constructed in the following way:
 
 `(http|https)://0.0.0.0:${SLIMSTORE_PORT}/${SLIMSTORE_BASE_URL}`
 
 - `SLIMSTORE_LOGGING_DIRNAME`
 
-Folder including log files produced by slimstore
+Folder including log files produced by Storages-CE
 
 - `SLIMSTORE_HTTPS_KEY_PATH`
 - `SLIMSTORE_HTTPS_CERT_PATH`
@@ -97,5 +97,5 @@ Once the application is started, swagger documentation is available at: `http://
 <h2>License</h2>
 
 <p>
-Slimstore is released under the <a href="https://www.gnu.org/licenses/agpl-3.0.en.html" alt="GNU Affero General Public License">GNU Affero General Public License</a>, see `LICENSE.txt` for further details.
+Storages-CE is released under the <a href="https://www.gnu.org/licenses/agpl-3.0.en.html" alt="GNU Affero General Public License">GNU Affero General Public License</a>, see `LICENSE.txt` for further details.
 </p>
