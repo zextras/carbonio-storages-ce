@@ -1,6 +1,6 @@
 {
-  "name": "carbonio-slimstore",
-  "description": "Zextras Carbonio Slimstore",
+  "name": "carbonio-storages-ce",
+  "description": "Zextras Carbonio Storages-CE",
   "build_dir": "/tmp/",
   "output": "artifacts",
   "projects": [

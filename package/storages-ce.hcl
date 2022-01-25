@@ -8,6 +8,6 @@ services {
   connect {
     sidecar_service { }
   }
-  name = "slimstore"
+  name = "storages-ce"
   port = 5794
 }

@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-only
 
-import {startupConfiguration, read, SLIMSTORE_CONF} from "../node/config/configuration";
+import {startupConfiguration, read, STORAGES_CONF} from "../node/config/configuration";
 import tap                            from "tap";
 
 tap.test('config validation', async t => {
@@ -21,7 +21,7 @@ tap.test('reject invalid log level', async t => {
             "logging": {
               "defaultLevel": 42,
               "datePattern": "YYYY-MM-DD",
-              "filename": "slimstore-%DATE%.log",
+              "filename": "storages-ce-%DATE%.log",
               "dirname": "/tmp/storages/logs",
               "zippedArchive": true
             }
@@ -34,7 +34,7 @@ tap.test('reject missing non existing certpath', async t => {
             "bindAddress": "0.0.0.0",
             "path": "/tmp/storages/store",
             "port": 5794,
-            "baseURL": "slimstore",
+            "baseURL": "",
             "servingURLPrefix": "http://localhost:5794",
             "compress": false,
             "logging": {
@@ -54,7 +54,7 @@ tap.test('reject missing non existing certpath', async t => {
 
 tap.test('custom logging dirname', async t => {
   const c = {
-    "SLIMSTORE_LOGGING_DIRNAME": 'bla'
+    "STORAGES_LOGGING_DIRNAME": 'bla'
   };
 
   const configuration = await startupConfiguration(c);
@@ -64,15 +64,15 @@ tap.test('custom logging dirname', async t => {
 
 tap.test('expect error if custom Aws conf incomplete', async t => {
   const c = {
-    [SLIMSTORE_CONF.AUTH.AWS4_ACCESS_KEY]: 'bla'
+    [STORAGES_CONF.AUTH.AWS4_ACCESS_KEY]: 'bla'
   };
   await startupConfiguration(c).then(() => t.fail("config is valid")).catch(() => {});
 })
 
 tap.test('custom Aws conf valid', async t => {
   const c = {
-    [SLIMSTORE_CONF.AUTH.AWS4_ACCESS_KEY]: 'bla',
-    [SLIMSTORE_CONF.AUTH.AWS4_ACCESS_SECRET]: 'bla'
+    [STORAGES_CONF.AUTH.AWS4_ACCESS_KEY]: 'bla',
+    [STORAGES_CONF.AUTH.AWS4_ACCESS_SECRET]: 'bla'
   };
 
   const configuration = await startupConfiguration(c);

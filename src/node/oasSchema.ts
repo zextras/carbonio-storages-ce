@@ -7,8 +7,8 @@ export default function oasSchema(url:string, prefix:string, host:string) {
     routePrefix: prefix + "/swagger",
     openapi: {
       info: {
-        title: 'Slimstore Server',
-        description: 'Slimstore server',
+        title: 'Storages-CE Server',
+        description: 'Storages-CE server',
         version: '0.0.0'
       },
       servers: [{

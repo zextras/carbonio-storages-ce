@@ -23,7 +23,7 @@ export default function(filesystem: FilesystemAccessor): (fastify: FastifyInstan
       url: "/stats",
       schema: {
         tags: ['health'],
-        description: 'Returns statistics on the Slimstore server memory usage.',
+        description: 'Returns statistics on the Storages-CE server memory usage.',
         response: {
           200: StatsType
         }

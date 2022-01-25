@@ -1,20 +1,20 @@
 [Unit]
-Description=Slimstore sidecar proxy
+Description=Storages-CE sidecar proxy
 Documentation=https://docs.zextras.com/zextras-suite-documentation/latest/
 Requires=network-online.target
-Requires=slimstore.service
+Requires=storages-ce.service
 After=network-online.target
-After=slimstore.service
+After=storages-ce.service
 
 [Service]
 Type=simple
 ExecStart=/usr/bin/consul connect envoy \
-    -token-file /etc/zextras/slimstore/token \
+    -token-file /etc/zextras/storages-ce/token \
     -admin-bind localhost:0 \
-    -sidecar-for slimstore
+    -sidecar-for storages-ce
 Restart=on-failure
 RestartSec=15
-User=zextras
+User=carbonio-storages
 KillMode=process
 KillSignal=SIGKILL
 LimitNOFILE=65536

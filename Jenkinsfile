@@ -111,7 +111,7 @@ pipeline {
                                 "props": "deb.distribution=bionic;deb.component=main;deb.architecture=amd64"
                             },
                             {
-                                "pattern": "artifacts/(carbonio-slimstore)-(*).rpm",
+                                "pattern": "artifacts/(carbonio-storages-ce)-(*).rpm",
                                 "target": "centos8-playground/zextras/{1}/{1}-{2}.rpm",
                                 "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
                             }
@@ -169,7 +169,7 @@ pipeline {
                     uploadSpec= """{
                         "files": [
                             {
-                                "pattern": "artifacts/(carbonio-slimstore)-(*).rpm",
+                                "pattern": "artifacts/(carbonio-storages-ce)-(*).rpm",
                                 "target": "centos8-rc/zextras/{1}/{1}-{2}.rpm",
                                 "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
                             }

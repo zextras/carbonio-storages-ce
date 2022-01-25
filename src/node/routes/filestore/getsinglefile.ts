@@ -21,7 +21,7 @@ export default function(filesystem: FilesystemAccessor): (fastify: FastifyInstan
       url: "/download",
       schema: {
         tags: ['filestore'],
-        description: 'Downloads from Slimstore the node described by node-id and version (if needed) passed as query string parameters',
+        description: 'Downloads from Storages-CE the node described by node-id and version (if needed) passed as query string parameters',
         querystring: QueryStringType,
         produces: ['application/octet-stream', 'application/json'],
         response: {

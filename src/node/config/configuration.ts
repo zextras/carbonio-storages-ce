@@ -31,28 +31,28 @@ const ConfigType = Type.Object({
 
 export type Config = Static<typeof ConfigType>
 
-export const SLIMSTORE_CONF = {
-  CONF_PATH: "SLIMSTORE_CONF_PATH",
-  BIND_ADDRESS: "SLIMSTORE_BIND_ADDRESS",
-  PATH: "SLIMSTORE_PATH",
-  PORT: "SLIMSTORE_PORT",
-  BASE_URL: "SLIMSTORE_BASE_URL",
+export const STORAGES_CONF = {
+  CONF_PATH: "STORAGES_CONF_PATH",
+  BIND_ADDRESS: "STORAGES_BIND_ADDRESS",
+  PATH: "STORAGES_PATH",
+  PORT: "STORAGES_PORT",
+  BASE_URL: "STORAGES_BASE_URL",
   LOGGING: {
-    DIRNAME: "SLIMSTORE_LOGGING_DIRNAME"
+    DIRNAME: "STORAGES_LOGGING_DIRNAME"
   },
   HTTPS: {
-    KEY_PATH: "SLIMSTORE_HTTPS_KEY_PATH",
-    CERT_PATH: "SLIMSTORE_HTTPS_CERT_PATH"
+    KEY_PATH: "STORAGES_HTTPS_KEY_PATH",
+    CERT_PATH: "STORAGES_HTTPS_CERT_PATH"
   },
   AUTH: {
-    AWS4_ACCESS_KEY: "SLIMSTORE_AUTH_AWSV4SIGNATURE_ACCESS_KEY",
-    AWS4_ACCESS_SECRET: "SLIMSTORE_AUTH_AWSV4SIGNATURE_ACCESS_SECRET"
+    AWS4_ACCESS_KEY: "STORAGES_AUTH_AWSV4SIGNATURE_ACCESS_KEY",
+    AWS4_ACCESS_SECRET: "STORAGES_AUTH_AWSV4SIGNATURE_ACCESS_SECRET"
   }
 }
 
 const awsEnvConf = (conf: any) => {
-  const key = conf[SLIMSTORE_CONF.AUTH.AWS4_ACCESS_KEY];
-  const value = conf[SLIMSTORE_CONF.AUTH.AWS4_ACCESS_SECRET];
+  const key = conf[STORAGES_CONF.AUTH.AWS4_ACCESS_KEY];
+  const value = conf[STORAGES_CONF.AUTH.AWS4_ACCESS_SECRET];
 
   if (key && value) {
     return {
@@ -66,30 +66,30 @@ const awsEnvConf = (conf: any) => {
 }
 
 const loadEnvironmentConf = (conf: any = process.env) : DeepPartial<Config> => {
-  const port = conf[SLIMSTORE_CONF.PORT];
+  const port = conf[STORAGES_CONF.PORT];
 
   const result: DeepPartial<Config> = {}
 
-  if (conf[SLIMSTORE_CONF.BIND_ADDRESS] != undefined)
-    result.bindAddress = conf[SLIMSTORE_CONF.BIND_ADDRESS]
+  if (conf[STORAGES_CONF.BIND_ADDRESS] != undefined)
+    result.bindAddress = conf[STORAGES_CONF.BIND_ADDRESS]
 
-  if (conf[SLIMSTORE_CONF.PATH] != undefined)
-    result.path = conf[SLIMSTORE_CONF.PATH]
+  if (conf[STORAGES_CONF.PATH] != undefined)
+    result.path = conf[STORAGES_CONF.PATH]
 
   if (port != undefined)
     result.port = parseInt(port);
 
-  if (conf[SLIMSTORE_CONF.BASE_URL] != undefined)
-    result.baseURL = conf[SLIMSTORE_CONF.BASE_URL]
+  if (conf[STORAGES_CONF.BASE_URL] != undefined)
+    result.baseURL = conf[STORAGES_CONF.BASE_URL]
 
-  if (conf[SLIMSTORE_CONF.LOGGING.DIRNAME] != undefined)
-    result.logging = {dirname: conf[SLIMSTORE_CONF.LOGGING.DIRNAME]}
+  if (conf[STORAGES_CONF.LOGGING.DIRNAME] != undefined)
+    result.logging = {dirname: conf[STORAGES_CONF.LOGGING.DIRNAME]}
 
-  if (conf[SLIMSTORE_CONF.HTTPS.KEY_PATH] != undefined &&
-      conf[SLIMSTORE_CONF.HTTPS.CERT_PATH] != undefined) {
+  if (conf[STORAGES_CONF.HTTPS.KEY_PATH] != undefined &&
+      conf[STORAGES_CONF.HTTPS.CERT_PATH] != undefined) {
     result.https = {
-      keyPath: conf[SLIMSTORE_CONF.HTTPS.KEY_PATH],
-      certPath: conf[SLIMSTORE_CONF.HTTPS.CERT_PATH]
+      keyPath: conf[STORAGES_CONF.HTTPS.KEY_PATH],
+      certPath: conf[STORAGES_CONF.HTTPS.CERT_PATH]
     }
   }
 
@@ -102,7 +102,7 @@ const loadEnvironmentConf = (conf: any = process.env) : DeepPartial<Config> => {
 
 export async function startupConfiguration(conf: any = process.env): Promise<Config> {
   return mergeDeep(
-      await import((conf[SLIMSTORE_CONF.CONF_PATH] !== undefined) ? conf[SLIMSTORE_CONF.CONF_PATH] : './config.json')
+      await import((conf[STORAGES_CONF.CONF_PATH] !== undefined) ? conf[STORAGES_CONF.CONF_PATH] : './config.json')
         .then(({default: startupConfig}) => startupConfig),
       await import('./config.json').then(({default: startupConfig}) => startupConfig as any),
       loadEnvironmentConf(conf)

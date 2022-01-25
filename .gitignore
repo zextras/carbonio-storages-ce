@@ -12,7 +12,7 @@ node_modules/
 dist/
 coverage/
 .nyc_output/
-slimstore
+storages-ce
 
 # Compiled Java class files
 *.class

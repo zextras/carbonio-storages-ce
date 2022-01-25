@@ -2,12 +2,12 @@ targets=(
   "centos"
   "ubuntu"
 )
-pkgname="carbonio-slimstore"
+pkgname="carbonio-storages-ce"
 pkgver="1.0.0"
 pkgrel="1"
-pkgdesc="External store for Carbonio Drive CE"
+pkgdesc="External store for Carbonio CE"
 pkgdesclong=(
-  "External store for Carbonio Drive CE"
+  "External store for Carbonio CE"
 )
 arch="amd64"
 maintainer="Zextras <packages@zextras.com"
@@ -20,10 +20,10 @@ depends=(
   "jq"
 )
 sources=(
-  "slimstore.sh"
-  "slimstore.hcl"
-  "slimstore.service"
-  "slimstore-sidecar.service"
+  "storages-ce.sh"
+  "storages-ce.hcl"
+  "storages-ce.service"
+  "storages-ce-sidecar.service"
 )
 hashsums=(
   "1d504fcdda279cd7f3bc532c3fa5820fb727b1b653dae567cfd57cf95f00f412"
@@ -42,44 +42,44 @@ build() {
 package:apt() {
   cd "${srcdir}"/../../project
 
-  install -Dm755 "${srcdir}/slimstore.sh" \
-    "${pkgdir}/usr/bin/slimstore"
-  install -Dm755 "${srcdir}/slimstore.service" \
-    "${pkgdir}"/lib/systemd/system/slimstore.service
-  install -Dm755 "${srcdir}/slimstore-sidecar.service" \
-    "${pkgdir}"/lib/systemd/system/slimstore-sidecar.service
-  install -Dm755 slimstore \
-    "${pkgdir}/opt/zextras/common/bin/slimstore"
-  install -Dm644 "${srcdir}/slimstore.hcl" \
-    "${pkgdir}/etc/zextras/service-discover/slimstore.hcl"
+  install -Dm755 "${srcdir}/storages-ce.sh" \
+    "${pkgdir}/usr/bin/carbonio/storages-ce"
+  install -Dm755 "${srcdir}/storages-ce.service" \
+    "${pkgdir}"/lib/systemd/system/storages-ce.service
+  install -Dm755 "${srcdir}/storages-ce-sidecar.service" \
+    "${pkgdir}"/lib/systemd/system/storages-ce-sidecar.service
+  install -Dm755 storages-ce \
+    "${pkgdir}/opt/carbonio/common/bin/storages-ce"
+  install -Dm644 "${srcdir}/storages-ce.hcl" \
+    "${pkgdir}/etc/carbonio/service-discover/storages-ce.hcl"
 
   mkdir -p "${pkgdir}/etc/carbonio/storages"
   cp "src/node/config/config.json" "${pkgdir}/etc/carbonio/storages"
-  mkdir -p "${pkgdir}/etc/zextras/slimstore"
+  mkdir -p "${pkgdir}/etc/carbonio/storages"
 }
 
 package:yum() {
   cd "${srcdir}"/../../project
 
-  install -Dm755 "${srcdir}/slimstore.sh" \
-    "${pkgdir}/usr/bin/slimstore"
-  install -Dm755 "${srcdir}/slimstore.service" \
-    "${pkgdir}"/usr/lib/systemd/system/slimstore.service
-  install -Dm755 "${srcdir}/slimstore-sidecar.service" \
-    "${pkgdir}"/usr/lib/systemd/system/slimstore-sidecar.service
-  install -Dm755 slimstore \
-    "${pkgdir}/opt/zextras/common/bin/slimstore"
-  install -Dm644 "${srcdir}/slimstore.hcl" \
-    "${pkgdir}/etc/zextras/service-discover/slimstore.hcl"
+  install -Dm755 "${srcdir}/storages-ce.sh" \
+    "${pkgdir}/usr/bin/carbonio/storages-ce"
+  install -Dm755 "${srcdir}/storages-ce.service" \
+    "${pkgdir}"/usr/lib/systemd/system/storages-ce.service
+  install -Dm755 "${srcdir}/storages-ce-sidecar.service" \
+    "${pkgdir}"/usr/lib/systemd/system/storages-ce-sidecar.service
+  install -Dm755 storages-ce \
+    "${pkgdir}/opt/carbonio/common/bin/storages-ce"
+  install -Dm644 "${srcdir}/storages-ce.hcl" \
+    "${pkgdir}/etc/carbonio/service-discover/storages-ce.hcl"
 
   mkdir -p "${pkgdir}/etc/carbonio/storages"
   cp "src/node/config/config.json" "${pkgdir}/etc/carbonio/storages"
-  mkdir -p "${pkgdir}/etc/zextras/slimstore"
+  mkdir -p "${pkgdir}/etc/carbonio/storages"
 }
 
 preinst:apt() {
   if [ -d /run/systemd/system ]; then
-    deb-systemd-invoke stop 'slimstore.service' >/dev/null || true
+    deb-systemd-invoke stop 'storages-ce.service' >/dev/null || true
   fi
 }
 
@@ -103,60 +103,60 @@ postinst:apt() {
 
   if [ -d /run/systemd/system ]; then
     systemctl daemon-reload >/dev/null 2>&1 || :
-    systemctl enable slimstore.service >/dev/null 2>&1 || :
-    systemctl enable slimstore-sidecar.service >/dev/null 2>&1 || :
+    systemctl enable storages-ce.service >/dev/null 2>&1 || :
+    systemctl enable storages-ce-sidecar.service >/dev/null 2>&1 || :
   fi
   echo ""
-  echo "Only one Slimstore is allowed in a multiserver environment"
+  echo "Only one Storages-CE is allowed in a multiserver environment"
   echo "Installed, you must now run as root:"
   echo "pending-setups"
-  cat >/etc/zextras/pending-setups.d/slimstore-setup.sh <<EOF
+  cat >/etc/zextras/pending-setups.d/storages-ce-setup.sh <<EOF
 #!/usr/bin/env bash
-slimstore setup
+storages-ce setup
 EOF
 }
 
 postinst:yum() {
   # creating zextras group if it isn't already there
-  if ! getent group zextras >/dev/null; then
+  if ! getent group carbonio-storages >/dev/null; then
     addgroup --system --force-badname --quiet zextras
   fi
   # creating zextras user if it isn't already there
-  if ! getent passwd zextras >/dev/null; then
+  if ! getent passwd carbonio-storages >/dev/null; then
     adduser --system --force-badname --quiet \
       --ingroup zextras \
       --home /opt/zextras \
       --shell /bin/bash \
-      zextras
-    usermod -c "zextras user" zextras
+      carbonio-storages
+    usermod -c "zextras user" carbonio-storages
   fi
 
   if [ -d /run/systemd/system ]; then
     systemctl daemon-reload >/dev/null 2>&1 || :
-    systemctl enable slimstore.service >/dev/null 2>&1 || :
-    systemctl enable slimstore-sidecar.service >/dev/null 2>&1 || :
+    systemctl enable storages-ce.service >/dev/null 2>&1 || :
+    systemctl enable storages-ce-sidecar.service >/dev/null 2>&1 || :
   fi
   echo ""
-  echo "Only one Slimstore is allowed in a multiserver environment"
+  echo "Only one Storages-CE is allowed in a multiserver environment"
   echo "Installed, you must now run as root:"
   echo "pending-setups"
-  cat >/etc/zextras/pending-setups.d/slimstore-setup.sh <<EOF
+  cat >/etc/zextras/pending-setups.d/storages-ce-setup.sh <<EOF
 #!/usr/bin/env bash
-slimstore setup
+storages-ce setup
 EOF
 }
 
 prerm() {
   if [ -d /run/systemd/system ]; then
-    systemctl --no-reload disable slimstore.service >/dev/null 2>&1 || :
-    systemctl --no-reload disable slimstore-sidecar.service >/dev/null 2>&1 || :
-    systemctl stop slimstore.service >/dev/null 2>&1 || :
-    systemctl stop slimstore-sidecar.service >/dev/null 2>&1 || :
+    systemctl --no-reload disable storages-ce.service >/dev/null 2>&1 || :
+    systemctl --no-reload disable storages-ce-sidecar.service >/dev/null 2>&1 || :
+    systemctl stop storages-ce.service >/dev/null 2>&1 || :
+    systemctl stop storages-ce-sidecar.service >/dev/null 2>&1 || :
   fi
 }
 
 postrm() {
-  rm -f /etc/zextras/pending-setups.d/slimstore-setup.sh
+  rm -f /etc/zextras/pending-setups.d/storages-ce-setup.sh
   if [ -d /run/systemd/system ]; then
     systemctl daemon-reload >/dev/null 2>&1 || :
   fi
