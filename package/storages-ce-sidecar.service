@@ -9,7 +9,7 @@ After=storages-ce.service
 [Service]
 Type=simple
 ExecStart=/usr/bin/consul connect envoy \
-    -token-file /etc/zextras/storages-ce/token \
+    -token-file /etc/zextras/storages/token \
     -admin-bind localhost:0 \
     -sidecar-for storages-ce
 Restart=on-failure

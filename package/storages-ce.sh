@@ -73,22 +73,28 @@ cat <<EOF | consul config write -
 }
 EOF
 
-if [[ ! -f "/etc/zextras/storages-ce/token" ]]; then
+if [[ ! -f "/etc/zextras/storages/token" ]]; then
   # create the token
+  touch /etc/zextras/storages/token
   consul acl token create -format json -policy-name "${POLICY_NAME}" -description "Token for storages-ce/$(hostname)" |
-    jq -r '.SecretID' >/etc/zextras/storages-ce/token
-  chown carbonio-storages:carbonio-storages /etc/zextras/storages-ce/token
-  chmod 0600 /etc/zextras/storages-ce/token
+    jq -r '.SecretID' > /etc/zextras/storages/token
+  chown carbonio-storages:zextras /etc/zextras/storages/token
+  chmod 0600 /etc/zextras/storages/token
 
   # to pass the token to consul-template we need to inject it to a env. variable
   # since it doesn't accept a file as an argument
   mkdir -p /etc/systemd/system/storages-ce.service.d/
   cat >/etc/systemd/system/storages-ce.service.d/override.conf <<EOF
 [Service]
-Environment="CONSUL_HTTP_TOKEN=$(cat /etc/zextras/storages-ce/token)"
+Environment="CONSUL_HTTP_TOKEN=$(cat /etc/zextras/storages/token)"
 EOF
   chmod 0600 /etc/systemd/system/storages-ce.service.d/override.conf
   systemctl daemon-reload
+fi
+
+if [[ ! -d "/var/log/carbonio/storages/" ]]; then
+  mkdir -p /var/log/carbonio/storages/
+  chown carbonio-storages:zextras /var/log/carbonio/storages/
 fi
 
 consul reload

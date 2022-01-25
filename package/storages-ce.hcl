@@ -1,6 +1,6 @@
 services {
   check {
-    http = "localhost:5794/health/live",
+    http = "http://localhost:5794/health/live",
     method = "GET",
     timeout = "1s"
     interval = "5s"
