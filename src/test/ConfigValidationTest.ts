@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2022 Zextras <https://www.zextras.com>
+//
+// SPDX-License-Identifier: AGPL-3.0-only
+
 import {startupConfiguration, read, SLIMSTORE_CONF} from "../node/config/configuration";
 import tap                            from "tap";
 

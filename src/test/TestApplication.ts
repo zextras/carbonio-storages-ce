@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2022 Zextras <https://www.zextras.com>
+//
+// SPDX-License-Identifier: AGPL-3.0-only
+
 import * as fs from "fs";
 import { createApp } from "../node/app";
 import { Config, read } from "../node/config/configuration";

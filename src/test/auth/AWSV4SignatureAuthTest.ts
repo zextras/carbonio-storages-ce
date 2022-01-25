@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2022 Zextras <https://www.zextras.com>
+//
+// SPDX-License-Identifier: AGPL-3.0-only
+
 import tap from "tap";
 import {AWSV4SignatureAuth} from "../../node/auth/AWSV4SignatureAuth";
 import {testApplication} from "../TestApplication";
