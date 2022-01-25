@@ -90,13 +90,13 @@ postinst:apt() {
       addgroup --system --force-badname --quiet zextras
     fi
 
-    # creating zextras user if it isn't already there
+    # creating carbonio-storages user if it isn't already there
     if ! getent passwd zextras >/dev/null; then
       adduser --system --force-badname --quiet \
         --ingroup zextras \
         --home /opt/zextras \
         --shell /bin/bash \
-        zextras
+        carbonio-storages
       usermod -c "zextras user" zextras
     fi
   fi
@@ -112,7 +112,7 @@ postinst:apt() {
   echo "pending-setups"
   cat >/etc/zextras/pending-setups.d/storages-ce-setup.sh <<EOF
 #!/usr/bin/env bash
-storages-ce setup
+/usr/bin/carbonio/storages-ce setup
 EOF
 }
 
@@ -121,7 +121,7 @@ postinst:yum() {
   if ! getent group carbonio-storages >/dev/null; then
     addgroup --system --force-badname --quiet zextras
   fi
-  # creating zextras user if it isn't already there
+  # creating carbonio-storages user if it isn't already there
   if ! getent passwd carbonio-storages >/dev/null; then
     adduser --system --force-badname --quiet \
       --ingroup zextras \
@@ -142,7 +142,7 @@ postinst:yum() {
   echo "pending-setups"
   cat >/etc/zextras/pending-setups.d/storages-ce-setup.sh <<EOF
 #!/usr/bin/env bash
-storages-ce setup
+/usr/bin/carbonio/storages-ce setup
 EOF
 }
 

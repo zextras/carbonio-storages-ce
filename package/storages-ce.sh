@@ -77,7 +77,7 @@ if [[ ! -f "/etc/zextras/storages-ce/token" ]]; then
   # create the token
   consul acl token create -format json -policy-name "${POLICY_NAME}" -description "Token for storages-ce/$(hostname)" |
     jq -r '.SecretID' >/etc/zextras/storages-ce/token
-  chown zextras:zextras /etc/zextras/storages-ce/token
+  chown carbonio-storages:carbonio-storages /etc/zextras/storages-ce/token
   chmod 0600 /etc/zextras/storages-ce/token
 
   # to pass the token to consul-template we need to inject it to a env. variable
