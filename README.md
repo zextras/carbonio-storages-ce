@@ -48,45 +48,45 @@ Then Storages-CE server will be available at `http://localhost:5794/`
 
 <h3>Docker</h3>
 
-A docker image is available on [Docker Hub](https://hub.docker.com/r/zextras/slimstore).
+A docker image is available on [Docker Hub](https://hub.docker.com/r/zextras/storages-ce).
 To run the application:
 
-`docker run -it --rm -d -p 5794:5794 --name storages-ce zextras/slimstore`
+`docker run -it --rm -d -p 5794:5794 -e STORAGES_BIND_ADDRESS="0.0.0.0" --name storages-ce zextras/storages-ce`
 
 <h2>Configuration</h2>
 
 The following environment variables can be provided when starting the Storages-CE server
 
-- `SLIMSTORE_CONF_PATH`
+- `STORAGES_CONF_PATH`
 
 The path to the configuration file
 
-- `SLIMSTORE_BIND_ADDRESS`
+- `STORAGES_BIND_ADDRESS`
 
 Address on which Storages-CE will listen for API calls (default 127.0.0.1)
 
-- `SLIMSTORE_PATH`
+- `STORAGES_PATH`
 
 
 The folder inside which all file are stored
 
-- `SLIMSTORE_PORT`
+- `STORAGES_PORT`
 
 The port the Storages-CE is listening for http connections.
 
-- `SLIMSTORE_BASE_URL`
+- `STORAGES_BASE_URL`
 
 The suffix path at which the Storages-CE is served.
 The full url is constructed in the following way:
 
-`(http|https)://0.0.0.0:${SLIMSTORE_PORT}/${SLIMSTORE_BASE_URL}`
+`(http|https)://0.0.0.0:${STORAGES_PORT}/${STORAGES_BASE_URL}`
 
-- `SLIMSTORE_LOGGING_DIRNAME`
+- `STORAGES_LOGGING_DIRNAME`
 
 Folder including log files produced by Storages-CE
 
-- `SLIMSTORE_HTTPS_KEY_PATH`
-- `SLIMSTORE_HTTPS_CERT_PATH`
+- `STORAGES_HTTPS_KEY_PATH`
+- `STORAGES_HTTPS_CERT_PATH`
 
 Cerificates informations
 

@@ -1,6 +1,6 @@
 services {
   check {
-    http = "localhost:5794/health/live",
+    http = "http://localhost:5794/health/live",
     method = "GET",
     timeout = "1s"
     interval = "5s"
@@ -8,6 +8,6 @@ services {
   connect {
     sidecar_service { }
   }
-  name = "slimstore"
+  name = "storages-ce"
   port = 5794
 }

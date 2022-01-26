@@ -66,6 +66,27 @@ pipeline {
                         }
                     }
                 }
+                stage('Ubuntu 20.04') {
+                    agent {
+                        node {
+                            label 'pacur-agent-ubuntu-20.04-v1'
+                        }
+                    }
+                    steps {
+                        unstash 'project'
+                        sh 'curl -fsSL https://deb.nodesource.com/setup_14.x | sudo -E bash -'
+                        sh 'sudo apt-get install -y nodejs'
+                        sh 'mkdir /tmp/project'
+                        sh 'cp -r . /tmp/project'
+                        sh 'sudo pacur build ubuntu-focal /tmp/project'
+                        stash includes: 'artifacts/', name: 'artifacts-ubuntu-focal'
+                    }
+                    post {
+                        always {
+                            archiveArtifacts artifacts: 'artifacts/*.deb', fingerprint: true
+                        }
+                    }
+                }
                 stage('Centos 8') {
                     agent {
                         node {
@@ -97,6 +118,7 @@ pipeline {
             }
             steps {
                 unstash 'artifacts-ubuntu-bionic'
+                unstash 'artifacts-ubuntu-focal'
                 unstash 'artifacts-centos-8'
                 script {
                     def server = Artifactory.server 'zextras-artifactory'
@@ -106,12 +128,17 @@ pipeline {
                     uploadSpec = '''{
                         "files": [
                             {
+                                "pattern": "artifacts/*focal*.deb",
+                                "target": "ubuntu-playground/pool/",
+                                "props": "deb.distribution=focal;deb.component=main;deb.architecture=amd64"
+                            },
+                            {
                                 "pattern": "artifacts/*bionic*.deb",
                                 "target": "ubuntu-playground/pool/",
                                 "props": "deb.distribution=bionic;deb.component=main;deb.architecture=amd64"
                             },
                             {
-                                "pattern": "artifacts/(carbonio-slimstore)-(*).rpm",
+                                "pattern": "artifacts/(carbonio-storages-ce)-(*).rpm",
                                 "target": "centos8-playground/zextras/{1}/{1}-{2}.rpm",
                                 "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
                             }
@@ -127,6 +154,7 @@ pipeline {
             }
             steps {
                 unstash 'artifacts-ubuntu-bionic'
+                unstash 'artifacts-ubuntu-focal'
                 unstash 'artifacts-centos-8'
                 script {
                     def server = Artifactory.server 'zextras-artifactory'
@@ -143,6 +171,11 @@ pipeline {
                                 "pattern": "artifacts/*bionic*.deb",
                                 "target": "ubuntu-rc/pool/",
                                 "props": "deb.distribution=bionic;deb.component=main;deb.architecture=amd64"
+                            },
+                            {
+                                "pattern": "artifacts/*focal*.deb",
+                                "target": "ubuntu-rc/pool/",
+                                "props": "deb.distribution=focal;deb.component=main;deb.architecture=amd64"
                             }
 
                         ]
@@ -169,7 +202,7 @@ pipeline {
                     uploadSpec= """{
                         "files": [
                             {
-                                "pattern": "artifacts/(carbonio-slimstore)-(*).rpm",
+                                "pattern": "artifacts/(carbonio-storages-ce)-(*).rpm",
                                 "target": "centos8-rc/zextras/{1}/{1}-{2}.rpm",
                                 "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras"
                             }

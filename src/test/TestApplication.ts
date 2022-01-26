@@ -18,9 +18,9 @@ export async function testApplication(t:Test, configPatch: DeepPartial<Config> =
   // not using aws v4 signature by default
   delete defaultTestConfig.awsv4signature
 
-  const testDir: string = await mkTempFolder("slimstoreTests");
+  const testDir: string = await mkTempFolder("storagesCETests");
   defaultTestConfig.path = `${testDir}/store`
-  const testDirLog: string = await mkTempFolder("slimstoreTestsLog");
+  const testDirLog: string = await mkTempFolder("storagesCETestsLog");
   defaultTestConfig.logging.dirname = `${testDirLog}/logs`
 
   defaultTestConfig.logging.defaultLevel = "fatal"

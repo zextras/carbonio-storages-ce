@@ -14,7 +14,7 @@ export default function(filesystem: FilesystemAccessor): (fastify: FastifyInstan
       url: "/delete",
       schema: {
         tags: ['filestore'],
-        description: 'Deletes from Slimstore node described by node-id and version (if needed) passed as query string parameters',
+        description: 'Deletes from Storages-CE node described by node-id and version (if needed) passed as query string parameters',
         querystring: QueryStringType
       },
       async handler(req, reply) {

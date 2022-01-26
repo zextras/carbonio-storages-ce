@@ -1,5 +1,5 @@
 {
-  "name": "slimstore",
+  "name": "storages-ce",
   "version": "1.0.0",
   "description": "",
   "bin": "dist/node/index.js",
