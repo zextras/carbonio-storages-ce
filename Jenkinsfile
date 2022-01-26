@@ -93,6 +93,10 @@ pipeline {
             when {
                 anyOf {
                     expression { params.PLAYGROUND == true }
+                    allOf { 
+                      changeRequest()
+                      expression { env.CHANGE_TARGET.startsWith('devel') } 
+                    }
                 }
             }
             steps {
