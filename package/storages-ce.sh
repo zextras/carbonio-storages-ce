@@ -97,6 +97,11 @@ if [[ ! -d "/var/log/carbonio/storages/" ]]; then
   chown carbonio-storages:zextras /var/log/carbonio/storages/
 fi
 
+if [[ ! -d "/opt/zextras/store/storages-ce" ]]; then
+  mkdir -p /opt/zextras/store/storages-ce
+  chown carbonio-storages:zextras /opt/zextras/store/storages-ce
+fi
+
 consul reload
 
 # limit token visibility as much as possible
