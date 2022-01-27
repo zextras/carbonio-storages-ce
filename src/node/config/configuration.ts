@@ -104,7 +104,6 @@ export async function startupConfiguration(conf: any = process.env): Promise<Con
   return mergeDeep(
       await import((conf[STORAGES_CONF.CONF_PATH] !== undefined) ? conf[STORAGES_CONF.CONF_PATH] : './config.json')
         .then(({default: startupConfig}) => startupConfig),
-      await import('./config.json').then(({default: startupConfig}) => startupConfig as any),
       loadEnvironmentConf(conf)
   );
 }
