@@ -92,14 +92,16 @@ EOF
   systemctl daemon-reload
 fi
 
-if [[ ! -d "/var/log/carbonio/storages/" ]]; then
-  mkdir -p /var/log/carbonio/storages/
-  chown carbonio-storages:zextras /var/log/carbonio/storages/
+LOG_DIR=$(grep dirname /etc/zextras/storages/config.json | cut -d ":" -f2 | sed '0,/"/{s/"//}' | sed 's/",$//')
+if [ ! -d ${LOG_DIR} ]; then
+  mkdir -p ${LOG_DIR}
+  chown carbonio-storages:zextras ${LOG_DIR}
 fi
 
-if [[ ! -d "/opt/zextras/store/storages-ce" ]]; then
-  mkdir -p /opt/zextras/store/storages-ce
-  chown carbonio-storages:zextras /opt/zextras/store/storages-ce
+STORE_DIR=$(grep path /etc/zextras/storages/config.json | cut -d ":" -f2 | sed '0,/"/{s/"//}' | sed 's/",$//')
+if [ ! -d ${STORE_DIR} ]; then
+  mkdir -p ${STORE_DIR}
+  chown carbonio-storages:zextras ${STORE_DIR}
 fi
 
 consul reload
