@@ -94,6 +94,12 @@ pipeline {
                         }
                     }
                     steps {
+                        // workaroud for centos 8
+                        sh 'sudo sed -i \'s/mirrorlist/#mirrorlist/g\' /etc/yum.repos.d/CentOS-Linux-* || true'
+                        sh 'sudo sed -i \'s|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g\' /etc/yum.repos.d/CentOS-Linux-* || true'
+                        sh 'sudo dnf install centos-release-stream -y;  sudo dnf swap centos-{linux,stream}-repos -y;  sudo dnf distro-sync -y'
+                        // end workaround
+
                         unstash 'project'
                         sh 'curl -fsSL https://rpm.nodesource.com/setup_14.x | sudo bash -'
                         sh 'sudo dnf install -y nodejs'
@@ -114,9 +120,9 @@ pipeline {
             when {
                 anyOf {
                     expression { params.PLAYGROUND == true }
-                    allOf { 
+                    allOf {
                       changeRequest()
-                      expression { env.CHANGE_TARGET.startsWith('devel') } 
+                      expression { env.CHANGE_TARGET.startsWith('devel') }
                     }
                 }
             }
