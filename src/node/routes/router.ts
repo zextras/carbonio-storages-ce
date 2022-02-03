@@ -15,6 +15,7 @@ import { LoggerTransports } from "../LoggerTransports";
 import setloglevel from "./config/setloglevel";
 import getconfig from "./config/getconfig";
 import uploadsinglefile from "./filestore/uploadsinglefile";
+import copy from "./filestore/copy";
 import redirectToSwagger from "./redirectToSwagger";
 
 export default function (config: Config, filesystem: FilesystemAccessor, transports: LoggerTransports) : (fastify : FastifyInstance) => Promise<void> {
@@ -25,9 +26,11 @@ export default function (config: Config, filesystem: FilesystemAccessor, transpo
     await fastify.register(livenessCheck, base);
     await fastify.register(stats(filesystem), base);
 
-    await fastify.register(uploadsinglefile(filesystem, new Urls(config)), base);
+    const urls = new Urls(config);
+    await fastify.register(uploadsinglefile(filesystem, urls), base);
     await fastify.register(getsinglefile(filesystem), base);
     await fastify.register(deletesinglefile(filesystem), base);
+    await fastify.register(copy(filesystem, urls), base);
 
     await fastify.register(getconfig(config), base);
     await fastify.register(getloglevel(transports), base);

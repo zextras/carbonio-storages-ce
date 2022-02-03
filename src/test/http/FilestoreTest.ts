@@ -9,9 +9,8 @@ import * as fs from "fs";
 import FormData from "form-data"
 import { Response as LightMyRequestResponse } from "light-my-request";
 import { Readable } from "stream";
-
-const node: string = "443c815e-6b88-47b1-800f-d74d2d3004bf"
-const version: number = 2
+import { CopyParameters } from "../../node/routes/types";
+import { Test } from "../TestUtils";
 
 function uploadURL(node: string, version: number) {
   return `upload?node=${node}&version=${version}&type=files`
@@ -23,6 +22,17 @@ function downloadURL(node: string, version: number) {
 
 function deleteURL(node: string, version: number) {
   return `delete?node=${node}&version=${version}&type=files`
+}
+
+function copyUrl(pars:Record<string, boolean | number | string> & CopyParameters) {
+  let parts:string[] = []
+  for (const k in pars) {
+    const v = pars[k]
+    if (v !== undefined) {
+      parts.push(`${k}=${encodeURIComponent(v)}`)
+    }
+  }
+  return `copy?${parts.join("&")}`
 }
 
 export async function postFile(app: FastifyInstance, path: string, node: string, version: number): Promise<LightMyRequestResponse> {
@@ -61,6 +71,14 @@ export async function deleteFile(app: FastifyInstance, node: string, version: nu
   });
 }
 
+export async function copy(app: FastifyInstance, copyParameters:CopyParameters): Promise<LightMyRequestResponse> {
+  return await app.inject({
+    method: "PUT",
+    url: copyUrl(copyParameters)
+  });
+}
+
+
 export async function streamToString (stream: Readable): Promise<string> {
   const chunks: any = [];
   return new Promise((resolve, reject) => {
@@ -70,12 +88,14 @@ export async function streamToString (stream: Readable): Promise<string> {
   })
 }
 
-type Test = InstanceType<typeof tap.Test>
-
 const testEnvironmentProviders: [string, (t: Test) => Promise<FastifyInstance>][] = [
   [" with default configuration", (t: Test) => testApplication(t)],
   [" with compressed store", (t: Test) => testApplication(t, {compress: true})],
 ]
+
+const sampleNode1: string = "443c815e-6b88-47b1-800f-d74d2d3004bf"
+const sampleNode2: string = "999c815e-6b88-47b1-999f-d74d2d3004bf"
+const sampleVersion: number = 2
 
 for(const environmentProviderConfig of testEnvironmentProviders) {
   const [description, provider] = environmentProviderConfig
@@ -84,10 +104,10 @@ for(const environmentProviderConfig of testEnvironmentProviders) {
     const server = await provider(t)
     const filePath = `${process.cwd()}/src/test/resources/file.txt`
 
-    const uploadResponse = await postFile(server, filePath, node, version);
+    const uploadResponse = await postFile(server, filePath, sampleNode1, sampleVersion);
     t.equal(200, uploadResponse.statusCode)
 
-    const downloadResponse = await downloadFile(server, node, version);
+    const downloadResponse = await downloadFile(server, sampleNode1, sampleVersion);
     t.equal(200, downloadResponse.statusCode)
     const body = downloadResponse.body;
     t.equal(body, await streamToString(fs.createReadStream(filePath)))
@@ -97,21 +117,133 @@ for(const environmentProviderConfig of testEnvironmentProviders) {
     const server = await provider(t)
     const filePath = `${process.cwd()}/src/test/resources/file.txt`
 
-    const uploadResponse = await postFile(server, filePath, node, version);
+    const uploadResponse = await postFile(server, filePath, sampleNode1, sampleVersion);
     t.equal(200, uploadResponse.statusCode)
 
-    const deleteResponse = await deleteFile(server, node, version);
+    const deleteResponse = await deleteFile(server, sampleNode1, sampleVersion);
     t.equal(200, deleteResponse.statusCode)
+  })
+
+  tap.test(`upload & copy`, async t => {
+    const server = await provider(t)
+    const filePath = `${process.cwd()}/src/test/resources/file.txt`
+
+    const uploadResponse = await postFile(server, filePath, sampleNode2, sampleVersion);
+    t.equal(200, uploadResponse.statusCode)
+
+    const copyResponse = await copy(server, {
+      type: "files",
+      sourceNode: sampleNode2, 
+      sourceVersion: sampleVersion,
+      destinationNode: sampleNode1,
+      destinationVersion: sampleVersion
+    });
+    t.equal(200, copyResponse.statusCode)
+ 
+    const downloadResponse1 = await downloadFile(server, sampleNode2, sampleVersion);
+    t.equal(200, downloadResponse1.statusCode)
+
+    const downloadResponse2 = await downloadFile(server, sampleNode1, sampleVersion);
+    t.equal(200, downloadResponse2.statusCode)
+  })
+
+  tap.test(`upload & copy`, async t => {
+    const server = await provider(t)
+    const filePath = `${process.cwd()}/src/test/resources/file.txt`
+
+    const uploadResponse = await postFile(server, filePath, sampleNode2, sampleVersion);
+    t.equal(200, uploadResponse.statusCode)
+
+    const copyResponse = await copy(server, {
+      type: "files",
+      sourceNode: sampleNode2, 
+      sourceVersion: sampleVersion,
+      destinationNode: sampleNode1,
+      destinationVersion: sampleVersion
+    });
+    t.equal(200, copyResponse.statusCode)
+ 
+    const downloadResponse1 = await downloadFile(server, sampleNode2, sampleVersion);
+    t.equal(200, downloadResponse1.statusCode)
+
+    const downloadResponse2 = await downloadFile(server, sampleNode1, sampleVersion);
+    t.equal(200, downloadResponse2.statusCode)
+  })
+
+  tap.test(`upload & copy with override`, async t => {
+    const server = await provider(t)
+    const filePath = `${process.cwd()}/src/test/resources/file.txt`
+
+    const uploadResponse1 = await postFile(server, filePath, sampleNode1, sampleVersion);
+    t.equal(200, uploadResponse1.statusCode)
+
+    const uploadResponse2 = await postFile(server, filePath, sampleNode2, sampleVersion);
+    t.equal(200, uploadResponse2.statusCode)
+
+    const copyResponse = await copy(server, {
+      type: "files",
+      sourceNode: sampleNode2, 
+      sourceVersion: sampleVersion,
+      destinationNode: sampleNode1,
+      destinationVersion: sampleVersion,
+      override: true
+    });
+    t.equal(200, copyResponse.statusCode)
+  })
+
+  tap.test(`upload & copy fail becouse of override=false`, async t => {
+    const server = await provider(t)
+    const filePath = `${process.cwd()}/src/test/resources/file.txt`
+
+    const uploadResponse1 = await postFile(server, filePath, sampleNode1, sampleVersion);
+    t.equal(200, uploadResponse1.statusCode)
+
+    const uploadResponse2 = await postFile(server, filePath, sampleNode2, sampleVersion);
+    t.equal(200, uploadResponse2.statusCode)
+
+    const copyResponse = await copy(server, {
+      type: "files",
+      sourceNode: sampleNode2, 
+      sourceVersion: sampleVersion,
+      destinationNode: sampleNode1,
+      destinationVersion: sampleVersion,
+      override: false
+    });
+    t.equal(409, copyResponse.statusCode)
+
+    const copyResponse1 = await copy(server, {
+      type: "files",
+      sourceNode: sampleNode2, 
+      sourceVersion: sampleVersion,
+      destinationNode: sampleNode1,
+      destinationVersion: sampleVersion,
+      override: undefined
+    });
+    t.equal(409, copyResponse1.statusCode)
+  })
+
+  tap.test(`copy fail becouse source does not exists`, async t => {
+    const server = await provider(t)
+
+    const copyResponse = await copy(server, {
+      type: "files",
+      sourceNode: sampleNode2, 
+      sourceVersion: sampleVersion,
+      destinationNode: sampleNode1,
+      destinationVersion: sampleVersion,
+      override: false
+    });
+    t.equal(404, copyResponse.statusCode)
   })
 
   tap.test(`POST: expect 409 error for same node/version`, async t => {
     const server = await provider(t)
     const filePath = `${process.cwd()}/src/test/resources/file.txt`
 
-    const uploadResponse = await postFile(server, filePath, node, version);
+    const uploadResponse = await postFile(server, filePath, sampleNode1, sampleVersion);
     t.equal(200, uploadResponse.statusCode)
 
-    const upload2Response = await postFile(server, filePath, node, version);
+    const upload2Response = await postFile(server, filePath, sampleNode1, sampleVersion);
     t.equal(409, upload2Response.statusCode)
   })
 
@@ -119,10 +251,10 @@ for(const environmentProviderConfig of testEnvironmentProviders) {
     const server = await provider(t)
     const filePath = `${process.cwd()}/src/test/resources/file.txt`
 
-    const uploadResponse = await putFile(server, filePath, node, version);
+    const uploadResponse = await putFile(server, filePath, sampleNode1, sampleVersion);
     t.equal(200, uploadResponse.statusCode)
 
-    const upload2Response = await putFile(server, filePath, node, version);
+    const upload2Response = await putFile(server, filePath, sampleNode1, sampleVersion);
     t.equal(200, upload2Response.statusCode)
   })
 
@@ -132,7 +264,7 @@ for(const environmentProviderConfig of testEnvironmentProviders) {
       const server = await provider(t)
       const filePath = `${process.cwd()}/src/test/resources/file.txt`
 
-      const uploadResponse = await c(server, filePath, node, version);
+      const uploadResponse = await c(server, filePath, sampleNode1, sampleVersion);
       t.equal(uploadResponse.statusCode, 200)
       const responseBody = JSON.parse(uploadResponse.body);
       const digest = responseBody.digest
@@ -146,14 +278,14 @@ for(const environmentProviderConfig of testEnvironmentProviders) {
   tap.test(`download missing resource`, async t => {
     const server = await provider(t)
 
-    const downloadResponse = await downloadFile(server, node, version);
+    const downloadResponse = await downloadFile(server, sampleNode1, sampleVersion);
     t.equal(404, downloadResponse.statusCode)
   })
 
   tap.test(`delete missing resource`, async t => {
     const server = await provider(t)
 
-    const deleteResponse = await deleteFile(server, node, version);
+    const deleteResponse = await deleteFile(server, sampleNode1, sampleVersion);
     t.equal(200, deleteResponse.statusCode)
   })
 }

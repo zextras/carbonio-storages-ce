@@ -4,14 +4,17 @@
 
 import {Static, Type} from "@sinclair/typebox";
 
+const ChatsType = Type.Literal("chats")
+const FilesType = Type.Literal("files")
+
 export const FilesQueryStringType = Type.Object({
-  type: Type.Literal("files"),
+  type: FilesType,
   node: Type.String({pattern: '^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$'}),
   version: Type.Number()
 })
 
 export const ChatsQueryStringType = Type.Object({
-  type: Type.Literal("chats"),
+  type: ChatsType,
   node: Type.String({pattern: '^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$'})
 })
 
@@ -50,3 +53,21 @@ export const LogLevelResponseType = LogLevelQueryStringType
 
 export type LogLevelResponse = Static<typeof LogLevelResponseType>
 
+export const CopyParametersType = Type.Object({
+  type: Type.Union([ChatsType, FilesType]),
+  sourceNode: Type.String({pattern: '^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$'}),
+  sourceVersion: Type.Number(),
+  destinationNode: Type.String({pattern: '^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$'}),
+  destinationVersion: Type.Number(),
+  override:Type.Optional(Type.Boolean())
+})
+
+export type CopyParameters = Static<typeof CopyParametersType>
+
+export const UploadResponseType = Type.Object({
+	query: Type.Object({}, {additionalProperties: true}),
+	resource: Type.String(),
+	size: Type.Number(),
+	digest: Type.String(),
+	digest_algorithm: Type.String()
+})

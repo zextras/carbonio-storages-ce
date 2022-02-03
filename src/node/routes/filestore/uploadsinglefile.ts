@@ -5,7 +5,7 @@
 import { FastifyInstance } from "fastify";
 import "fastify-multipart";
 import { Static, Type } from "@sinclair/typebox";
-import { ErrorType, QueryString, QueryStringType } from "../types";
+import { ErrorType, QueryString, QueryStringType, UploadResponseType } from "../types";
 import { FilesystemAccessor } from "../../filesystem/FilesystemAccessor";
 import { Identifier, parse } from "../../filesystem/Identifier";
 import { Urls } from "../../urls";
@@ -15,13 +15,6 @@ import { pipeline } from 'stream';
 
 const pump = util.promisify(pipeline)
 
-const UploadResponseType = Type.Object({
-	query: Type.Object({}, {additionalProperties: true}),
-	resource: Type.String(),
-	size: Type.Number(),
-	digest: Type.String(),
-	digest_algorithm: Type.String()
-})
 const ResponseType = Type.Union([UploadResponseType, ErrorType])
 
 type Response = Static<typeof ResponseType>
