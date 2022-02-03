@@ -3,7 +3,7 @@ targets=(
   "ubuntu"
 )
 pkgname="carbonio-storages-ce"
-pkgver="1.0.2"
+pkgver="1.0.4"
 pkgrel="1"
 pkgdesc="External store for Carbonio CE"
 pkgdesclong=(
@@ -20,10 +20,10 @@ depends=(
   "jq"
 )
 sources=(
-  "storages-ce.sh"
-  "storages-ce.hcl"
-  "storages-ce.service"
-  "storages-ce-sidecar.service"
+  "carbonio-storages.sh"
+  "carbonio-storages.hcl"
+  "carbonio-storages.service"
+  "carbonio-storages-sidecar.service"
 )
 hashsums=(
   "1d504fcdda279cd7f3bc532c3fa5820fb727b1b653dae567cfd57cf95f00f412"
@@ -42,44 +42,46 @@ build() {
 package:apt() {
   cd "${srcdir}"/../../project
 
-  install -Dm755 "${srcdir}/storages-ce.sh" \
-    "${pkgdir}/usr/bin/storages-ce"
-  install -Dm755 "${srcdir}/storages-ce.service" \
-    "${pkgdir}"/lib/systemd/system/storages-ce.service
-  install -Dm755 "${srcdir}/storages-ce-sidecar.service" \
-    "${pkgdir}"/lib/systemd/system/storages-ce-sidecar.service
-  install -Dm755 storages-ce \
-    "${pkgdir}/opt/carbonio/common/bin/storages-ce"
-  install -Dm644 "${srcdir}/storages-ce.hcl" \
-    "${pkgdir}/etc/zextras/service-discover/storages-ce.hcl"
+  install -Dm755 "${srcdir}/carbonio-storages.sh" \
+    "${pkgdir}/usr/bin/carbonio-storages"
+  install -Dm755 "${srcdir}/carbonio-storages.service" \
+    "${pkgdir}"/lib/systemd/system/carbonio-storages.service
+  install -Dm755 "${srcdir}/carbonio-storages-sidecar.service" \
+    "${pkgdir}"/lib/systemd/system/carbonio-storages-sidecar.service
+  install -Dm755 carbonio-storages \
+    "${pkgdir}/opt/zextras/common/bin/carbonio-storages"
+  install -Dm644 "${srcdir}/carbonio-storages.hcl" \
+    "${pkgdir}/etc/zextras/service-discover/carbonio-storages.hcl"
 
-  mkdir -p "${pkgdir}/etc/zextras/storages"
-  cp "src/node/config/config.json" "${pkgdir}/etc/zextras/storages"
-  mkdir -p "${pkgdir}/etc/zextras/storages"
+  mkdir -p "${pkgdir}/etc/zextras/carbonio-storages"
+
+  mkdir -p "${pkgdir}/etc/carbonio/storages"
+  cp "src/node/config/config.json" "${pkgdir}/etc/carbonio/storages"
 }
 
 package:yum() {
   cd "${srcdir}"/../../project
 
-  install -Dm755 "${srcdir}/storages-ce.sh" \
-    "${pkgdir}/usr/bin/storages-ce"
-  install -Dm755 "${srcdir}/storages-ce.service" \
-    "${pkgdir}"/usr/lib/systemd/system/storages-ce.service
-  install -Dm755 "${srcdir}/storages-ce-sidecar.service" \
-    "${pkgdir}"/usr/lib/systemd/system/storages-ce-sidecar.service
-  install -Dm755 storages-ce \
-    "${pkgdir}/opt/carbonio/common/bin/storages-ce"
-  install -Dm644 "${srcdir}/storages-ce.hcl" \
-    "${pkgdir}/etc/zextras/service-discover/storages-ce.hcl"
+  install -Dm755 "${srcdir}/carbonio-storages.sh" \
+    "${pkgdir}/usr/bin/carbonio-storages"
+  install -Dm755 "${srcdir}/carbonio-storages.service" \
+    "${pkgdir}"/usr/lib/systemd/system/carbonio-storages.service
+  install -Dm755 "${srcdir}/carbonio-storages-sidecar.service" \
+    "${pkgdir}"/usr/lib/systemd/system/carbonio-storages-sidecar.service
+  install -Dm755 carbonio-storages \
+    "${pkgdir}/opt/zextras/common/bin/carbonio-storages"
+  install -Dm644 "${srcdir}/carbonio-storages.hcl" \
+    "${pkgdir}/etc/zextras/service-discover/carbonio-storages.hcl"
 
-  mkdir -p "${pkgdir}/etc/zextras/storages"
-  cp "src/node/config/config.json" "${pkgdir}/etc/zextras/storages"
-  mkdir -p "${pkgdir}/etc/zextras/storages"
+  mkdir -p "${pkgdir}/etc/zextras/carbonio-storages"
+
+  mkdir -p "${pkgdir}/etc/carbonio/storages"
+  cp "src/node/config/config.json" "${pkgdir}/etc/carbonio/storages"
 }
 
 preinst:apt() {
   if [ -d /run/systemd/system ]; then
-    deb-systemd-invoke stop 'storages-ce.service' >/dev/null || true
+    deb-systemd-invoke stop 'carbonio-storages.service' >/dev/null || true
   fi
 }
 
@@ -103,16 +105,16 @@ postinst:apt() {
 
   if [ -d /run/systemd/system ]; then
     systemctl daemon-reload >/dev/null 2>&1 || :
-    systemctl enable storages-ce.service >/dev/null 2>&1 || :
-    systemctl enable storages-ce-sidecar.service >/dev/null 2>&1 || :
+    systemctl enable carbonio-storages.service >/dev/null 2>&1 || :
+    systemctl enable carbonio-storages-sidecar.service >/dev/null 2>&1 || :
   fi
   echo ""
   echo "Only one Storages-CE is allowed in a multiserver environment"
   echo "Installed, you must now run as root:"
   echo "pending-setups"
-  cat >/etc/zextras/pending-setups.d/storages-ce-setup.sh <<EOF
+  cat >/etc/zextras/pending-setups.d/carbonio-storages-setup.sh <<EOF
 #!/usr/bin/env bash
-/usr/bin/storages-ce setup
+/usr/bin/carbonio-storages setup
 EOF
 }
 
@@ -133,30 +135,30 @@ postinst:yum() {
 
   if [ -d /run/systemd/system ]; then
     systemctl daemon-reload >/dev/null 2>&1 || :
-    systemctl enable storages-ce.service >/dev/null 2>&1 || :
-    systemctl enable storages-ce-sidecar.service >/dev/null 2>&1 || :
+    systemctl enable carbonio-storages.service >/dev/null 2>&1 || :
+    systemctl enable carbonio-storages-sidecar.service >/dev/null 2>&1 || :
   fi
   echo ""
   echo "Only one Storages-CE is allowed in a multiserver environment"
   echo "Installed, you must now run as root:"
   echo "pending-setups"
-  cat >/etc/zextras/pending-setups.d/storages-ce-setup.sh <<EOF
+  cat >/etc/zextras/pending-setups.d/carbonio-storages-setup.sh <<EOF
 #!/usr/bin/env bash
-storages-ce setup
+carbonio-storages setup
 EOF
 }
 
 prerm() {
   if [ -d /run/systemd/system ]; then
-    systemctl --no-reload disable storages-ce.service >/dev/null 2>&1 || :
-    systemctl --no-reload disable storages-ce-sidecar.service >/dev/null 2>&1 || :
-    systemctl stop storages-ce.service >/dev/null 2>&1 || :
-    systemctl stop storages-ce-sidecar.service >/dev/null 2>&1 || :
+    systemctl --no-reload disable carbonio-storages.service >/dev/null 2>&1 || :
+    systemctl --no-reload disable carbonio-storages-sidecar.service >/dev/null 2>&1 || :
+    systemctl stop carbonio-storages.service >/dev/null 2>&1 || :
+    systemctl stop carbonio-storages-sidecar.service >/dev/null 2>&1 || :
   fi
 }
 
 postrm() {
-  rm -f /etc/zextras/pending-setups.d/storages-ce-setup.sh
+  rm -f /etc/zextras/pending-setups.d/carbonio-storages-setup.sh
   if [ -d /run/systemd/system ]; then
     systemctl daemon-reload >/dev/null 2>&1 || :
   fi

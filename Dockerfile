@@ -31,8 +31,8 @@ RUN mkdir -p /home/node/app
 RUN chown -R node:node /home/node/app
 RUN mkdir -p /var/log/carbonio/storages/
 RUN chown -R node:node /var/log/carbonio/storages/
-RUN mkdir -p /opt/zextras/store/storages-ce
-RUN chown -R node:node /opt/zextras/store/storages-ce
+RUN mkdir -p /opt/zextras/carbonio-storages
+RUN chown -R node:node /opt/zextras/carbonio-storages
 
 USER node
 

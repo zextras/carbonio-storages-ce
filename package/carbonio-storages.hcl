@@ -8,6 +8,6 @@ services {
   connect {
     sidecar_service { }
   }
-  name = "storages-ce"
+  name = "carbonio-storages"
   port = 5794
 }

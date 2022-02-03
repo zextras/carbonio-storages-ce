@@ -1,5 +1,5 @@
 {
-  "name": "storages-ce",
+  "name": "carbonio-storages",
   "version": "1.0.0",
   "description": "",
   "bin": "dist/node/index.js",

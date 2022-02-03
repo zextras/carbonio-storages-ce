@@ -1,6 +1,6 @@
 {
   "bindAddress" : "127.0.0.1",
-  "path": "/opt/zextras/store/storages-ce",
+  "path": "/opt/zextras/carbonio-storages",
   "port": 5794,
   "baseURL": "",
   "servingURLPrefix": "http://localhost:5794",
@@ -8,7 +8,7 @@
   "logging": {
     "defaultLevel": "debug",
     "datePattern": "YYYY-MM-DD",
-    "filename": "storages-ce-%DATE%.log",
+    "filename": "carbonio-storages-%DATE%.log",
     "dirname": "/var/log/carbonio/storages/",
     "zippedArchive": true
   }

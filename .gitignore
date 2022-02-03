@@ -13,6 +13,7 @@ dist/
 coverage/
 .nyc_output/
 storages-ce
+carbonio-storages
 
 # Compiled Java class files
 *.class

@@ -10,7 +10,7 @@ if [[ $(id -u) -ne 0 ]]; then
 fi
 
 if [[ "$1" != "setup" ]]; then
-  echo "Syntax: storages-ce <setup> to automatically setup the service"
+  echo "Syntax: carbonio-storages <setup> to automatically setup the service"
   exit 1
 fi
 
@@ -29,12 +29,12 @@ fi
 # limit secret visibility as much as possible
 export -n SETUP_CONSUL_TOKEN
 
-POLICY_NAME='storages-ce-policy'
-POLICY_DESCRIPTION='Storages-CE service policy for service and sidecar proxy'
+POLICY_NAME='carbonio-storages-policy'
+POLICY_DESCRIPTION='Carbonio Storages service policy for service and sidecar proxy'
 POLICY_RULES="$(
   cat <<EOF
 "key_prefix" = {
-  "storages-ce/" = {
+  "carbonio-storages/" = {
     "policy" = "read"
   }
 }
@@ -44,10 +44,10 @@ POLICY_RULES="$(
   }
 }
 "service" = {
-  "storages-ce" = {
+  "carbonio-storages" = {
     "policy" = "write"
   }
-  "storages-ce-sidecar-proxy" = {
+  "carbonio-storages-sidecar-proxy" = {
     "policy" = "write"
   }
 }
@@ -68,37 +68,37 @@ fi
 cat <<EOF | consul config write -
 {
   "kind": "service-defaults",
-  "name": "storages-ce",
+  "name": "carbonio-storages",
   "protocol": "http"
 }
 EOF
 
-if [[ ! -f "/etc/zextras/storages/token" ]]; then
+if [[ ! -f "/etc/zextras/carbonio-storages/token" ]]; then
   # create the token
-  touch /etc/zextras/storages/token
-  consul acl token create -format json -policy-name "${POLICY_NAME}" -description "Token for storages-ce/$(hostname)" |
-    jq -r '.SecretID' > /etc/zextras/storages/token
-  chown carbonio-storages:zextras /etc/zextras/storages/token
-  chmod 0600 /etc/zextras/storages/token
+  touch /etc/zextras/carbonio-storages/token
+  consul acl token create -format json -policy-name "${POLICY_NAME}" -description "Token for carbonio-storages/$(hostname)" |
+    jq -r '.SecretID' > /etc/zextras/carbonio-storages/token
+  chown carbonio-storages:zextras /etc/zextras/carbonio-storages/token
+  chmod 0600 /etc/zextras/carbonio-storages/token
 
   # to pass the token to consul-template we need to inject it to a env. variable
   # since it doesn't accept a file as an argument
-  mkdir -p /etc/systemd/system/storages-ce.service.d/
-  cat >/etc/systemd/system/storages-ce.service.d/override.conf <<EOF
+  mkdir -p /etc/systemd/system/carbonio-storages.service.d/
+  cat >/etc/systemd/system/carbonio-storages.service.d/override.conf <<EOF
 [Service]
-Environment="CONSUL_HTTP_TOKEN=$(cat /etc/zextras/storages/token)"
+Environment="CONSUL_HTTP_TOKEN=$(cat /etc/zextras/carbonio-storages/token)"
 EOF
-  chmod 0600 /etc/systemd/system/storages-ce.service.d/override.conf
+  chmod 0600 /etc/systemd/system/carbonio-storages.service.d/override.conf
   systemctl daemon-reload
 fi
 
-LOG_DIR=$(grep dirname /etc/zextras/storages/config.json | cut -d ":" -f2 | sed '0,/"/{s/"//}' | sed 's/",$//')
+LOG_DIR=$(grep dirname /etc/carbonio/storages/config.json | cut -d ":" -f2 | sed '0,/"/{s/"//}' | sed 's/",$//')
 if [ ! -d ${LOG_DIR} ]; then
   mkdir -p ${LOG_DIR}
   chown carbonio-storages:zextras ${LOG_DIR}
 fi
 
-STORE_DIR=$(grep path /etc/zextras/storages/config.json | cut -d ":" -f2 | sed '0,/"/{s/"//}' | sed 's/",$//')
+STORE_DIR=$(grep path /etc/carbonio/storages/config.json | cut -d ":" -f2 | sed '0,/"/{s/"//}' | sed 's/",$//')
 if [ ! -d ${STORE_DIR} ]; then
   mkdir -p ${STORE_DIR}
   chown carbonio-storages:zextras ${STORE_DIR}
@@ -109,5 +109,5 @@ consul reload
 # limit token visibility as much as possible
 export -n CONSUL_HTTP_TOKEN
 
-systemctl restart storages-ce.service
-systemctl restart storages-ce-sidecar.service
+systemctl restart carbonio-storages.service
+systemctl restart carbonio-storages-sidecar.service

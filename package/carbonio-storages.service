@@ -1,0 +1,16 @@
+[Unit]
+Description=Carbonio Storages-CE daemon
+Requires=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+ExecStart=/opt/zextras/common/bin/carbonio-storages
+Environment="STORAGES_CONF_PATH=/etc/carbonio/storages/config.json"
+User=carbonio-storages
+Group=zextras
+Restart=on-failure
+RestartSec=15
+
+[Install]
+WantedBy=multi-user.target

@@ -2,16 +2,16 @@
 Description=Storages-CE sidecar proxy
 Documentation=https://docs.zextras.com/zextras-suite-documentation/latest/
 Requires=network-online.target
-Requires=storages-ce.service
+Requires=carbonio-storages.service
 After=network-online.target
-After=storages-ce.service
+After=carbonio-storages.service
 
 [Service]
 Type=simple
 ExecStart=/usr/bin/consul connect envoy \
-    -token-file /etc/zextras/storages/token \
+    -token-file /etc/zextras/carbonio-storages/token \
     -admin-bind localhost:0 \
-    -sidecar-for storages-ce
+    -sidecar-for carbonio-storages
 Restart=on-failure
 RestartSec=15
 User=carbonio-storages
