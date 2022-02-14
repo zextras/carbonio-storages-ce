@@ -5,7 +5,7 @@
 import { FastifyInstance } from "fastify";
 import "fastify-multipart";
 import { Static, Type } from "@sinclair/typebox";
-import { ErrorType, QueryString, QueryStringType, UploadResponseType } from "../types";
+import {ErrorType, QueryString, UploadResponseType} from "../types";
 import { FilesystemAccessor } from "../../filesystem/FilesystemAccessor";
 import { Identifier, parse } from "../../filesystem/Identifier";
 import { Urls } from "../../urls";
@@ -27,7 +27,24 @@ export default function (filesystem: FilesystemAccessor, urls: Urls): (fastify: 
 			schema: {
 				tags: ['filestore'],
 				description: 'Creates a resource node (if not existent) using the node-id and version passed as query string parameters and the ',
-				querystring: QueryStringType,
+				querystring: {
+					type: 'object',
+					required: ['type', 'node'],
+					additionalProperties: false,
+					properties: {
+						type: {
+							type: "string",
+							enum: ["files", "chats"],
+						},
+						node : {
+							type: 'string',
+							format: 'uuid'
+						},
+						version : {
+							type: 'number'
+						}
+					}
+				},
 				consumes: ['multipart/form-data'],
 				response: {
 					200: UploadResponseType,

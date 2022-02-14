@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 import {FastifyInstance} from "fastify";
-import {QueryString, QueryStringType} from "../types";
+import {QueryString} from "../types";
 import {FilesystemAccessor} from "../../filesystem/FilesystemAccessor";
 import {Identifier, parse} from "../../filesystem/Identifier";
 
@@ -15,7 +15,24 @@ export default function(filesystem: FilesystemAccessor): (fastify: FastifyInstan
       schema: {
         tags: ['filestore'],
         description: 'Deletes from Storages-CE node described by node-id and version (if needed) passed as query string parameters',
-        querystring: QueryStringType
+        querystring: {
+          type: 'object',
+          required: ['type', 'node'],
+          additionalProperties: false,
+          properties: {
+            type: {
+              type: "string",
+              enum: ["files", "chats"],
+            },
+            node : {
+              type: 'string',
+              format: 'uuid'
+            },
+            version : {
+              type: 'number'
+            }
+          }
+        }
       },
       async handler(req, reply) {
         const identifier: Identifier = parse(req.query)

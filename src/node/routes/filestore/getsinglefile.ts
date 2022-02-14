@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 import {FastifyInstance} from "fastify";
-import {ErrorType, QueryString, QueryStringType} from "../types";
+import {ErrorType, QueryString} from "../types";
 import {FilesystemAccessor} from "../../filesystem/FilesystemAccessor";
 import {Static, Type} from "@sinclair/typebox";
 import {Identifier, parse} from "../../filesystem/Identifier";
@@ -22,7 +22,24 @@ export default function(filesystem: FilesystemAccessor): (fastify: FastifyInstan
       schema: {
         tags: ['filestore'],
         description: 'Downloads from Storages-CE the node described by node-id and version (if needed) passed as query string parameters',
-        querystring: QueryStringType,
+        querystring: {
+          type: 'object',
+          required: ['type', 'node'],
+          additionalProperties: false,
+          properties: {
+            type: {
+              type: "string",
+              enum: ["files", "chats"],
+            },
+            node : {
+              type: 'string',
+              format: 'uuid'
+            },
+            version : {
+              type: 'number'
+            }
+          }
+        },
         produces: ['application/octet-stream', 'application/json'],
         response: {
           200: {
