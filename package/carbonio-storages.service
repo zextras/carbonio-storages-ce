@@ -6,11 +6,15 @@ After=network-online.target
 [Service]
 Type=simple
 ExecStart=/opt/zextras/common/bin/carbonio-storages
+Environment="STORAGES_PORT=10000"
+Environment="STORAGES_BIND_ADDRESS=127.78.0.3"
 Environment="STORAGES_CONF_PATH=/etc/carbonio/storages/config.json"
 User=carbonio-storages
 Group=zextras
 Restart=on-failure
 RestartSec=15
+TimeoutSec=60
+TimeoutStopSec=120
 
 [Install]
 WantedBy=multi-user.target

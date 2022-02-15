@@ -3,7 +3,7 @@ targets=(
   "ubuntu"
 )
 pkgname="carbonio-storages-ce"
-pkgver="1.0.4"
+pkgver="1.0.7"
 pkgrel="1"
 pkgdesc="External store for Carbonio CE"
 pkgdesclong=(
@@ -24,12 +24,16 @@ sources=(
   "carbonio-storages.hcl"
   "carbonio-storages.service"
   "carbonio-storages-sidecar.service"
+  "intentions.json"
+  "service-protocol.json"
 )
 hashsums=(
   "1d504fcdda279cd7f3bc532c3fa5820fb727b1b653dae567cfd57cf95f00f412"
   "e83c4c17ca4d6b9bb84676baf2a6e4e74a77a8ea67729c7460778aef4f277ba5"
   "b3de776c542be4c938766cdaf4919b7d5d5a24e935fc0c59f55a9055dd4e7039"
   "16005384d619273d5024ca1b67b3cfb3cae05fb289b7f4e6df0c9c0ece15c1f0"
+  "skip"
+  "skip"
 )
 
 build() {
@@ -52,6 +56,10 @@ package:apt() {
     "${pkgdir}/opt/zextras/common/bin/carbonio-storages"
   install -Dm644 "${srcdir}/carbonio-storages.hcl" \
     "${pkgdir}/etc/zextras/service-discover/carbonio-storages.hcl"
+  install -Dm644 "${srcdir}/service-protocol.json" \
+    "${pkgdir}/etc/carbonio/storages/service-discover/service-protocol.json"
+  install -Dm644 "${srcdir}/intentions.json" \
+    "${pkgdir}/etc/carbonio/storages/service-discover/intentions.json"
 
   mkdir -p "${pkgdir}/etc/zextras/carbonio-storages"
 
@@ -72,6 +80,10 @@ package:yum() {
     "${pkgdir}/opt/zextras/common/bin/carbonio-storages"
   install -Dm644 "${srcdir}/carbonio-storages.hcl" \
     "${pkgdir}/etc/zextras/service-discover/carbonio-storages.hcl"
+  install -Dm644 "${srcdir}/service-protocol.json" \
+    "${pkgdir}/etc/carbonio/storages/service-discover/service-protocol.json"
+  install -Dm644 "${srcdir}/intentions.json" \
+    "${pkgdir}/etc/carbonio/storages/service-discover/intentions.json"
 
   mkdir -p "${pkgdir}/etc/zextras/carbonio-storages"
 

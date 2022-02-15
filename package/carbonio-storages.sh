@@ -64,14 +64,11 @@ if [[ "$?" != "0" ]]; then
   fi
 fi
 
-# declare the service as http
-cat <<EOF | consul config write -
-{
-  "kind": "service-defaults",
-  "name": "carbonio-storages",
-  "protocol": "http"
-}
-EOF
+# Declare the service as http
+consul config write /etc/carbonio/storages/service-discover/service-protocol.json
+
+# Allow other services to contact this service
+consul config write /etc/carbonio/storages/service-discover/intentions.json
 
 if [[ ! -f "/etc/zextras/carbonio-storages/token" ]]; then
   # create the token
