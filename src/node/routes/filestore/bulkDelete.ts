@@ -30,6 +30,31 @@ const BulkDeleteResponseBodyType = Type.Object({
 type BulkDeleteRequestBody = Static<typeof BulkDeleteRequestBodyType>
 type BulkDeleteResponseBody = Static<typeof BulkDeleteResponseBodyType>
 
+const bulkDeleteItems = {
+  type: 'object',
+  required: ['ids'],
+  additionalProperties: false,
+  properties: {
+    "ids": {
+      type: "array",
+      items: {
+        type: 'object',
+        required: ['node'],
+        additionalProperties: false,
+        properties: {
+          node : {
+            type: 'string',
+            format: 'uuid'
+          },
+          version : {
+            type: 'number'
+          }
+        }
+      }
+    }
+  }
+}
+
 export default function(filesystem: FilesystemAccessor): (fastify: FastifyInstance) => FastifyInstance {
   return fastify => {
     return fastify.route<{Querystring: BulkDeleteQueryString, Body:BulkDeleteRequestBody, Response:BulkDeleteResponseBody }>({
@@ -49,29 +74,9 @@ export default function(filesystem: FilesystemAccessor): (fastify: FastifyInstan
             }
           }
         },
-        body: {
-          type: 'object',
-          required: ['ids'],
-          additionalProperties: false,
-          properties: {
-            "ids": {
-              type: "array",
-              items: {
-                type: 'object',
-                required: ['node'],
-                additionalProperties: false,
-                properties: {
-                  node : {
-                    type: 'string',
-                    format: 'uuid'
-                  },
-                  version : {
-                    type: 'number'
-                  }
-                }
-              }
-            }
-          }
+        body: bulkDeleteItems,
+        response: {
+          200: bulkDeleteItems
         }
       },
       async handler(req, reply) {
