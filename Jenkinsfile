@@ -87,19 +87,13 @@ pipeline {
                         }
                     }
                 }
-                stage('Centos 8') {
+                stage('Rocky 8') {
                     agent {
                         node {
-                            label 'pacur-agent-centos-8-v1'
+                            label 'pacur-agent-rocky-8-v1'
                         }
                     }
                     steps {
-                        // workaroud for centos 8
-                        sh 'sudo sed -i \'s/mirrorlist/#mirrorlist/g\' /etc/yum.repos.d/CentOS-Linux-* || true'
-                        sh 'sudo sed -i \'s|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g\' /etc/yum.repos.d/CentOS-Linux-* || true'
-                        sh 'sudo dnf install centos-release-stream -y;  sudo dnf swap centos-{linux,stream}-repos -y;  sudo dnf distro-sync -y'
-                        // end workaround
-
                         unstash 'project'
                         sh 'curl -fsSL https://rpm.nodesource.com/setup_14.x | sudo bash -'
                         sh 'sudo dnf install -y nodejs'
@@ -237,4 +231,3 @@ pipeline {
         }
     }
 }
-
