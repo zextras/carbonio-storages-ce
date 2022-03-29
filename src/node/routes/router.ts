@@ -16,6 +16,7 @@ import setloglevel from "./config/setloglevel";
 import getconfig from "./config/getconfig";
 import uploadsinglefile from "./filestore/uploadsinglefile";
 import copy from "./filestore/copy";
+import bulkDelete from "./filestore/bulkDelete"
 import redirectToSwagger from "./redirectToSwagger";
 
 export default function (config: Config, filesystem: FilesystemAccessor, transports: LoggerTransports) : (fastify : FastifyInstance) => Promise<void> {
@@ -31,6 +32,7 @@ export default function (config: Config, filesystem: FilesystemAccessor, transpo
     await fastify.register(getsinglefile(filesystem), base);
     await fastify.register(deletesinglefile(filesystem), base);
     await fastify.register(copy(filesystem, urls), base);
+    await fastify.register(bulkDelete(filesystem), base);
 
     await fastify.register(getconfig(config), base);
     await fastify.register(getloglevel(transports), base);

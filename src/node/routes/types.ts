@@ -4,18 +4,20 @@
 
 import {Static, Type} from "@sinclair/typebox";
 
-const ChatsType = Type.Literal("chats")
-const FilesType = Type.Literal("files")
+export const ChatsType = Type.Literal("chats")
+export const FilesType = Type.Literal("files")
+
+export const NodeIdType = Type.String({pattern: '^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$'})
 
 export const FilesQueryStringType = Type.Object({
   type: FilesType,
-  node: Type.String({pattern: '^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$'}),
+  node: NodeIdType,
   version: Type.Number()
 })
 
 export const ChatsQueryStringType = Type.Object({
   type: ChatsType,
-  node: Type.String({pattern: '^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$'})
+  node: NodeIdType
 })
 
 export const QueryStringType = Type.Union([FilesQueryStringType, ChatsQueryStringType])

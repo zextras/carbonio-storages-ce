@@ -24,6 +24,8 @@ function deleteURL(node: string, version: number) {
   return `delete?node=${node}&version=${version}&type=files`
 }
 
+const deleteBulkURL = `bulk-delete?type=files`
+
 function copyUrl(pars:Record<string, boolean | number | string> & CopyParameters) {
   let parts:string[] = []
   for (const k in pars) {
@@ -69,6 +71,11 @@ export async function deleteFile(app: FastifyInstance, node: string, version: nu
     method: "DELETE",
     url: deleteURL(node, version)
   });
+}
+
+export async function deleteBulk(app: FastifyInstance, ids:{node: string, version: number}[]): Promise<LightMyRequestResponse> {
+  const payload = {ids}
+  return await app.inject({ method: "POST", url: deleteBulkURL, payload });
 }
 
 export async function copy(app: FastifyInstance, copyParameters:CopyParameters): Promise<LightMyRequestResponse> {
@@ -288,4 +295,29 @@ for(const environmentProviderConfig of testEnvironmentProviders) {
     const deleteResponse = await deleteFile(server, sampleNode1, sampleVersion);
     t.equal(200, deleteResponse.statusCode)
   })
+
+  tap.test(`uploads & bulk delete`, async t => {
+    const server = await provider(t)
+    const filePath = `${process.cwd()}/src/test/resources/file.txt`
+
+    const ids = [...Array(9).keys()].map( d => ({
+      node:`443c815e-6b88-47b1-800f-d74d2d3004b${d}`,
+      version: sampleVersion
+    }))
+    for await (const {node:id, version} of ids) {
+      const uploadResponse = await postFile(server, filePath, id, version);
+      if (uploadResponse.statusCode !== 200) {
+        t.fail(`Upload failed ${JSON.stringify(uploadResponse, null, 2)}`)
+      }
+    }
+
+    const deleteResponse = await deleteBulk(server, ids);
+    t.equal(200, deleteResponse.statusCode)
+
+    for await (const id of ids) {
+      const downloadResponse = await downloadFile(server, id.node, id.version);
+      t.equal(404, downloadResponse.statusCode)
+    }
+  })
+  
 }
