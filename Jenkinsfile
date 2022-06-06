@@ -45,27 +45,6 @@ pipeline {
         }
         stage('Packaging...') {
             parallel {
-                stage('Ubuntu 18.04') {
-                    agent {
-                        node {
-                            label 'pacur-agent-ubuntu-18.04-v1'
-                        }
-                    }
-                    steps {
-                        unstash 'project'
-                        sh 'curl -fsSL https://deb.nodesource.com/setup_14.x | sudo -E bash -'
-                        sh 'sudo apt-get install -y nodejs'
-                        sh 'mkdir /tmp/project'
-                        sh 'cp -r . /tmp/project'
-                        sh 'sudo pacur build ubuntu-bionic /tmp/project'
-                        stash includes: 'artifacts/', name: 'artifacts-ubuntu-bionic'
-                    }
-                    post {
-                        always {
-                            archiveArtifacts artifacts: 'artifacts/*.deb', fingerprint: true
-                        }
-                    }
-                }
                 stage('Ubuntu 20.04') {
                     agent {
                         node {
