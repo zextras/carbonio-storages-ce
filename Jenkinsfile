@@ -100,7 +100,6 @@ pipeline {
                 }
             }
             steps {
-                unstash 'artifacts-ubuntu-bionic'
                 unstash 'artifacts-ubuntu-focal'
                 unstash 'artifacts-centos-8'
                 script {
@@ -114,11 +113,6 @@ pipeline {
                                 "pattern": "artifacts/*focal*.deb",
                                 "target": "ubuntu-playground/pool/",
                                 "props": "deb.distribution=focal;deb.component=main;deb.architecture=amd64"
-                            },
-                            {
-                                "pattern": "artifacts/*bionic*.deb",
-                                "target": "ubuntu-playground/pool/",
-                                "props": "deb.distribution=bionic;deb.component=main;deb.architecture=amd64"
                             },
                             {
                                 "pattern": "artifacts/(carbonio-storages-ce)-(*).rpm",
@@ -136,7 +130,6 @@ pipeline {
                 buildingTag()
             }
             steps {
-                unstash 'artifacts-ubuntu-bionic'
                 unstash 'artifacts-ubuntu-focal'
                 unstash 'artifacts-centos-8'
                 script {
@@ -150,11 +143,6 @@ pipeline {
                     buildInfo.name += "-ubuntu"
                     uploadSpec = """{
                         "files": [
-                            {
-                                "pattern": "artifacts/*bionic*.deb",
-                                "target": "ubuntu-rc/pool/",
-                                "props": "deb.distribution=bionic;deb.component=main;deb.architecture=amd64"
-                            },
                             {
                                 "pattern": "artifacts/*focal*.deb",
                                 "target": "ubuntu-rc/pool/",
