@@ -3,7 +3,7 @@ targets=(
   "ubuntu"
 )
 pkgname="carbonio-storages-ce"
-pkgver="1.0.7"
+pkgver="1.0.8"
 pkgrel="1"
 pkgdesc="External store for Carbonio CE"
 pkgdesclong=(
