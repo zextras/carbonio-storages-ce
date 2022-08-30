@@ -3,7 +3,7 @@ apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
   name: carbonio-storages-ce
-  title: Carbonio Storages CE (Node/JS/TS SDK)
+  title: Carbonio Storages CE
   description: External files store application for Carbonio CE
   tags:
     - node
