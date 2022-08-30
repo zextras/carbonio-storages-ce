@@ -6,7 +6,7 @@ metadata:
   title: Carbonio Storages CE (Node/JS/TS SDK)
   description: External files store application for Carbonio CE
   tags:
-    - java
+    - node
     - github
 spec:
   type: library
