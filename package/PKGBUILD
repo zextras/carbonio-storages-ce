@@ -51,8 +51,7 @@ build:yum() {
 
   # ugly workaround to disable rpm system-wide stripping
   # please don't execute outside of the build agent
-  echo "#!/bin/sh" > /usr/lib/rpm/brp-strip-static-archive
-  echo "#!/bin/sh" > /usr/lib/rpm/brp-strip
+  echo "/bin/true" > /usr/bin/strip
 }
 
 package:apt() {
