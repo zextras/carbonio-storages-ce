@@ -36,11 +36,22 @@ hashsums=(
   "skip"
 )
 
-build() {
+build:apt() {
   cd "${srcdir}"/../../project
   npm install
   npm run build
   npm run pkg
+}
+
+build:yum() {
+  cd "${srcdir}"/../../project
+  npm install
+  npm run build
+  npm run pkg
+
+  # ugly workaround to disable rpm system-wide stripping
+  # please don't execute outside of the build agent
+  echo "#!/bin/sh" > /usr/lib/rpm/brp-strip
 }
 
 package:apt() {
@@ -69,7 +80,6 @@ package:apt() {
 
 package:yum() {
   cd "${srcdir}"/../../project
-
   install -Dm755 "${srcdir}/carbonio-storages.sh" \
     "${pkgdir}/usr/bin/carbonio-storages"
   install -Dm755 "${srcdir}/carbonio-storages.service" \
@@ -92,15 +102,15 @@ package:yum() {
 }
 
 preinst:apt() {
+  if [ ! -d /opt/zextras ]; then
+          mkdir -p /opt/zextras
+  fi
   if [ -d /run/systemd/system ]; then
     deb-systemd-invoke stop 'carbonio-storages.service' >/dev/null || true
   fi
 }
 
 postinst:apt() {
-  if [ ! -d /opt/zextras ]; then
-          mkdir -p /opt/zextras
-  fi
   if [ "$1" = "configure" ]; then
     # creating zextras group if it isn't already there
     if ! getent group zextras >/dev/null; then
@@ -133,10 +143,13 @@ postinst:apt() {
 EOF
 }
 
-postinst:yum() {
+preinst:yum() {
   if [ ! -d /opt/zextras ]; then
           mkdir -p /opt/zextras
   fi
+}
+
+postinst:yum() {
   # creating zextras group if it isn't already there
   if ! getent group zextras >/dev/null; then
     groupadd --system zextras
