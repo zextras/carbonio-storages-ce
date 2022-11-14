@@ -137,7 +137,7 @@ postinst:yum() {
   fi
   # creating carbonio-storages user if it isn't already there
   if ! getent passwd carbonio-storages >/dev/null; then
-    adduser --system --force-badname --quiet \
+    adduser --system --quiet \
       --ingroup zextras \
       --home /opt/zextras \
       --shell /bin/bash \
