@@ -1,5 +1,5 @@
 targets=(
-  "centos"
+  "rocky-8"
   "ubuntu"
 )
 pkgname="carbonio-storages-ce"
@@ -36,11 +36,22 @@ hashsums=(
   "skip"
 )
 
-build() {
+build:apt() {
   cd "${srcdir}"/../../project
   npm install
   npm run build
   npm run pkg
+}
+
+build:yum() {
+  cd "${srcdir}"/../../project
+  npm install
+  npm run build
+  npm run pkg
+
+  # ugly workaround to disable rpm system-wide stripping
+  # please don't execute outside of the build agent
+  echo "/bin/true" > /usr/bin/strip
 }
 
 package:apt() {
@@ -69,7 +80,6 @@ package:apt() {
 
 package:yum() {
   cd "${srcdir}"/../../project
-
   install -Dm755 "${srcdir}/carbonio-storages.sh" \
     "${pkgdir}/usr/bin/carbonio-storages"
   install -Dm755 "${srcdir}/carbonio-storages.service" \
@@ -92,6 +102,9 @@ package:yum() {
 }
 
 preinst:apt() {
+  if [ ! -d /opt/zextras ]; then
+          mkdir -p /opt/zextras
+  fi
   if [ -d /run/systemd/system ]; then
     deb-systemd-invoke stop 'carbonio-storages.service' >/dev/null || true
   fi
@@ -130,16 +143,22 @@ postinst:apt() {
 EOF
 }
 
+preinst:yum() {
+  if [ ! -d /opt/zextras ]; then
+          mkdir -p /opt/zextras
+  fi
+}
+
 postinst:yum() {
   # creating zextras group if it isn't already there
-  if ! getent group carbonio-storages >/dev/null; then
-    addgroup --system --force-badname --quiet zextras
+  if ! getent group zextras >/dev/null; then
+    groupadd --system zextras
   fi
   # creating carbonio-storages user if it isn't already there
   if ! getent passwd carbonio-storages >/dev/null; then
-    adduser --system --force-badname --quiet \
-      --ingroup zextras \
-      --home /opt/zextras \
+    useradd --system \
+      --groups zextras \
+      --home-dir /opt/zextras \
       --shell /bin/bash \
       carbonio-storages
     usermod -c "zextras user" carbonio-storages

@@ -78,7 +78,7 @@ pipeline {
                         sh 'sudo dnf install -y nodejs'
                         sh 'mkdir /tmp/project'
                         sh 'cp -r . /tmp/project'
-                        sh 'sudo pacur build centos /tmp/project'
+                        sh 'sudo pacur build rocky-8 /tmp/project'
                         stash includes: 'artifacts/', name: 'artifacts-centos-8'
                     }
                     post {
