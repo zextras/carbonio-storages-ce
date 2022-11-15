@@ -10,7 +10,7 @@
     "@types/crypto-js": "^4.0.2",
     "@types/node": "^16.10.2",
     "@types/tap": "^15.0.5",
-    "fastify": "^3.21.6",
+    "fastify": "^4.9.2",
     "pkg": "^5.8.0",
     "rimraf": "^3.0.2",
     "tap": "^15.0.10",
