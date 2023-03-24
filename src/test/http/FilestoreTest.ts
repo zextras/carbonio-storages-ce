@@ -16,8 +16,16 @@ function uploadURL(node: string, version: number) {
   return `upload?node=${node}&version=${version}&type=files`
 }
 
+function chatsUploadURL(node: string) {
+  return `upload?node=${node}&type=chats`
+}
+
 function downloadURL(node: string, version: number) {
   return `download?node=${node}&version=${version}&type=files`
+}
+
+function chatsDownloadURL(node: string) {
+  return `download?node=${node}&type=chats`
 }
 
 function deleteURL(node: string, version: number) {
@@ -48,6 +56,18 @@ export async function postFile(app: FastifyInstance, path: string, node: string,
   });
 }
 
+export async function postChatsAttachment(app: FastifyInstance, path: string, node: string): Promise<LightMyRequestResponse> {
+  const form = new FormData();
+  form.append("", fs.createReadStream(path));
+  return await app.inject({
+    method: "POST",
+    url: chatsUploadURL(node),
+    headers: form.getHeaders(),
+    payload: form,
+  });
+}
+
+
 export async function putFile(app: FastifyInstance, path: string, node: string, version: number): Promise<LightMyRequestResponse> {
   const form = new FormData();
   form.append("", fs.createReadStream(path));
@@ -65,6 +85,14 @@ export async function downloadFile(app: FastifyInstance, node: string, version: 
     url: downloadURL(node, version)
   });
 }
+
+export async function downloadChatsAttachment(app: FastifyInstance, node: string): Promise<LightMyRequestResponse> {
+  return await app.inject({
+    method: "GET",
+    url: chatsDownloadURL(node)
+  });
+}
+
 
 export async function deleteFile(app: FastifyInstance, node: string, version: number): Promise<LightMyRequestResponse> {
   return await app.inject({
@@ -174,6 +202,27 @@ for(const environmentProviderConfig of testEnvironmentProviders) {
     t.equal(200, downloadResponse1.statusCode)
 
     const downloadResponse2 = await downloadFile(server, sampleNode1, sampleVersion);
+    t.equal(200, downloadResponse2.statusCode)
+  })
+
+  tap.test(`upload & copy chats`, async t => {
+    const server = await provider(t)
+    const filePath = `${process.cwd()}/src/test/resources/file.txt`
+
+    const uploadResponse = await postChatsAttachment(server, filePath, sampleNode2);
+    t.equal(200, uploadResponse.statusCode)
+
+    const copyResponse = await copy(server, {
+      type: "chats",
+      sourceNode: sampleNode2, 
+      destinationNode: sampleNode1,
+    });
+    t.equal(200, copyResponse.statusCode)
+ 
+    const downloadResponse1 = await downloadChatsAttachment(server, sampleNode2);
+    t.equal(200, downloadResponse1.statusCode)
+
+    const downloadResponse2 = await downloadChatsAttachment(server, sampleNode1);
     t.equal(200, downloadResponse2.statusCode)
   })
 

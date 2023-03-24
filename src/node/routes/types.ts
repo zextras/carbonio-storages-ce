@@ -57,10 +57,10 @@ export type LogLevelResponse = Static<typeof LogLevelResponseType>
 
 export const CopyParametersType = Type.Object({
   type: Type.Union([ChatsType, FilesType]),
-  sourceNode: Type.String({pattern: '^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$'}),
-  sourceVersion: Type.Number(),
-  destinationNode: Type.String({pattern: '^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$'}),
-  destinationVersion: Type.Number(),
+  sourceNode: NodeIdType,
+  sourceVersion: Type.Optional(Type.Number()),
+  destinationNode: NodeIdType,
+  destinationVersion: Type.Optional(Type.Number()),
   override:Type.Optional(Type.Boolean())
 })
 

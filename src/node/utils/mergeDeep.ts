@@ -24,6 +24,6 @@ export function mergeDeep<T>(target:T, ...sources:DeepPartial<T>[]): T {
 	return mergeDeep(target, ...sources);
 }
 
-export function isObject(item:any):boolean {
+export function isObject(item:any):item is {} {
   return (item && typeof item === 'object' && !Array.isArray(item));
 }
