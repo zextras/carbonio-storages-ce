@@ -8,6 +8,8 @@ metadata:
   tags:
     - node
     - github
+  annotations:
+    github.com/project-slug: Zextras/carbonio-storages-ce
 spec:
   type: library
   lifecycle: production
