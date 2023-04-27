@@ -2,15 +2,16 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-only
 
-import {FastifyInstance} from "fastify";
+import {FastifyInstance, FastifyReply, RawReplyDefaultExpression, RawRequestDefaultExpression, RawServerBase} from "fastify";
 import {CopyParameters, CopyParametersType, ErrorType} from "../types";
 import {FilesystemAccessor} from "../../filesystem/FilesystemAccessor";
 import {Static, Type} from "@sinclair/typebox";
-import {parse} from "../../filesystem/Identifier";
+import {parse, parseQueryString} from "../../filesystem/Identifier";
 import StreamHash from "../../filesystem/utils/StreamHash";
 import util from 'util';
 import { pipeline } from 'stream';
 import { Urls } from "../../urls";
+import { RouteGenericInterface } from "fastify/types/route";
 
 const pump = util.promisify(pipeline)
 
@@ -42,51 +43,77 @@ export default function(filesystem: FilesystemAccessor, urls: Urls): (fastify: F
         },
       },
       handler: async function (req, reply) {
-        const sourceIdentifier = parse({ 
-          type:req.query.type, 
-          node:req.query.sourceNode, 
-          version:req.query.sourceVersion 
-        })
+        const sourceQuery = parseQueryString(req.query.type, req.query.sourceNode, req.query.sourceVersion); 
+        
+        if (sourceQuery === undefined) {
+          return replyError(reply, {
+            statusCode : 400,
+            error : "Bad Request",
+            message : `Invalid request ${JSON.stringify(req.query)}`
+          })
+        } 
+        
+        const sourceIdentifier = parse(sourceQuery);
         if (!(await filesystem.fileExists(sourceIdentifier))) {
-          const error = {
+          return replyError(reply, {
             statusCode : 404,
             error : "Not found",
             message : `File '${JSON.stringify(sourceIdentifier)}' does not exist`
-          }
-          reply.status(404)
-            .type('application/json')
-            .send(error)
+          })
         } else {
-          const destinationQuery = { 
-            type:req.query.type, 
-            node:req.query.destinationNode, 
-            version:req.query.destinationVersion 
+          const destinationQuery = parseQueryString(req.query.type, req.query.destinationNode, req.query.destinationVersion);
+          
+          if (destinationQuery === undefined) {
+            return replyError(reply, {
+              statusCode : 400,
+              error : "Bad Request",
+              message : `Invalid request ${JSON.stringify(req.query)}`
+            })
           }
-          const destinationIdentifier = parse(destinationQuery)
-          if (!req.query.override && await filesystem.fileExists(destinationIdentifier)) {
-            reply.code(409).send({
+
+          const destinationIdentifier = parse(destinationQuery);
+          if (destinationIdentifier === undefined) {
+            return replyError(reply, {
+              statusCode : 400,
+              error : "Bad Request",
+              message : `Invalid request ${JSON.stringify(req.query)}`
+            })
+          } else if (!req.query.override && await filesystem.fileExists(destinationIdentifier)) {
+            return replyError(reply, {
               statusCode: 409,
               error: 'Conflict',
               message: `Identifier ${JSON.stringify(destinationIdentifier)} already exists`
             })
+          } else {
+            
+            const sourceStream = await filesystem.openReadStream(sourceIdentifier)
+            const hashTransform = new StreamHash();
+
+            hashTransform.pipe(await filesystem.openWriterStream(destinationIdentifier, true))
+
+            await pump(sourceStream, hashTransform);
+
+            reply.status(200).send({
+              query: destinationQuery,
+              resource: urls.downloadURL(destinationQuery),
+              digest_algorithm: hashTransform.algo,
+              size: hashTransform.byteCount,
+              digest: hashTransform.computedHash()
+            })
           }
-          
-          const sourceStream = await filesystem.openReadStream(sourceIdentifier)
-          const hashTransform = new StreamHash();
-
-          hashTransform.pipe(await filesystem.openWriterStream(destinationIdentifier, true))
-
-          await pump(sourceStream, hashTransform);
-
-          reply.status(200).send({
-            query: destinationQuery,
-            resource: urls.downloadURL(destinationQuery),
-            digest_algorithm: hashTransform.algo,
-            size: hashTransform.byteCount,
-            digest: hashTransform.computedHash()
-          })
         }
       },
     })
   };
 }
+
+function replyError<
+  S extends RawServerBase,
+  M extends RawRequestDefaultExpression<S>, 
+  R extends RawReplyDefaultExpression<S>,
+  A extends RouteGenericInterface>(reply:FastifyReply<S, M, R, A>, error:A["Reply"] & {statusCode:number}):void {
+  reply.status(error.statusCode)
+    .type('application/json')
+    .send(error)
+}
+

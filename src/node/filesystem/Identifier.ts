@@ -20,3 +20,20 @@ export function parse(queryString: QueryString): Identifier {
       return new ChatsIdentifier(queryString)
   }
 }
+
+export function parseQueryString(type:QueryString["type"], node:string, version:undefined | number):undefined | QueryString {
+  if (version !== undefined) {
+    return { 
+      type:type, 
+      node:node, 
+      version:version 
+    }   
+  } else if (version === undefined && type=== "chats") {
+    return { 
+      type:type, 
+      node:node
+    }
+  } else {
+    return undefined;
+  }
+}
