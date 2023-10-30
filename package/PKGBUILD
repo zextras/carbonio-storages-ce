@@ -1,15 +1,8 @@
-targets=(
-  "rocky-8"
-  "ubuntu"
-)
 pkgname="carbonio-storages-ce"
 pkgver="1.0.9"
 pkgrel="1"
 pkgdesc="External store for Carbonio CE"
-pkgdesclong=(
-  "External store for Carbonio CE"
-)
-arch="amd64"
+arch=('x86_64')
 maintainer="Zextras <packages@zextras.com"
 url="https://zextras.com"
 section="libs"
@@ -19,7 +12,7 @@ depends=(
   "service-discover"
   "jq"
 )
-sources=(
+source=(
   "carbonio-storages.sh"
   "carbonio-storages.hcl"
   "carbonio-storages.service"
@@ -27,23 +20,16 @@ sources=(
   "intentions.json"
   "service-protocol.json"
 )
-hashsums=(
+sha256sums=(
   "1d504fcdda279cd7f3bc532c3fa5820fb727b1b653dae567cfd57cf95f00f412"
   "e83c4c17ca4d6b9bb84676baf2a6e4e74a77a8ea67729c7460778aef4f277ba5"
   "b3de776c542be4c938766cdaf4919b7d5d5a24e935fc0c59f55a9055dd4e7039"
   "16005384d619273d5024ca1b67b3cfb3cae05fb289b7f4e6df0c9c0ece15c1f0"
-  "skip"
-  "skip"
+  "SKIP"
+  "SKIP"
 )
 
-build:apt() {
-  cd "${srcdir}"/../../project
-  npm install
-  npm run build
-  npm run pkg
-}
-
-build:yum() {
+build() {
   cd "${srcdir}"/../../project
   npm install
   npm run build
@@ -51,34 +37,10 @@ build:yum() {
 
   # ugly workaround to disable rpm system-wide stripping
   # please don't execute outside of the build agent
-  echo "/bin/true" > /usr/bin/strip
+  echo "/bin/true" >/usr/bin/strip
 }
 
-package:apt() {
-  cd "${srcdir}"/../../project
-
-  install -Dm755 "${srcdir}/carbonio-storages.sh" \
-    "${pkgdir}/usr/bin/carbonio-storages"
-  install -Dm755 "${srcdir}/carbonio-storages.service" \
-    "${pkgdir}"/lib/systemd/system/carbonio-storages.service
-  install -Dm755 "${srcdir}/carbonio-storages-sidecar.service" \
-    "${pkgdir}"/lib/systemd/system/carbonio-storages-sidecar.service
-  install -Dm755 carbonio-storages \
-    "${pkgdir}/opt/zextras/common/bin/carbonio-storages"
-  install -Dm644 "${srcdir}/carbonio-storages.hcl" \
-    "${pkgdir}/etc/zextras/service-discover/carbonio-storages.hcl"
-  install -Dm644 "${srcdir}/service-protocol.json" \
-    "${pkgdir}/etc/carbonio/storages/service-discover/service-protocol.json"
-  install -Dm644 "${srcdir}/intentions.json" \
-    "${pkgdir}/etc/carbonio/storages/service-discover/intentions.json"
-
-  mkdir -p "${pkgdir}/etc/zextras/carbonio-storages"
-
-  mkdir -p "${pkgdir}/etc/carbonio/storages"
-  cp "src/node/config/config.json" "${pkgdir}/etc/carbonio/storages"
-}
-
-package:yum() {
+package() {
   cd "${srcdir}"/../../project
   install -Dm755 "${srcdir}/carbonio-storages.sh" \
     "${pkgdir}/usr/bin/carbonio-storages"
@@ -101,16 +63,16 @@ package:yum() {
   cp "src/node/config/config.json" "${pkgdir}/etc/carbonio/storages"
 }
 
-preinst:apt() {
+preinst__apt() {
   if [ ! -d /opt/zextras ]; then
-          mkdir -p /opt/zextras
+    mkdir -p /opt/zextras
   fi
   if [ -d /run/systemd/system ]; then
     deb-systemd-invoke stop 'carbonio-storages.service' >/dev/null || true
   fi
 }
 
-postinst:apt() {
+postinst__apt() {
   if [ "$1" = "configure" ]; then
     # creating zextras group if it isn't already there
     if ! getent group zextras >/dev/null; then
@@ -143,13 +105,13 @@ postinst:apt() {
 EOF
 }
 
-preinst:yum() {
+preinst__yum() {
   if [ ! -d /opt/zextras ]; then
-          mkdir -p /opt/zextras
+    mkdir -p /opt/zextras
   fi
 }
 
-postinst:yum() {
+postinst__yum() {
   # creating zextras group if it isn't already there
   if ! getent group zextras >/dev/null; then
     groupadd --system zextras
