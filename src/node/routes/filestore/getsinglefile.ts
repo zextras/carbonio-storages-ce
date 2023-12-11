@@ -65,7 +65,8 @@ export default function(filesystem: FilesystemAccessor): (fastify: FastifyInstan
             .send(error)
         } else {
           reply.type('application/octet-stream')
-            .send(await filesystem.openReadStream(identifier))
+            .send(await filesystem.openReadStream(identifier));
+          return reply;
         }
       },
     })

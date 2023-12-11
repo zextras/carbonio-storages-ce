@@ -4,13 +4,13 @@
 
 import tap from "tap"
 import { testApplication } from "../TestApplication";
-import { FastifyInstance } from "fastify";
 import * as fs from "fs";
 import FormData from "form-data"
 import { Response as LightMyRequestResponse } from "light-my-request";
 import { Readable } from "stream";
 import { CopyParameters } from "../../node/routes/types";
 import { Test } from "../TestUtils";
+import { DefaultFastifyInstance } from "../../node/app";
 
 function uploadURL(node: string, version: number) {
   return `upload?node=${node}&version=${version}&type=files`
@@ -45,7 +45,7 @@ function copyUrl(pars:Record<string, boolean | number | string> & CopyParameters
   return `copy?${parts.join("&")}`
 }
 
-export async function postFile(app: FastifyInstance, path: string, node: string, version: number): Promise<LightMyRequestResponse> {
+export async function postFile(app: DefaultFastifyInstance, path: string, node: string, version: number): Promise<LightMyRequestResponse> {
   const form = new FormData();
   form.append("", fs.createReadStream(path));
   return await app.inject({
@@ -56,7 +56,7 @@ export async function postFile(app: FastifyInstance, path: string, node: string,
   });
 }
 
-export async function postChatsAttachment(app: FastifyInstance, path: string, node: string): Promise<LightMyRequestResponse> {
+export async function postChatsAttachment(app: DefaultFastifyInstance, path: string, node: string): Promise<LightMyRequestResponse> {
   const form = new FormData();
   form.append("", fs.createReadStream(path));
   return await app.inject({
@@ -68,7 +68,7 @@ export async function postChatsAttachment(app: FastifyInstance, path: string, no
 }
 
 
-export async function putFile(app: FastifyInstance, path: string, node: string, version: number): Promise<LightMyRequestResponse> {
+export async function putFile(app: DefaultFastifyInstance, path: string, node: string, version: number): Promise<LightMyRequestResponse> {
   const form = new FormData();
   form.append("", fs.createReadStream(path));
   return await app.inject({
@@ -79,14 +79,14 @@ export async function putFile(app: FastifyInstance, path: string, node: string, 
   });
 }
 
-export async function downloadFile(app: FastifyInstance, node: string, version: number): Promise<LightMyRequestResponse> {
+export async function downloadFile(app: DefaultFastifyInstance, node: string, version: number): Promise<LightMyRequestResponse> {
   return await app.inject({
     method: "GET",
     url: downloadURL(node, version)
   });
 }
 
-export async function downloadChatsAttachment(app: FastifyInstance, node: string): Promise<LightMyRequestResponse> {
+export async function downloadChatsAttachment(app: DefaultFastifyInstance, node: string): Promise<LightMyRequestResponse> {
   return await app.inject({
     method: "GET",
     url: chatsDownloadURL(node)
@@ -94,19 +94,19 @@ export async function downloadChatsAttachment(app: FastifyInstance, node: string
 }
 
 
-export async function deleteFile(app: FastifyInstance, node: string, version: number): Promise<LightMyRequestResponse> {
+export async function deleteFile(app: DefaultFastifyInstance, node: string, version: number): Promise<LightMyRequestResponse> {
   return await app.inject({
     method: "DELETE",
     url: deleteURL(node, version)
   });
 }
 
-export async function deleteBulk(app: FastifyInstance, ids:{node: string, version: number}[]): Promise<LightMyRequestResponse> {
+export async function deleteBulk(app: DefaultFastifyInstance, ids:{node: string, version: number}[]): Promise<LightMyRequestResponse> {
   const payload = {ids}
   return await app.inject({ method: "POST", url: deleteBulkURL, payload });
 }
 
-export async function copy(app: FastifyInstance, copyParameters:CopyParameters): Promise<LightMyRequestResponse> {
+export async function copy(app: DefaultFastifyInstance, copyParameters:CopyParameters): Promise<LightMyRequestResponse> {
   return await app.inject({
     method: "PUT",
     url: copyUrl(copyParameters)
@@ -123,7 +123,7 @@ export async function streamToString (stream: Readable): Promise<string> {
   })
 }
 
-const testEnvironmentProviders: [string, (t: Test) => Promise<FastifyInstance>][] = [
+const testEnvironmentProviders: [string, (t: Test) => Promise<DefaultFastifyInstance>][] = [
   [" with default configuration", (t: Test) => testApplication(t)],
   [" with compressed store", (t: Test) => testApplication(t, {compress: true})],
 ]
@@ -185,7 +185,6 @@ for(const environmentProviderConfig of testEnvironmentProviders) {
   tap.test(`upload & copy`, async t => {
     const server = await provider(t)
     const filePath = `${process.cwd()}/src/test/resources/file.txt`
-
     const uploadResponse = await postFile(server, filePath, sampleNode2, sampleVersion);
     t.equal(200, uploadResponse.statusCode)
 

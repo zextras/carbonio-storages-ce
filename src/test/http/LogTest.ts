@@ -4,8 +4,8 @@
 
 import tap from "tap"
 import {testApplication} from "../TestApplication";
-import {FastifyInstance} from "fastify";
 import {Response as LightMyRequestResponse} from "light-my-request";
+import { DefaultFastifyInstance } from "../../node/app";
 
 tap.test("get config", async t => {
   const server = await testApplication(t)
@@ -24,14 +24,14 @@ function setLogLevelURL(level: string) {
   return `loglevel?level=${level}`
 }
 
-export async function getLogLevel(app: FastifyInstance): Promise<LightMyRequestResponse> {
+export async function getLogLevel(app: DefaultFastifyInstance): Promise<LightMyRequestResponse> {
   return await app.inject({
     method: "GET",
     url: getLogLevelURL()
   });
 }
 
-export async function setLogLevel(app: FastifyInstance, level: string): Promise<LightMyRequestResponse> {
+export async function setLogLevel(app: DefaultFastifyInstance, level: string): Promise<LightMyRequestResponse> {
   return await app.inject({
     method: "PUT",
     url: setLogLevelURL(level)

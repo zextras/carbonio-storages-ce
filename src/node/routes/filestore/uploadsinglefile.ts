@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 import { FastifyInstance } from "fastify";
-import "fastify-multipart";
+import "@fastify/multipart";
 import { Static, Type } from "@sinclair/typebox";
 import {ErrorType, QueryString, UploadResponseType} from "../types";
 import { FilesystemAccessor } from "../../filesystem/FilesystemAccessor";
@@ -48,7 +48,7 @@ export default function (filesystem: FilesystemAccessor, urls: Urls): (fastify: 
 				consumes: ['multipart/form-data'],
 				response: {
 					200: UploadResponseType,
-          409: ErrorType,
+          			409: ErrorType,
 					500: ErrorType
 				}
 			},
@@ -63,19 +63,27 @@ export default function (filesystem: FilesystemAccessor, urls: Urls): (fastify: 
 					})
 				} else {
 					const data = await req.file()
-					const hashTransform = new StreamHash();
+					if (data !== undefined) {
+						const hashTransform = new StreamHash();
 
-					hashTransform.pipe(await filesystem.openWriterStream(identifier, true))
+						hashTransform.pipe(await filesystem.openWriterStream(identifier, true))
 
-					await pump(data.file, hashTransform);
+						await pump(data.file, hashTransform);
 
-					reply.send({
-						query: req.query,
-						resource: urls.downloadURL(req.query),
-						digest_algorithm: hashTransform.algo,
-						size: hashTransform.byteCount,
-						digest: hashTransform.computedHash()
-					})
+						reply.send({
+							query: req.query,
+							resource: urls.downloadURL(req.query),
+							digest_algorithm: hashTransform.algo,
+							size: hashTransform.byteCount,
+							digest: hashTransform.computedHash()
+						})
+					} else {
+						reply.code(409).send({
+							statusCode: 404,
+							error: 'NotFound',
+							message: `Could not found ${JSON.stringify(identifier)}`
+						})	
+					}
 				}
 			},
 		})

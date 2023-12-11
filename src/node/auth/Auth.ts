@@ -2,9 +2,9 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-only
 
-import {FastifyInstance} from "fastify";
 import {FastifyRequest} from "fastify/types/request";
+import { DefaultFastifyInstance } from "../app";
 
 export interface Auth {
-  check(server: FastifyInstance, request: FastifyRequest): Promise<void>
+  check(server: DefaultFastifyInstance, request: FastifyRequest): Promise<void>
 }

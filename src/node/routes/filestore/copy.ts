@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-only
 
-import {FastifyInstance, FastifyReply, RawReplyDefaultExpression, RawRequestDefaultExpression, RawServerBase} from "fastify";
+import {FastifyInstance, FastifyReply, RawServerDefault} from "fastify";
 import {CopyParameters, CopyParametersType, ErrorType} from "../types";
 import {FilesystemAccessor} from "../../filesystem/FilesystemAccessor";
 import {Static, Type} from "@sinclair/typebox";
@@ -11,7 +11,7 @@ import StreamHash from "../../filesystem/utils/StreamHash";
 import util from 'util';
 import { pipeline } from 'stream';
 import { Urls } from "../../urls";
-import { RouteGenericInterface } from "fastify/types/route";
+import { IncomingMessage, ServerResponse } from "http";
 
 const pump = util.promisify(pipeline)
 
@@ -107,13 +107,16 @@ export default function(filesystem: FilesystemAccessor, urls: Urls): (fastify: F
   };
 }
 
-function replyError<
-  S extends RawServerBase,
-  M extends RawRequestDefaultExpression<S>, 
-  R extends RawReplyDefaultExpression<S>,
-  A extends RouteGenericInterface>(reply:FastifyReply<S, M, R, A>, error:A["Reply"] & {statusCode:number}):void {
-  reply.status(error.statusCode)
-    .type('application/json')
-    .send(error)
+type ErrorResponse = {
+  statusCode: number,
+  error: string,
+  message: string
 }
+
+function replyError(reply: FastifyReply<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>>, errorResponse: ErrorResponse) {
+  return reply.status(errorResponse.statusCode)
+    .type('application/json')
+    .send(errorResponse);
+}
+
 
