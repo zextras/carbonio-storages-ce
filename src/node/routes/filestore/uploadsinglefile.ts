@@ -78,7 +78,7 @@ export default function (filesystem: FilesystemAccessor, urls: Urls): (fastify: 
 							digest: hashTransform.computedHash()
 						})
 					} else {
-						reply.code(409).send({
+						reply.code(404).send({
 							statusCode: 404,
 							error: 'NotFound',
 							message: `Could not found ${JSON.stringify(identifier)}`

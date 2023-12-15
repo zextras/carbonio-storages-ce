@@ -367,5 +367,41 @@ for(const environmentProviderConfig of testEnvironmentProviders) {
       t.equal(404, downloadResponse.statusCode)
     }
   })
+
+  tap.test(`uploads & bulk delete, one file is not stored`, async t => {
+    const server = await provider(t)
+    const filePath = `${process.cwd()}/src/test/resources/file.txt`
+
+    const ids = [...Array(5).keys()].map( d => ({
+      node:`443c815e-6b88-47b1-800f-d74d2d3004b${d}`,
+      version: sampleVersion
+    }))
+    for await (const {node:id, version} of ids) {
+      const uploadResponse = await postFile(server, filePath, id, version);
+      if (uploadResponse.statusCode !== 200) {
+        t.fail(`Upload failed ${JSON.stringify(uploadResponse, null, 2)}`)
+      }
+    }
+
+    const notStoredId = `443c815e-6b88-47b1-800f-d74d2d3004b7`;
+    const notStored = [{
+      node:notStoredId,
+      version: sampleVersion
+    }]
+
+    const deleteResponse = await deleteBulk(server, ids.concat(notStored));
+    t.equal(200, deleteResponse.statusCode)
+    var respBody = deleteResponse.json()
+
+    t.equal(respBody.ids.length, 1)
+    const item = respBody.ids[0];
+    t.equal(item.type, "files")
+    t.equal(item.node, notStoredId)
+
+    for await (const id of ids) {
+      const downloadResponse = await downloadFile(server, id.node, id.version);
+      t.equal(404, downloadResponse.statusCode)
+    }
+  })
   
 }
