@@ -6,6 +6,8 @@ def nodeCmd(String cmd) {
 	sh '. load_nvm && nvm install && nvm use && ' + cmd
 }
 
+final NODE_MAJOR = 20
+
 pipeline {
     parameters {
         booleanParam defaultValue: false, description: 'Whether to upload the packages in playground repositories', name: 'PLAYGROUND'
@@ -53,8 +55,13 @@ pipeline {
                     }
                     steps {
                         unstash 'project'
-                        sh 'curl -fsSL https://deb.nodesource.com/setup_14.x | sudo -E bash -'
-                        sh 'sudo apt-get install -y nodejs'
+                        sh 'sudo apt-get update'
+                        sh 'sudo apt-get install -y ca-certificates curl gnupg'
+                        sh 'sudo mkdir -p /etc/apt/keyrings'
+                        sh 'curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | sudo gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg'
+                        sh 'echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_16.x nodistro main" | sudo tee /etc/apt/sources.list.d/nodesource.list'
+                        sh 'sudo apt-get update'
+                        sh 'sudo apt-get install nodejs -y'
                         sh 'mkdir /tmp/project'
                         sh 'cp -r . /tmp/project'
                         sh 'sudo yap build ubuntu /tmp/project'
@@ -74,8 +81,8 @@ pipeline {
                     }
                     steps {
                         unstash 'project'
-                        sh 'curl -fsSL https://rpm.nodesource.com/setup_14.x | sudo bash -'
-                        sh 'sudo dnf install -y nodejs'
+                        sh 'sudo yum install https://rpm.nodesource.com/pub_16.x/nodistro/repo/nodesource-release-nodistro-1.noarch.rpm -y'
+                        sh 'sudo yum install nodejs -y --setopt=nodesource-nodejs.module_hotfixes=1'
                         sh 'mkdir /tmp/project'
                         sh 'cp -r . /tmp/project'
                         sh 'sudo yap build rocky /tmp/project'
