@@ -77,7 +77,6 @@ const testEnvironmentProviders: [string, () => any][] = [
     () => {
       const testHeaders: any = {... headers}
       delete testHeaders['x-amz-date']
-      console.log(JSON.stringify(testHeaders))
       return testHeaders
     }
   ],

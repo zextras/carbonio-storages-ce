@@ -1,5 +1,5 @@
 pkgname="carbonio-storages-ce"
-pkgver="1.0.9"
+pkgver="1.0.10"
 pkgrel="1"
 pkgdesc="External store for Carbonio CE"
 arch=('x86_64')
@@ -21,12 +21,12 @@ source=(
   "service-protocol.json"
 )
 sha256sums=(
-  "1d504fcdda279cd7f3bc532c3fa5820fb727b1b653dae567cfd57cf95f00f412"
-  "e83c4c17ca4d6b9bb84676baf2a6e4e74a77a8ea67729c7460778aef4f277ba5"
-  "b3de776c542be4c938766cdaf4919b7d5d5a24e935fc0c59f55a9055dd4e7039"
-  "16005384d619273d5024ca1b67b3cfb3cae05fb289b7f4e6df0c9c0ece15c1f0"
-  "SKIP"
-  "SKIP"
+  "5bf54df7a315ddfa3b13365f7bdc906e401d9895d1402e9f37c18ef9ca381fcf"
+  "dcf809de82c23d720e4bb4444cbce1c308e9c9515b6787fcb42e448759d0c07f"
+  "9ff0d8ca695232fba7ed75b9ed6e6d1f9d38b5c63b90ac7956119db7704bad81"
+  "65bf2b844f4c18fcbe32acf1434cc882ffe3708eeb0cb4c4400f56db6e226ea8"
+  "7b912fbc263e31aa3541ffd750a339bb641bab0a31e4be96f3ad225c1bf9a195"
+  "1078726118b7329de7640fafdb732d631f867912172cc78a466fa9eacc8b440e"
 )
 
 build() {

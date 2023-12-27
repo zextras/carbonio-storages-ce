@@ -11,10 +11,17 @@ const livenessCheck: (fastify: FastifyInstance) => FastifyInstance =
       url: "/health/live",
       schema:{
         tags: ['health'],
-        description: 'Checks if server is running, useful for health checks'
+        description: 'Checks if server is running, useful for health checks',
+        response: {
+          200: {
+            type: 'null',
+            description: 'Server is running'
+          }
+        }
+        
       },
       handler: async function (__, reply) {
-        reply.send()
+        reply.code(200).send()
       },
     })
   }

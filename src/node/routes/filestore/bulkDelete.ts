@@ -42,6 +42,9 @@ const bulkDeleteItems = {
         required: ['node'],
         additionalProperties: false,
         properties: {
+          type : {
+            type: 'string',
+          },
           node : {
             type: 'string',
             format: 'uuid'

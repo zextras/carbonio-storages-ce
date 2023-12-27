@@ -2,8 +2,9 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-only
 
-import fastifyMultipart from "fastify-multipart"
-import fastifySwagger from "fastify-swagger"
+import fastify, { FastifyBaseLogger, FastifyInstance, FastifyTypeProviderDefault } from 'fastify'
+import fastifyMultipart from "@fastify/multipart"
+import fastifySwagger from "@fastify/swagger"
 import router from "./routes/router";
 import {Config} from "./config/configuration";
 import oasSchema from "./oasSchema";
@@ -11,8 +12,7 @@ import {LocalFilesystemAccessor} from "./filesystem/LocalFilesystemAcessor";
 import {LocalPathStrategy} from "./filesystem/FilePathStategy";
 import winston, {Logger} from "winston";
 import 'winston-daily-rotate-file';
-import {FastifyInstance, FastifyReply} from "fastify";
-import {IncomingMessage, Server, ServerResponse} from "http";
+import {FastifyReply} from "fastify";
 import {LoggerTransports} from "./LoggerTransports";
 import {GzipWrapperFilesystemAccessor} from "./filesystem/GzipWrapperFilesystemAccessor";
 import {FastifyRequest} from "fastify/types/request";
@@ -21,8 +21,12 @@ import * as fs from "fs";
 import {AuthFactory} from "./auth/AuthFactory";
 import {AuthError} from "./auth/AuthError";
 import os from "os"
+import { Http2SecureServer, Http2ServerRequest, Http2ServerResponse } from 'http2';
+import fastifySwaggerUi from '@fastify/swagger-ui';
 
-export function createApp(config: Config):FastifyInstance<Server, IncomingMessage, ServerResponse> {
+export type DefaultFastifyInstance = FastifyInstance<Http2SecureServer, Http2ServerRequest, Http2ServerResponse, FastifyBaseLogger, FastifyTypeProviderDefault>
+
+export async function createApp(config: Config):Promise<DefaultFastifyInstance> {
 
   const pathStrategy = new LocalPathStrategy(config)
   const localfilesystem = new LocalFilesystemAccessor(config, pathStrategy)
@@ -46,9 +50,9 @@ export function createApp(config: Config):FastifyInstance<Server, IncomingMessag
     }
   }
 
-  const server = require('fastify')(fastifyConfig)
+  const server = fastify(fastifyConfig)
 
-  server.setNotFoundHandler((request: FastifyRequest, reply: any) => {
+  server.setNotFoundHandler((request, reply) => {
     server.log.warn('Route not found: ' +  request.url)
     reply.status(404).send({ message: 'Not found' })
   })
@@ -84,10 +88,17 @@ export function createApp(config: Config):FastifyInstance<Server, IncomingMessag
     }
   })
 
-  server.register(fastifyMultipart);
-  server.register(fastifySwagger, oasSchema(config.servingURLPrefix, config.baseURL, config.bindAddress));
+  const swaggerUiOptions = {
+      routePrefix: "/",
+      exposeRoute: true,
+  };
 
-  server.register(router(config, filesystem, loggerTransports));
+  await server.register(fastifyMultipart);
+  
+  await server.register(fastifySwagger, oasSchema(config.servingURLPrefix, config.baseURL, config.bindAddress));
+  await server.register(fastifySwaggerUi, swaggerUiOptions);
+
+  await server.register(router(config, filesystem, loggerTransports));
 
   return server;
 }

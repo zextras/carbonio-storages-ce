@@ -4,10 +4,10 @@
 
 import tap from "tap";
 import {testApplication} from "../TestApplication";
-import {FastifyInstance} from "fastify";
 import {Response as LightMyRequestResponse} from "light-my-request";
+import { DefaultFastifyInstance } from "../../node/app";
 
-export async function unknownUrl(app: FastifyInstance): Promise<LightMyRequestResponse> {
+export async function unknownUrl(app: DefaultFastifyInstance): Promise<LightMyRequestResponse> {
   return await app.inject({
     method: "GET",
     url: "test-unknown-url"

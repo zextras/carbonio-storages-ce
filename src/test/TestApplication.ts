@@ -3,12 +3,12 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 import * as fs from "fs";
-import { createApp } from "../node/app";
+import { DefaultFastifyInstance, createApp } from "../node/app";
 import { Config, read } from "../node/config/configuration";
 import { Test } from "./TestUtils";
 import { DeepPartial, mergeDeep } from "../node/utils/mergeDeep";
 
-export async function testApplication(t:Test, configPatch: DeepPartial<Config> = {}) {
+export async function testApplication(t:Test, configPatch: DeepPartial<Config> = {}):Promise<DefaultFastifyInstance> {
 
   const defaultTestConfig: Config = {... await read()}
 
@@ -27,7 +27,7 @@ export async function testApplication(t:Test, configPatch: DeepPartial<Config> =
 
   const testConfig: Config = mergeDeep({... defaultTestConfig}, {... configPatch})
 
-  const server = createApp(testConfig)
+  const server = await createApp(testConfig)
   t.teardown(async () => {
     await server.close()
     await fs.promises.rm(testDir, {recursive: true})

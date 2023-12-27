@@ -4,10 +4,10 @@
 
 import {Auth} from "./Auth";
 import * as crypto from "crypto-js";
-import {FastifyInstance} from "fastify";
 import {FastifyRequest} from "fastify/types/request";
 import {createContext} from "../loggingutils";
 import {AuthError} from "./AuthError";
+import { DefaultFastifyInstance } from "../app";
 
 export class AWSV4SignatureAuth implements Auth {
   private static readonly ALGORITHM_IDENTIFIER = "AWS4-HMAC-SHA256";
@@ -19,7 +19,7 @@ export class AWSV4SignatureAuth implements Auth {
 
   constructor(private readonly credentials: any) {}
 
-  async check(server: FastifyInstance, request: FastifyRequest): Promise<void> {
+  async check(server: DefaultFastifyInstance, request: FastifyRequest): Promise<void> {
     server.log.debug("AWSV4 signature checks on request " + request.id)
 
     const authentication = request.headers["authorization"] as string;
