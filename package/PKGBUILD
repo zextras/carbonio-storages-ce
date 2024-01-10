@@ -33,8 +33,8 @@ build() {
   cd "${srcdir}"/../../project
   npm install
   npm run build
-  npm run pkg
-
+  PKG_CACHE_PATH=/tmp/pkg-cache npm run pkg
+  
   # ugly workaround to disable rpm system-wide stripping
   # please don't execute outside of the build agent
   echo "/bin/true" >/usr/bin/strip
