@@ -64,7 +64,7 @@ pipeline {
                         sh 'sudo apt-get install nodejs -y'
                         sh 'mkdir /tmp/project'
                         sh 'cp -r . /tmp/project'
-                        sh 'sudo yap build ubuntu-jammy /tmp/project'
+                        sh 'sudo yap build ubuntu /tmp/project'
                         stash includes: 'artifacts/', name: 'artifacts-deb'
                     }
                     post {
