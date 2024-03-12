@@ -31,6 +31,7 @@ pipeline {
             }
             steps {
                 checkout scm
+                sh 'echo "$(node --version)"'
                 stash includes: '**', name: 'project'
             }
         }
@@ -42,6 +43,7 @@ pipeline {
             }
             steps {
                 unstash 'project'
+                sh 'echo "$(node --version)"'
                 nodeCmd 'npm install && npm run build && npm run test'
             }
         }
@@ -55,15 +57,17 @@ pipeline {
                     }
                     steps {
                         unstash 'project'
+                sh 'echo "$(node --version)"'
                         sh 'sudo apt-get update'
                         sh 'sudo apt-get install -y ca-certificates curl gnupg'
                         sh 'sudo mkdir -p /etc/apt/keyrings'
                         sh 'curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | sudo gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg'
-                        sh 'echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_16.x nodistro main" | sudo tee /etc/apt/sources.list.d/nodesource.list'
+                        sh 'echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_18.x nodistro main" | sudo tee /etc/apt/sources.list.d/nodesource.list'
                         sh 'sudo apt-get update'
                         sh 'sudo apt-get install nodejs -y'
                         sh 'mkdir /tmp/project'
                         sh 'cp -r . /tmp/project'
+                sh 'echo "$(node --version)"'
                         sh 'sudo yap build ubuntu /tmp/project'
                         stash includes: 'artifacts/', name: 'artifacts-deb'
                     }
