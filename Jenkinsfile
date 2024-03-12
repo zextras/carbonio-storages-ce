@@ -37,7 +37,7 @@ pipeline {
         stage('Launch tests') {
             agent {
                 node {
-                    label 'nodejs-agent-v3'
+                    label 'nodejs-agent-v2'
                 }
             }
             steps {
