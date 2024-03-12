@@ -37,12 +37,11 @@ pipeline {
         stage('Launch tests') {
             agent {
                 node {
-                    label 'nodejs-agent-v2'
+                    label 'nodejs-agent-v3'
                 }
             }
             steps {
                 unstash 'project'
-                sh 'echo "$(node --version)"'
                 nodeCmd 'npm install && npm run build && npm run test'
             }
         }
@@ -56,7 +55,6 @@ pipeline {
                     }
                     steps {
                         unstash 'project'
-                sh 'echo "$(node --version)"'
                         sh 'sudo apt-get update'
                         sh 'sudo apt-get install -y ca-certificates curl gnupg'
                         sh 'sudo mkdir -p /etc/apt/keyrings'
@@ -66,8 +64,7 @@ pipeline {
                         sh 'sudo apt-get install nodejs -y'
                         sh 'mkdir /tmp/project'
                         sh 'cp -r . /tmp/project'
-                sh 'echo "$(node --version)"'
-                        sh 'sudo yap build ubuntu /tmp/project'
+                        sh 'sudo yap build ubuntu-jammy /tmp/project'
                         stash includes: 'artifacts/', name: 'artifacts-deb'
                     }
                     post {
