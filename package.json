@@ -28,7 +28,7 @@
   },
   "scripts": {
     "build": "rimraf dist && tsc --build",
-    "pkg": "pkg -t node14-linux -C Brotli .",
+    "pkg": "pkg -t node16-linux -C Brotli .",
     "start": "STORAGES_LOGGING_DIRNAME=/tmp/storages-ce-log STORAGES_PATH=/tmp/storages-ce-store node dist/node/index.js",
     "test": "tap 'src/test/**/*Test.ts' -R terse --allow-incomplete-coverage",
     "test:single": "tap",
@@ -37,7 +37,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@fastify/multipart": "^8.0.0",
+    "@fastify/multipart": "^8.1.0",
     "@fastify/swagger": "^8.12.1",
     "@fastify/swagger-ui": "^2.0.1",
     "@types/react": "^18.2.42",

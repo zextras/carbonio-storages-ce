@@ -93,7 +93,12 @@ export async function createApp(config: Config):Promise<DefaultFastifyInstance> 
       exposeRoute: true,
   };
 
-  await server.register(fastifyMultipart);
+  await server.register(fastifyMultipart, {
+    limits: {
+      fileSize: Infinity,
+      parts: Infinity
+    }
+  });
   
   await server.register(fastifySwagger, oasSchema(config.servingURLPrefix, config.baseURL, config.bindAddress));
   await server.register(fastifySwaggerUi, swaggerUiOptions);

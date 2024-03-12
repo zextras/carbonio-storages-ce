@@ -4,7 +4,6 @@ SPDX-FileCopyrightText: 2022 Zextras <https://www.zextras.com>
 SPDX-License-Identifier: AGPL-3.0-only
 -->
 
-
 <div align="center">
   <h1>Storages-CE</h1>
 </div>
@@ -30,12 +29,10 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <h4>Prerequisites</h4>
 
-Node 14 is required to build the application, alternativelly [nvm](https://github.com/nvm-sh/nvm) may be used:
+Node 16 is required to build the application, alternatively [nvm](https://github.com/nvm-sh/nvm) may be used:
 
 ```sh
 $ nvm install
-...
-Now using node v14.18.2 (npm v6.14.15)
 ```
 
 <h4>Start the application</h4>
@@ -66,7 +63,6 @@ The path to the configuration file
 Address on which Storages-CE will listen for API calls (default 127.0.0.1)
 
 - `STORAGES_PATH`
-
 
 The folder inside which all file are stored
 
