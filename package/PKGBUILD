@@ -29,6 +29,7 @@ sha256sums=('5bf54df7a315ddfa3b13365f7bdc906e401d9895d1402e9f37c18ef9ca381fcf'
 
 build() {
   cd "${srcdir}"/../../project
+  export PKG_CACHE_PATH="${srcdir}/../../project"
   npm install
   npm run build
   npm run pkg
