@@ -37,7 +37,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@fastify/multipart": "^8.0.0",
+    "@fastify/multipart": "^8.1.0",
     "@fastify/swagger": "^8.12.1",
     "@fastify/swagger-ui": "^2.0.1",
     "@types/react": "^18.2.42",
