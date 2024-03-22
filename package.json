@@ -5,7 +5,7 @@
   "bin": "dist/node/index.js",
   "type": "commonjs",
   "devDependencies": {
-    "@sinclair/typebox": "^0.31.28",
+    "@sinclair/typebox": "^0.32.18",
     "@types/busboy": "^0.2.4",
     "@types/crypto-js": "^4.0.2",
     "@types/node": "^16.11.7",
