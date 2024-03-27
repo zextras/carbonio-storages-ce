@@ -39,7 +39,7 @@
   "dependencies": {
     "@fastify/multipart": "^8.1.0",
     "@fastify/swagger": "^8.12.1",
-    "@fastify/swagger-ui": "^2.0.1",
+    "@fastify/swagger-ui": "^3.0.0",
     "@types/react": "^18.2.42",
     "check-disk-space": "^3.4.0",
     "crypto-js": "^4.2.0",
