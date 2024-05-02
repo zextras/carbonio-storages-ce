@@ -5,6 +5,7 @@
   "bin": "dist/node/index.js",
   "type": "commonjs",
   "devDependencies": {
+    "@sinclair/typebox": "^0.26.3",
     "@types/busboy": "^0.2.4",
     "@types/crypto-js": "^4.0.2",
     "@types/node": "^16.11.7",
@@ -36,7 +37,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@sinclair/typebox": "^0.32.20",
     "@fastify/multipart": "^8.1.0",
     "@fastify/swagger": "^8.12.1",
     "@fastify/swagger-ui": "^3.0.0",
