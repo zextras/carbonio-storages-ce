@@ -64,7 +64,14 @@ pipeline {
                         sh 'sudo apt-get install nodejs -y'
                         sh 'mkdir /tmp/project'
                         sh 'cp -r . /tmp/project'
-                        sh 'sudo yap build ubuntu /tmp/project'
+                        script {
+                            if (BRANCH_NAME == 'devel') {
+                                def timestamp = new Date().format('yyyyMMddHHmmss')
+                                sh "sudo yap build ubuntu /tmp/project -r ${timestamp}"
+                            } else {
+                                sh 'sudo yap build ubuntu /tmp/project'
+                            }
+                        }
                         stash includes: 'artifacts/', name: 'artifacts-deb'
                     }
                     post {
@@ -85,7 +92,14 @@ pipeline {
                         sh 'sudo yum install nodejs -y --setopt=nodesource-nodejs.module_hotfixes=1'
                         sh 'mkdir /tmp/project'
                         sh 'cp -r . /tmp/project'
-                        sh 'sudo yap build rocky /tmp/project'
+                        script {
+                            if (BRANCH_NAME == 'devel') {
+                                def timestamp = new Date().format('yyyyMMddHHmmss')
+                                sh "sudo yap build rocky /tmp/project -r ${timestamp}"
+                            } else {
+                                sh 'sudo yap build rocky /tmp/project'
+                            }
+                        }
                         stash includes: 'artifacts/x86_64/*.rpm', name: 'artifacts-rpm'
                     }
                     post {
