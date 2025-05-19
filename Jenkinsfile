@@ -2,12 +2,6 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-only
 
-def nodeCmd(String cmd) {
-	sh '. load_nvm && nvm install && nvm use && ' + cmd
-}
-
-final NODE_MAJOR = 20
-
 pipeline {
     parameters {
         booleanParam defaultValue: false, description: 'Whether to upload the packages in playground repositories', name: 'PLAYGROUND'
@@ -19,16 +13,11 @@ pipeline {
     }
     agent {
         node {
-            label 'base-agent-v1'
+            label 'base'
         }
     }
     stages {
         stage('Fetch sources') {
-            agent {
-                node {
-                    label 'base-agent-v1'
-                }
-            }
             steps {
                 checkout scm
                 script {
@@ -38,14 +27,16 @@ pipeline {
             }
         }
         stage('Launch tests') {
-            agent {
-                node {
-                    label 'nodejs-agent-v2'
-                }
-            }
             steps {
                 unstash 'project'
-                nodeCmd 'npm install && npm run build && npm run test'
+                sh 'sudo apt-get update'
+                sh 'sudo apt-get install -y ca-certificates curl gnupg'
+                sh 'sudo mkdir -p /etc/apt/keyrings'
+                sh 'curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | sudo gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg'
+                sh 'echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_16.x nodistro main" | sudo tee /etc/apt/sources.list.d/nodesource.list'
+                sh 'sudo apt-get update'
+                sh 'sudo apt-get install nodejs -y'
+                sh 'npm install && npm run build && npm run test'
             }
         }
         stage('Packaging...') {
@@ -53,29 +44,31 @@ pipeline {
                 stage('Ubuntu') {
                     agent {
                         node {
-                            label 'yap-agent-ubuntu-20.04-v2'
+                            label 'yap-ubuntu-20-v1'
                         }
                     }
                     steps {
-                        unstash 'project'
-                        sh 'sudo apt-get update'
-                        sh 'sudo apt-get install -y ca-certificates curl gnupg'
-                        sh 'sudo mkdir -p /etc/apt/keyrings'
-                        sh 'curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | sudo gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg'
-                        sh 'echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_16.x nodistro main" | sudo tee /etc/apt/sources.list.d/nodesource.list'
-                        sh 'sudo apt-get update'
-                        sh 'sudo apt-get install nodejs -y'
-                        sh 'mkdir /tmp/project'
-                        sh 'cp -r . /tmp/project'
-                        script {
-                            if (BRANCH_NAME == 'devel') {
-                                def timestamp = new Date().format('yyyyMMddHHmmss')
-                                sh "sudo yap build ubuntu /tmp/project -r ${timestamp}"
-                            } else {
-                                sh 'sudo yap build ubuntu /tmp/project'
+                        container('yap') {
+                            unstash 'project'
+                            sh 'sudo apt-get update'
+                            sh 'sudo apt-get install -y ca-certificates curl gnupg'
+                            sh 'sudo mkdir -p /etc/apt/keyrings'
+                            sh 'curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | sudo gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg'
+                            sh 'echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_16.x nodistro main" | sudo tee /etc/apt/sources.list.d/nodesource.list'
+                            sh 'sudo apt-get update'
+                            sh 'sudo apt-get install nodejs -y'
+                            sh 'mkdir /tmp/project'
+                            sh 'cp -r . /tmp/project'
+                            script {
+                                if (BRANCH_NAME == 'devel') {
+                                    def timestamp = new Date().format('yyyyMMddHHmmss')
+                                    sh "sudo yap build ubuntu /tmp/project -r ${timestamp}"
+                                } else {
+                                    sh 'sudo yap build ubuntu /tmp/project'
+                                }
                             }
+                            stash includes: 'artifacts/', name: 'artifacts-deb'
                         }
-                        stash includes: 'artifacts/', name: 'artifacts-deb'
                     }
                     post {
                         always {
@@ -86,28 +79,30 @@ pipeline {
                 stage('RHEL') {
                     agent {
                         node {
-                            label 'yap-agent-rocky-8-v2'
+                            label 'yap-rocky-8-v1'
                         }
                     }
                     steps {
-                        unstash 'project'
-                        sh 'sudo yum install https://rpm.nodesource.com/pub_16.x/nodistro/repo/nodesource-release-nodistro-1.noarch.rpm -y'
-                        sh 'sudo yum install nodejs -y --setopt=nodesource-nodejs.module_hotfixes=1'
-                        sh 'mkdir /tmp/project'
-                        sh 'cp -r . /tmp/project'
-                        script {
-                            if (BRANCH_NAME == 'devel') {
-                                def timestamp = new Date().format('yyyyMMddHHmmss')
-                                sh "sudo yap build rocky /tmp/project -r ${timestamp}"
-                            } else {
-                                sh 'sudo yap build rocky /tmp/project'
+                        container('yap') {
+                            unstash 'project'
+                            sh 'sudo yum install https://rpm.nodesource.com/pub_16.x/nodistro/repo/nodesource-release-nodistro-1.noarch.rpm -y'
+                            sh 'sudo yum install nodejs -y --setopt=nodesource-nodejs.module_hotfixes=1'
+                            sh 'mkdir /tmp/project'
+                            sh 'cp -r . /tmp/project'
+                            script {
+                                if (BRANCH_NAME == 'devel') {
+                                    def timestamp = new Date().format('yyyyMMddHHmmss')
+                                    sh "sudo yap build rocky /tmp/project -r ${timestamp}"
+                                } else {
+                                    sh 'sudo yap build rocky /tmp/project'
+                                }
                             }
+                            stash includes: 'artifacts/*.rpm', name: 'artifacts-rpm'
                         }
-                        stash includes: 'artifacts/x86_64/*.rpm', name: 'artifacts-rpm'
                     }
                     post {
                         always {
-                            archiveArtifacts artifacts: 'artifacts/x86_64/*.rpm', fingerprint: true
+                            archiveArtifacts artifacts: 'artifacts/*.rpm', fingerprint: true
                         }
                     }
                 }
@@ -139,12 +134,12 @@ pipeline {
                                 "props": "deb.distribution=focal;deb.distribution=jammy;deb.distribution=noble;deb.component=main;deb.architecture=amd64;vcs.revision=${env.GIT_COMMIT}"
                             },
                             {
-                                "pattern": "artifacts/x86_64/(carbonio-storages-ce)-(*).x86_64.rpm",
+                                "pattern": "artifacts/(carbonio-storages-ce)-(*).x86_64.rpm",
                                 "target": "centos8-playground/zextras/{1}/{1}-{2}.x86_64.rpm",
                                 "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras;vcs.revision=${env.GIT_COMMIT}"
                             },
                             {
-                                "pattern": "artifacts/x86_64/(carbonio-storages-ce)-(*).x86_64.rpm",
+                                "pattern": "artifacts/(carbonio-storages-ce)-(*).x86_64.rpm",
                                 "target": "rhel9-playground/zextras/{1}/{1}-{2}.x86_64.rpm",
                                 "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras;vcs.revision=${env.GIT_COMMIT}"
                             }
@@ -174,12 +169,12 @@ pipeline {
                                 "props": "deb.distribution=focal;deb.distribution=jammy;deb.distribution=noble;deb.component=main;deb.architecture=amd64;vcs.revision=${env.GIT_COMMIT}"
                             },
                             {
-                                "pattern": "artifacts/x86_64/(carbonio-storages-ce)-(*).x86_64.rpm",
+                                "pattern": "artifacts/(carbonio-storages-ce)-(*).x86_64.rpm",
                                 "target": "centos8-devel/zextras/{1}/{1}-{2}.x86_64.rpm",
                                 "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras;vcs.revision=${env.GIT_COMMIT}"
                             },
                             {
-                                "pattern": "artifacts/x86_64/(carbonio-storages-ce)-(*).x86_64.rpm",
+                                "pattern": "artifacts/(carbonio-storages-ce)-(*).x86_64.rpm",
                                 "target": "rhel9-devel/zextras/{1}/{1}-{2}.x86_64.rpm",
                                 "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras;vcs.revision=${env.GIT_COMMIT}"
                             }
@@ -235,7 +230,7 @@ pipeline {
                     uploadSpec= """{
                         "files": [
                             {
-                                "pattern": "artifacts/x86_64/(carbonio-storages-ce)-(*).x86_64.rpm",
+                                "pattern": "artifacts/(carbonio-storages-ce)-(*).x86_64.rpm",
                                 "target": "centos8-rc/zextras/{1}/{1}-{2}.x86_64.rpm",
                                 "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras;vcs.revision=${env.GIT_COMMIT}"
                             }
@@ -262,7 +257,7 @@ pipeline {
                     uploadSpec= """{
                         "files": [
                             {
-                                "pattern": "artifacts/x86_64/(carbonio-storages-ce)-(*).x86_64.rpm",
+                                "pattern": "artifacts/(carbonio-storages-ce)-(*).x86_64.rpm",
                                 "target": "rhel9-rc/zextras/{1}/{1}-{2}.x86_64.rpm",
                                 "props": "rpm.metadata.arch=x86_64;rpm.metadata.vendor=zextras;vcs.revision=${env.GIT_COMMIT}"
                             }
