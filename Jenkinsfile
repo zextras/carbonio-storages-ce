@@ -13,7 +13,7 @@ pipeline {
     }
     agent {
         node {
-            label 'base'
+            label 'yap-ubuntu-20-v1'
         }
     }
     stages {
@@ -28,15 +28,17 @@ pipeline {
         }
         stage('Launch tests') {
             steps {
-                unstash 'project'
-                sh 'sudo apt-get update'
-                sh 'sudo apt-get install -y ca-certificates curl gnupg'
-                sh 'sudo mkdir -p /etc/apt/keyrings'
-                sh 'curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | sudo gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg'
-                sh 'echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_16.x nodistro main" | sudo tee /etc/apt/sources.list.d/nodesource.list'
-                sh 'sudo apt-get update'
-                sh 'sudo apt-get install nodejs -y'
-                sh 'npm install && npm run build && npm run test'
+                container('yap') {
+                    unstash 'project'
+                    sh 'apt-get update'
+                    sh 'apt-get install -y ca-certificates curl gnupg'
+                    sh 'mkdir -p /etc/apt/keyrings'
+                    sh 'curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | sudo gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg'
+                    sh 'echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_16.x nodistro main" | sudo tee /etc/apt/sources.list.d/nodesource.list'
+                    sh 'apt-get update'
+                    sh 'apt-get install nodejs -y'
+                    sh 'npm install && npm run build && npm run test'
+                }
             }
         }
         stage('Packaging...') {
@@ -50,13 +52,13 @@ pipeline {
                     steps {
                         container('yap') {
                             unstash 'project'
-                            sh 'sudo apt-get update'
-                            sh 'sudo apt-get install -y ca-certificates curl gnupg'
-                            sh 'sudo mkdir -p /etc/apt/keyrings'
+                            sh 'apt-get update'
+                            sh 'apt-get install -y ca-certificates curl gnupg'
+                            sh 'mkdir -p /etc/apt/keyrings'
                             sh 'curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | sudo gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg'
                             sh 'echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_16.x nodistro main" | sudo tee /etc/apt/sources.list.d/nodesource.list'
-                            sh 'sudo apt-get update'
-                            sh 'sudo apt-get install nodejs -y'
+                            sh 'apt-get update'
+                            sh 'apt-get install nodejs -y'
                             sh 'mkdir /tmp/project'
                             sh 'cp -r . /tmp/project'
                             script {
