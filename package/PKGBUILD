@@ -7,6 +7,7 @@ maintainer="Zextras <packages@zextras.com"
 url="https://zextras.com"
 section="libs"
 priority="important"
+options=('!strip')
 depends=(
   "pending-setups"
   "service-discover"
