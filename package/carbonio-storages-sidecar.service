@@ -7,19 +7,16 @@ After=network-online.target
 After=carbonio-storages.service
 
 [Service]
-Type=simple
+User=carbonio-storages
 ExecStart=/usr/bin/consul connect envoy \
     -token-file /etc/zextras/carbonio-storages/token \
     -admin-bind localhost:0 \
     -sidecar-for carbonio-storages
 Restart=on-failure
 RestartSec=15
-User=carbonio-storages
-KillMode=process
-KillSignal=SIGKILL
+ExecReload=/usr/bin/kill -HUP $MAINPID
+KillSignal=SIGINT
 LimitNOFILE=65536
-TimeoutSec=120
-TimeoutStopSec=120
 
 [Install]
 WantedBy=multi-user.target
