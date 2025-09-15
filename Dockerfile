@@ -2,18 +2,18 @@
 #
 # SPDX-License-Identifier: AGPL-3.0-only
 
-ARG NODE_IMAGE_VERSION
+ARG NODE_IMAGE_VERSION=22
 
-FROM node:${NODE_IMAGE_VERSION} as node_modules_builder_production
+FROM node:${NODE_IMAGE_VERSION} AS node_modules_builder_production
 
 WORKDIR /usr/src/app
 
 COPY package.json ./
 
 # install production dependencies here, for better reuse of layers
-RUN npm install --production
+RUN npm install --omit=dev
 
-FROM node:${NODE_IMAGE_VERSION} as node_modules_builder
+FROM node:${NODE_IMAGE_VERSION} AS node_modules_builder
 
 WORKDIR /usr/src/app
 
@@ -25,7 +25,7 @@ COPY --from=node_modules_builder_production \
 # install dependencies here, for better reuse of layers
 RUN npm install && npm audit fix && npm cache clean --force
 
-FROM node:${NODE_IMAGE_VERSION} as builder
+FROM node:${NODE_IMAGE_VERSION} AS builder
 
 RUN mkdir -p /home/node/app
 RUN chown -R node:node /home/node/app
@@ -44,4 +44,4 @@ COPY --chown=node:node . .
 EXPOSE 5794
 
 RUN npm run build
-ENTRYPOINT npm run start
+ENTRYPOINT ["npm", "run", "start"]

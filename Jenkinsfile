@@ -2,6 +2,15 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-only
 
+def buildContainer(String title, String description, String dockerfile, String tag) {
+    sh 'docker build ' +
+            '--label org.opencontainers.image.title="' + title + '" ' +
+            '--label org.opencontainers.image.description="' + description + '" ' +
+            '--label org.opencontainers.image.vendor="Zextras" ' +
+            '-f ' + dockerfile + ' -t ' + tag + ' .'
+    sh 'docker push ' + tag
+}
+
 pipeline {
     parameters {
         booleanParam defaultValue: false, description: 'Whether to upload the packages in playground repositories', name: 'PLAYGROUND'
@@ -34,7 +43,7 @@ pipeline {
                     sh 'apt-get install -y ca-certificates curl gnupg'
                     sh 'mkdir -p /etc/apt/keyrings'
                     sh 'curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | sudo gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg'
-                    sh 'echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_16.x nodistro main" | sudo tee /etc/apt/sources.list.d/nodesource.list'
+                    sh 'echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_22.x nodistro main" | sudo tee /etc/apt/sources.list.d/nodesource.list'
                     sh 'apt-get update'
                     sh 'apt-get install nodejs -y'
                     sh 'npm install && npm run build && npm run test'
@@ -43,6 +52,47 @@ pipeline {
         }
         stage('Packaging...') {
             parallel {
+                stage('Build and Publish Docker Image - Dev') {
+                    agent {
+                        node {
+                            label 'zextras-v1'
+                        }
+                    }
+                    when {
+                        not {
+                            buildingTag()
+                        }
+                        not {
+                            expression { env.BRANCH_NAME.startsWith("PR-") }
+                        }
+                    }
+                    steps {
+                        container('dind') {
+                            unstash 'project'
+                            withDockerRegistry(credentialsId: 'private-registry', url: 'https://registry.dev.zextras.com') {
+                                script {
+                                    def branchTag = env.BRANCH_NAME.replaceAll('/', '-').toLowerCase()
+                                    def imageTag = "registry.dev.zextras.com/dev/carbonio-storages-ce:${branchTag}"
+
+                                    buildContainer(
+                                        'Carbonio storages CE',
+                                        'Carbonio storages CE',
+                                        'Dockerfile',
+                                        imageTag
+                                    )
+
+                                    // alias "latest" for last build of develop
+                                    if (env.BRANCH_NAME == 'devel') {
+                                        def latestTag = "registry.dev.zextras.com/dev/carbonio-storages-ce:latest"
+
+                                        sh "docker tag ${imageTag} ${latestTag}"
+                                        sh "docker push ${latestTag}"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
                 stage('Ubuntu') {
                     agent {
                         node {
@@ -56,7 +106,7 @@ pipeline {
                             sh 'apt-get install -y ca-certificates curl gnupg'
                             sh 'mkdir -p /etc/apt/keyrings'
                             sh 'curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | sudo gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg'
-                            sh 'echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_16.x nodistro main" | sudo tee /etc/apt/sources.list.d/nodesource.list'
+                            sh 'echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_22.x nodistro main" | sudo tee /etc/apt/sources.list.d/nodesource.list'
                             sh 'apt-get update'
                             sh 'apt-get install nodejs -y'
                             sh 'mkdir /tmp/project'
@@ -87,8 +137,8 @@ pipeline {
                     steps {
                         container('yap') {
                             unstash 'project'
-                            sh 'sudo yum install https://rpm.nodesource.com/pub_16.x/nodistro/repo/nodesource-release-nodistro-1.noarch.rpm -y'
-                            sh 'sudo yum install nodejs -y --setopt=nodesource-nodejs.module_hotfixes=1'
+                            sh 'curl -fsSL https://rpm.nodesource.com/setup_22.x | sudo bash -'
+                            sh 'sudo yum install nodejs -y'
                             sh 'mkdir /tmp/project'
                             sh 'cp -r . /tmp/project'
                             script {

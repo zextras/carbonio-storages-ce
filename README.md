@@ -29,7 +29,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <h4>Prerequisites</h4>
 
-Node 16 is required to build the application, alternatively [nvm](https://github.com/nvm-sh/nvm) may be used:
+Node 22 is required to build the application, alternatively [nvm](https://github.com/nvm-sh/nvm) may be used:
 
 ```sh
 $ nvm install
