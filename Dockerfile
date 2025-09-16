@@ -9,21 +9,23 @@ FROM node:${NODE_IMAGE_VERSION} AS node_modules_builder_production
 WORKDIR /usr/src/app
 
 COPY package.json ./
+COPY package-lock.json ./
 
 # install production dependencies here, for better reuse of layers
-RUN npm install --omit=dev
+RUN npm ci --omit=dev
 
 FROM node:${NODE_IMAGE_VERSION} AS node_modules_builder
 
 WORKDIR /usr/src/app
 
 COPY package.json ./
+COPY package-lock.json ./
 
 COPY --from=node_modules_builder_production \
   /usr/src/app/node_modules /usr/src/app/node_modules
 
 # install dependencies here, for better reuse of layers
-RUN npm install && npm audit fix && npm cache clean --force
+RUN npm ci && npm audit fix && npm cache clean --force
 
 FROM node:${NODE_IMAGE_VERSION} AS builder
 
