@@ -5,7 +5,7 @@
 import {Identifier} from "./Identifier";
 import {FilesystemAccessor} from "./FilesystemAccessor";
 import {Readable, Writable} from "stream";
-import * as zlib from "zlib";
+import * as zlib from "node:zlib";
 
 
 export class GzipWrapperFilesystemAccessor implements FilesystemAccessor {
