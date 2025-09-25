@@ -31,9 +31,8 @@ sha256sums=(
 )
 
 build() {
-  cd "${srcdir}"/../../project
-  export PKG_CACHE_PATH="${srcdir}/../../project"
-  npm install
+  export PKG_CACHE_PATH="."
+  npm ci
   npm run build
   npm run pkg
 
@@ -43,7 +42,6 @@ build() {
 }
 
 package() {
-  cd "${srcdir}"/../../project
   install -Dm755 "${srcdir}/carbonio-storages.sh" \
     "${pkgdir}/usr/bin/carbonio-storages"
   install -Dm755 "${srcdir}/carbonio-storages.service" \
