@@ -8,6 +8,16 @@ import fs from "fs";
 import { LogLevelType } from "../routes/types";
 import { mergeDeep, DeepPartial } from "../utils/mergeDeep";
 
+const LoggingOptionsType = Type.Object({
+  defaultLevel: LogLevelType,
+  //datePattern: Type.String(),
+  //zippedArchive: Type.Optional(Type.Boolean()),
+  filename: Type.String(),
+  dirname: Type.Optional(Type.String())
+})
+
+export type LoggingOptions = Static<typeof LoggingOptionsType>
+
 const ConfigType = Type.Object({
   bindAddress: Type.String(),
   path: Type.String(),
@@ -15,13 +25,7 @@ const ConfigType = Type.Object({
   baseURL: Type.String(),
   servingURLPrefix: Type.String(),
   compress: Type.Boolean(),
-  logging: Type.Object({
-    defaultLevel: LogLevelType,
-    datePattern: Type.String(),
-    zippedArchive: Type.Optional(Type.Boolean()),
-    filename: Type.String(),
-    dirname: Type.Optional(Type.String())
-  }),
+  logging: Type.Optional(LoggingOptionsType),
   https: Type.Optional(Type.Object({
     keyPath: Type.String(),
     certPath: Type.String()

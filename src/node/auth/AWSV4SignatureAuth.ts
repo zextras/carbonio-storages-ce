@@ -7,7 +7,6 @@ import * as crypto from "crypto-js";
 import {FastifyRequest} from "fastify/types/request";
 import {createContext} from "../loggingutils";
 import {AuthError} from "./AuthError";
-import { DefaultFastifyInstance } from "../app";
 
 export class AWSV4SignatureAuth implements Auth {
   private static readonly ALGORITHM_IDENTIFIER = "AWS4-HMAC-SHA256";
@@ -19,18 +18,18 @@ export class AWSV4SignatureAuth implements Auth {
 
   constructor(private readonly credentials: any) {}
 
-  async check(server: DefaultFastifyInstance, request: FastifyRequest): Promise<void> {
-    server.log.debug("AWSV4 signature checks on request " + request.id)
+  async check(request: FastifyRequest): Promise<void> {
+    request.log.debug("AWSV4 signature checks on request " + request.id)
 
     const authentication = request.headers["authorization"] as string;
     if (authentication === undefined || authentication === null || authentication.length === 0) {
-      server.log.error(`[${createContext(request)}] Missing authentication header`)
+      request.log.error(`[${createContext(request)}] Missing authentication header`)
       throw new AuthError()
     }
 
     const longDate = request.headers[AWSV4SignatureAuth.AMZ_DATE_HEADER] as string
     if (longDate === undefined || longDate === null || longDate.length === 0) {
-      server.log.error(`[${createContext(request)}] Missing date header`)
+      request.log.error(`[${createContext(request)}] Missing date header`)
       throw new AuthError()
     }
 
@@ -40,13 +39,13 @@ export class AWSV4SignatureAuth implements Auth {
     const [accessKey, signatureReceived] = AWSV4SignatureAuth.parseAuthenticationHeader(authentication, scope)
 
     if (!(accessKey in this.credentials)) {
-      server.log.error(`[${createContext(request)}] Unknown access key ${accessKey}`)
+      request.log.error(`[${createContext(request)}] Unknown access key ${accessKey}`)
       throw new AuthError()
     }
 
     const signedHeaders = AWSV4SignatureAuth.getSignedHeaders(request.headers)
     if (signedHeaders === undefined) {
-      server.log.error(`[${createContext(request)}] Invalid signed headers`)
+      request.log.error(`[${createContext(request)}] Invalid signed headers`)
       throw new AuthError()
     }
 
@@ -64,7 +63,7 @@ export class AWSV4SignatureAuth implements Auth {
     )
 
     if (!(signature == signatureReceived)) {
-      server.log.error(`[${createContext(request)}] invalid signature`)
+      request.log.error(`[${createContext(request)}] invalid signature`)
       throw new AuthError()
     }
   }

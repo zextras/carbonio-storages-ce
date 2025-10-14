@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-only
 
-import {FastifyInstance, FastifyReply, RawServerDefault} from "fastify";
+import {FastifyInstance, FastifyReply, RawServerBase, RouteGenericInterface} from "fastify";
 import {CopyParameters, CopyParametersType, ErrorType} from "../types";
 import {FilesystemAccessor} from "../../filesystem/FilesystemAccessor";
 import {Static, Type} from "@sinclair/typebox";
@@ -11,7 +11,8 @@ import StreamHash from "../../filesystem/utils/StreamHash";
 import util from 'util';
 import { pipeline } from 'stream';
 import { Urls } from "../../urls";
-import { IncomingMessage, ServerResponse } from "http";
+import { IncomingMessage } from "http";
+import { Http2ServerRequest } from "http2";
 
 const pump = util.promisify(pipeline)
 
@@ -113,7 +114,7 @@ type ErrorResponse = {
   message: string
 }
 
-function replyError(reply: FastifyReply<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>>, errorResponse: ErrorResponse) {
+function replyError(reply: FastifyReply<RouteGenericInterface, RawServerBase, IncomingMessage | Http2ServerRequest>, errorResponse: ErrorResponse) {
   return reply.status(errorResponse.statusCode)
     .type('application/json')
     .send(errorResponse);

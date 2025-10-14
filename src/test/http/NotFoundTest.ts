@@ -3,11 +3,10 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 import tap from "tap";
-import {testApplication} from "../TestApplication";
+import {testApplication, TestServer} from "../TestApplication";
 import {Response as LightMyRequestResponse} from "light-my-request";
-import { DefaultFastifyInstance } from "../../node/app";
 
-export async function unknownUrl(app: DefaultFastifyInstance): Promise<LightMyRequestResponse> {
+export async function unknownUrl(app: TestServer): Promise<LightMyRequestResponse> {
   return await app.inject({
     method: "GET",
     url: "test-unknown-url"

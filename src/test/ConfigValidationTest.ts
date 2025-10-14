@@ -59,7 +59,7 @@ tap.test('custom logging dirname', async t => {
 
   const configuration = await startupConfiguration(c);
 
-  t.equal(configuration.logging.dirname, 'bla');
+  t.equal(configuration.logging?.dirname, 'bla');
 });
 
 tap.test('expect error if custom Aws conf incomplete', async t => {
