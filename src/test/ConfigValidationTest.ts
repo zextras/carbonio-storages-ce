@@ -20,7 +20,6 @@ tap.test('reject invalid log level', async t => {
             "compress": false,
             "logging": {
               "defaultLevel": 42,
-              "datePattern": "YYYY-MM-DD",
               "filename": "storages-ce-%DATE%.log",
               "dirname": "/tmp/storages/logs",
               "zippedArchive": true
@@ -39,7 +38,6 @@ tap.test('reject missing non existing certpath', async t => {
             "compress": false,
             "logging": {
               "defaultLevel": "debug",
-              "datePattern": "YYYY-MM-DD",
               "filename": "storages-%DATE%.log",
               "dirname": "/tmp/storages/logs",
               "zippedArchive": true

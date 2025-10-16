@@ -10,8 +10,7 @@ import { mergeDeep, DeepPartial } from "../utils/mergeDeep";
 
 const LoggingOptionsType = Type.Object({
   defaultLevel: LogLevelType,
-  // datePattern: Type.String(),
-  // zippedArchive: Type.Optional(Type.Boolean()),
+  zippedArchive: Type.Optional(Type.Boolean()),
   filename: Type.String(),
   dirname: Type.Optional(Type.String())
 })

@@ -16,8 +16,9 @@ import copy from "./filestore/copy";
 import bulkDelete from "./filestore/bulkDelete"
 import { getLogLevel } from "./config/getloglevel";
 import { setLogLevel } from "./config/setloglevel";
+import pino from "pino";
 
-export default function (config: Config, filesystem: FilesystemAccessor) : (fastify : FastifyInstance) => Promise<void> {
+export default function (config: Config, filesystem: FilesystemAccessor, logger: pino.Logger | undefined) : (fastify : FastifyInstance) => Promise<void> {
   return async fastify => {
     const base = { prefix: config.baseURL.length === 0 ? "" : "/" + config.baseURL }
 
@@ -33,6 +34,6 @@ export default function (config: Config, filesystem: FilesystemAccessor) : (fast
 
     await fastify.register(getconfig(config), base);
     await fastify.register(getLogLevel, base);
-    await fastify.register(setLogLevel, base);
+    await fastify.register(setLogLevel(logger), base);
   }
 }

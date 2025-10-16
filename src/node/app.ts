@@ -95,12 +95,12 @@ export async function createApp(config: Config) {
   await server.register(fastifySwagger, oasSchema(config.servingURLPrefix, config.baseURL, config.bindAddress));
   await server.register(fastifySwaggerUi, swaggerUiOptions);
 
-  await server.register(router(config, filesystem));
+  await server.register(router(config, filesystem, logger));
 
   return server;
 }
 
-function createLogger(logging: LoggingOptions) {
+function createLogger(logging: LoggingOptions) : pino.Logger<never, boolean> {
   const fileStream = createFileLogger(logging)
   const consoleStream = pretty({
     colorize: true,
@@ -135,10 +135,12 @@ function createFileLogger(logging: LoggingOptions) {
     const formattedDate = formatter.formatToParts(currentTime).filter(p => p.type !== 'literal').map(p => p.value).join('-');
     return logging.filename.replace( "%DATE%", formattedDate );
   };
+  const fileLoggingProperties: rfs.Options = logging.zippedArchive === true ?
+    { compress: 'gzip' } : {};
   return rfs.createStream(fileNameGenerator, {
       interval: '1d',
       path: logging.dirname,
-      compress: 'gzip',
+      ...fileLoggingProperties
   })
 }
 

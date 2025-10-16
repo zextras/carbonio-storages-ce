@@ -27,9 +27,6 @@ export async function testApplication(t:Test, configPatch: DeepPartial<Config> =
 
   defaultTestConfig.logging = undefined;
 
-  // defaultTestConfig.logging.dirname = `${testDirLog}/logs`
-  // defaultTestConfig.logging.defaultLevel = "fatal"
-
   const testConfig: Config = mergeDeep({... defaultTestConfig}, {... configPatch})
 
   const server = await createApp(testConfig)

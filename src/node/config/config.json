@@ -7,7 +7,6 @@
   "compress": false,
   "logging": {
     "defaultLevel": "warn",
-    "datePattern": "YYYY-MM-DD",
     "filename": "carbonio-storages-%DATE%.log",
     "dirname": "/var/log/carbonio/storages/",
     "zippedArchive": true

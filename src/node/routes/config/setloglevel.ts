@@ -4,9 +4,10 @@
 
 import {FastifyInstance} from "fastify";
 import {LogLevelQueryString, LogLevelQueryStringType, LogLevelResponse, LogLevelResponseType} from "../types";
+import pino from "pino";
 
-export const setLogLevel: (fastify: FastifyInstance) => FastifyInstance =
-  fastify => {
+export const setLogLevel: (logger: pino.Logger | undefined) => (fastify: FastifyInstance) => FastifyInstance =
+  logger => fastify => {
     return fastify.route<{Querystring: LogLevelQueryString, Reply: LogLevelResponse}>({
       method: "PUT",
       url: "/loglevel",
@@ -20,6 +21,9 @@ export const setLogLevel: (fastify: FastifyInstance) => FastifyInstance =
       },
       async handler (req, reply) {
         fastify.log.level = req.query.level;
+        if (logger !== undefined) {
+          logger.level = req.query.level;
+        }
         reply.send({level: req.query.level})
       },
     })
