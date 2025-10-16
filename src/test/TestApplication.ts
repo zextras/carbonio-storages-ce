@@ -24,11 +24,11 @@ export async function testApplication(t:Test, configPatch: DeepPartial<Config> =
 
   const testDir: string = await mkTempFolder("storagesCETests");
   defaultTestConfig.path = `${testDir}/store`
-  
+
   defaultTestConfig.logging = undefined;
-  
-  //defaultTestConfig.logging.dirname = `${testDirLog}/logs`
-  //defaultTestConfig.logging.defaultLevel = "fatal"
+
+  // defaultTestConfig.logging.dirname = `${testDirLog}/logs`
+  // defaultTestConfig.logging.defaultLevel = "fatal"
 
   const testConfig: Config = mergeDeep({... defaultTestConfig}, {... configPatch})
 

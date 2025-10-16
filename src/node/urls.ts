@@ -12,7 +12,7 @@ export class Urls {
 
   downloadURL(identifier: QueryString): string {
     return this.config.servingURLPrefix +
-        (this.config.baseURL.length == 0 ? "" :  "/" + this.config.baseURL) +
+        (this.config.baseURL.length === 0 ? "" :  "/" + this.config.baseURL) +
         "/download" + Urls.buildQueryString(Urls.transform(identifier))
   }
 
@@ -33,7 +33,7 @@ export class Urls {
   private static buildQueryString(record: Record<string, string>): string {
     const arr: string[] = []
 
-    for (const key in record) {
+    for (const key of Object.keys(record)) {
       arr.push(`${key}=${encodeURIComponent(record[key])}`)
     }
 

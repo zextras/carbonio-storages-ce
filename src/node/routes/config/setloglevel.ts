@@ -5,7 +5,7 @@
 import {FastifyInstance} from "fastify";
 import {LogLevelQueryString, LogLevelQueryStringType, LogLevelResponse, LogLevelResponseType} from "../types";
 
-export const setLogLevel: (fastify: FastifyInstance) => FastifyInstance = 
+export const setLogLevel: (fastify: FastifyInstance) => FastifyInstance =
   fastify => {
     return fastify.route<{Querystring: LogLevelQueryString, Reply: LogLevelResponse}>({
       method: "PUT",
@@ -18,7 +18,7 @@ export const setLogLevel: (fastify: FastifyInstance) => FastifyInstance =
           200: LogLevelResponseType
         }
       },
-      handler: async function (req, reply) {
+      async handler (req, reply) {
         fastify.log.level = req.query.level;
         reply.send({level: req.query.level})
       },

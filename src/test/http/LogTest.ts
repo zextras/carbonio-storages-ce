@@ -39,8 +39,8 @@ export async function setLogLevel(app: TestServer, level: string): Promise<Light
 
 tap.test("set & get log level", async t => {
   const testDirLog: string = await mkTempFolder("storagesCETestsLog");
-  //defaultTestConfig.logging.dirname = `${testDirLog}/logs`
-  //defaultTestConfig.logging.defaultLevel = "fatal"
+  // defaultTestConfig.logging.dirname = `${testDirLog}/logs`
+  // defaultTestConfig.logging.defaultLevel = "fatal"
   const server = await testApplication(t, {
     logging: {
       filename:"carbonio-storages-%DATE%.log",

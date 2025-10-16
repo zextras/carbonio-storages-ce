@@ -34,7 +34,7 @@ export const ErrorType = Type.Object({
 
 export type Error = Static<typeof ErrorType>
 
-//"fatal" | "error" | "warn" | "info" | "debug" | "trace"
+// "fatal" | "error" | "warn" | "info" | "debug" | "trace"
 export const LogLevelType = Type.Union([
     Type.Literal("trace"),
     Type.Literal("debug"),

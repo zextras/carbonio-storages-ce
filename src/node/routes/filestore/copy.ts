@@ -43,17 +43,17 @@ export default function(filesystem: FilesystemAccessor, urls: Urls): (fastify: F
           500: ErrorType
         },
       },
-      handler: async function (req, reply) {
-        const sourceQuery = parseQueryString(req.query.type, req.query.sourceNode, req.query.sourceVersion); 
-        
+      async handler (req, reply) {
+        const sourceQuery = parseQueryString(req.query.type, req.query.sourceNode, req.query.sourceVersion);
+
         if (sourceQuery === undefined) {
           return replyError(reply, {
             statusCode : 400,
             error : "Bad Request",
             message : `Invalid request ${JSON.stringify(req.query)}`
           })
-        } 
-        
+        }
+
         const sourceIdentifier = parse(sourceQuery);
         if (!(await filesystem.fileExists(sourceIdentifier))) {
           return replyError(reply, {
@@ -63,7 +63,7 @@ export default function(filesystem: FilesystemAccessor, urls: Urls): (fastify: F
           })
         } else {
           const destinationQuery = parseQueryString(req.query.type, req.query.destinationNode, req.query.destinationVersion);
-          
+
           if (destinationQuery === undefined) {
             return replyError(reply, {
               statusCode : 400,
@@ -86,7 +86,7 @@ export default function(filesystem: FilesystemAccessor, urls: Urls): (fastify: F
               message: `Identifier ${JSON.stringify(destinationIdentifier)} already exists`
             })
           } else {
-            
+
             const sourceStream = await filesystem.openReadStream(sourceIdentifier)
             const hashTransform = new StreamHash();
 

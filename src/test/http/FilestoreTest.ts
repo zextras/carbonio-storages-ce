@@ -34,8 +34,8 @@ function deleteURL(node: string, version: number) {
 const deleteBulkURL = `bulk-delete?type=files`
 
 function copyUrl(pars:Record<string, boolean | number | string> & CopyParameters) {
-  let parts:string[] = []
-  for (const k in pars) {
+  const parts:string[] = []
+  for (const k of Object.keys(pars)) {
     const v = pars[k]
     if (v !== undefined) {
       parts.push(`${k}=${encodeURIComponent(v)}`)
@@ -167,13 +167,13 @@ for(const environmentProviderConfig of testEnvironmentProviders) {
 
     const copyResponse = await copy(server, {
       type: "files",
-      sourceNode: sampleNode2, 
+      sourceNode: sampleNode2,
       sourceVersion: sampleVersion,
       destinationNode: sampleNode1,
       destinationVersion: sampleVersion
     });
     t.equal(200, copyResponse.statusCode)
- 
+
     const downloadResponse1 = await downloadFile(server, sampleNode2, sampleVersion);
     t.equal(200, downloadResponse1.statusCode)
 
@@ -189,13 +189,13 @@ for(const environmentProviderConfig of testEnvironmentProviders) {
 
     const copyResponse = await copy(server, {
       type: "files",
-      sourceNode: sampleNode2, 
+      sourceNode: sampleNode2,
       sourceVersion: sampleVersion,
       destinationNode: sampleNode1,
       destinationVersion: sampleVersion
     });
     t.equal(200, copyResponse.statusCode)
- 
+
     const downloadResponse1 = await downloadFile(server, sampleNode2, sampleVersion);
     t.equal(200, downloadResponse1.statusCode)
 
@@ -212,11 +212,11 @@ for(const environmentProviderConfig of testEnvironmentProviders) {
 
     const copyResponse = await copy(server, {
       type: "chats",
-      sourceNode: sampleNode2, 
+      sourceNode: sampleNode2,
       destinationNode: sampleNode1,
     });
     t.equal(200, copyResponse.statusCode)
- 
+
     const downloadResponse1 = await downloadChatsAttachment(server, sampleNode2);
     t.equal(200, downloadResponse1.statusCode)
 
@@ -236,7 +236,7 @@ for(const environmentProviderConfig of testEnvironmentProviders) {
 
     const copyResponse = await copy(server, {
       type: "files",
-      sourceNode: sampleNode2, 
+      sourceNode: sampleNode2,
       sourceVersion: sampleVersion,
       destinationNode: sampleNode1,
       destinationVersion: sampleVersion,
@@ -257,7 +257,7 @@ for(const environmentProviderConfig of testEnvironmentProviders) {
 
     const copyResponse = await copy(server, {
       type: "files",
-      sourceNode: sampleNode2, 
+      sourceNode: sampleNode2,
       sourceVersion: sampleVersion,
       destinationNode: sampleNode1,
       destinationVersion: sampleVersion,
@@ -267,7 +267,7 @@ for(const environmentProviderConfig of testEnvironmentProviders) {
 
     const copyResponse1 = await copy(server, {
       type: "files",
-      sourceNode: sampleNode2, 
+      sourceNode: sampleNode2,
       sourceVersion: sampleVersion,
       destinationNode: sampleNode1,
       destinationVersion: sampleVersion,
@@ -281,7 +281,7 @@ for(const environmentProviderConfig of testEnvironmentProviders) {
 
     const copyResponse = await copy(server, {
       type: "files",
-      sourceNode: sampleNode2, 
+      sourceNode: sampleNode2,
       sourceVersion: sampleVersion,
       destinationNode: sampleNode1,
       destinationVersion: sampleVersion,
@@ -402,5 +402,5 @@ for(const environmentProviderConfig of testEnvironmentProviders) {
       t.equal(404, downloadResponse.statusCode)
     }
   })
-  
+
 }

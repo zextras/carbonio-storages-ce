@@ -18,9 +18,9 @@ const livenessCheck: (fastify: FastifyInstance) => FastifyInstance =
             description: 'Server is running'
           }
         }
-        
+
       },
-      handler: async function (__, reply) {
+      async handler (__, reply) {
         reply.code(200).send()
       },
     })

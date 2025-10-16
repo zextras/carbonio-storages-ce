@@ -91,7 +91,7 @@ export async function createApp(config: Config) {
       parts: Infinity
     }
   });
-  
+
   await server.register(fastifySwagger, oasSchema(config.servingURLPrefix, config.baseURL, config.bindAddress));
   await server.register(fastifySwaggerUi, swaggerUiOptions);
 
@@ -109,11 +109,11 @@ function createLogger(logging: LoggingOptions) {
     ignore: 'hostname',
   });
   const stream = pino.multistream([
-    { stream: fileStream, level: logging.defaultLevel }, 
-    { stream: consoleStream, level: logging.defaultLevel } 
+    { stream: fileStream, level: logging.defaultLevel },
+    { stream: consoleStream, level: logging.defaultLevel }
   ])
   return pino({
-    level: logging.defaultLevel, 
+    level: logging.defaultLevel,
     timestamp: pino.stdTimeFunctions.isoTime,
     formatters: {
       level(label) {
@@ -136,9 +136,9 @@ function createFileLogger(logging: LoggingOptions) {
     return logging.filename.replace( "%DATE%", formattedDate );
   };
   return rfs.createStream(fileNameGenerator, {
-      interval: '1d', 
-      path: logging.dirname, 
-      compress: 'gzip', 
+      interval: '1d',
+      path: logging.dirname,
+      compress: 'gzip',
   })
 }
 

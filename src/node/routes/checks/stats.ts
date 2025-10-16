@@ -28,7 +28,7 @@ export default function(filesystem: FilesystemAccessor): (fastify: FastifyInstan
           200: StatsType
         }
       },
-      handler: async function (__, reply) {
+      async handler (__, reply) {
         const spaceAvailable: number = await filesystem.availableSpace()
         const freeSpace: number = await filesystem.freeSpace()
         reply.send({

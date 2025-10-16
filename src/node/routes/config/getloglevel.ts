@@ -16,7 +16,7 @@ export const getLogLevel: (fastify: FastifyInstance) => FastifyInstance  = fasti
           200: LogLevelResponseType
         }
       },
-      handler: async function (__, reply) {
+      async handler (__, reply) {
         reply.send({level: fastify.log.level})
       },
     })

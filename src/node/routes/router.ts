@@ -19,7 +19,7 @@ import { setLogLevel } from "./config/setloglevel";
 
 export default function (config: Config, filesystem: FilesystemAccessor) : (fastify : FastifyInstance) => Promise<void> {
   return async fastify => {
-    const base = { prefix: config.baseURL.length == 0 ? "" : "/" + config.baseURL }
+    const base = { prefix: config.baseURL.length === 0 ? "" : "/" + config.baseURL }
 
     await fastify.register(livenessCheck, base);
     await fastify.register(stats(filesystem), base);
