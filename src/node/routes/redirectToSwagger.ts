@@ -13,7 +13,7 @@ const redirectToSwagger: (fastify: FastifyInstance) => FastifyInstance =
           tags: ['swagger'],
           description: 'Shows APIs'
         },
-        handler: async function (__, reply) {
+        async handler (__, reply) {
           reply.redirect("swagger/static/index.html")
         },
       })

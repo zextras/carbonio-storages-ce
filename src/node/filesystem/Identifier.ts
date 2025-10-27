@@ -23,15 +23,15 @@ export function parse(queryString: QueryString): Identifier {
 
 export function parseQueryString(type:QueryString["type"], node:string, version:undefined | number):undefined | QueryString {
   if (version !== undefined) {
-    return { 
-      type:type, 
-      node:node, 
-      version:version 
-    }   
+    return {
+      type,
+      node,
+      version
+    }
   } else if (version === undefined && type=== "chats") {
-    return { 
-      type:type, 
-      node:node
+    return {
+      type,
+      node
     }
   } else {
     return undefined;

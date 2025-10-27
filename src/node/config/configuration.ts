@@ -8,6 +8,15 @@ import fs from "fs";
 import { LogLevelType } from "../routes/types";
 import { mergeDeep, DeepPartial } from "../utils/mergeDeep";
 
+const LoggingOptionsType = Type.Object({
+  defaultLevel: LogLevelType,
+  zippedArchive: Type.Optional(Type.Boolean()),
+  filename: Type.String(),
+  dirname: Type.Optional(Type.String())
+})
+
+export type LoggingOptions = Static<typeof LoggingOptionsType>
+
 const ConfigType = Type.Object({
   bindAddress: Type.String(),
   path: Type.String(),
@@ -15,13 +24,7 @@ const ConfigType = Type.Object({
   baseURL: Type.String(),
   servingURLPrefix: Type.String(),
   compress: Type.Boolean(),
-  logging: Type.Object({
-    defaultLevel: LogLevelType,
-    datePattern: Type.String(),
-    zippedArchive: Type.Optional(Type.Boolean()),
-    filename: Type.String(),
-    dirname: Type.Optional(Type.String())
-  }),
+  logging: Type.Optional(LoggingOptionsType),
   https: Type.Optional(Type.Object({
     keyPath: Type.String(),
     certPath: Type.String()
@@ -65,7 +68,7 @@ const awsEnvConf = (conf: any) => {
   }
 }
 
-const loadEnvironmentConf = (conf: any = process.env) : DeepPartial<Config> => {
+const loadEnvironmentConf = (conf: Record<string,string|undefined> = process.env) : DeepPartial<Config> => {
   const port = conf[STORAGES_CONF.PORT];
 
   const result: DeepPartial<Config> = {}
@@ -77,7 +80,7 @@ const loadEnvironmentConf = (conf: any = process.env) : DeepPartial<Config> => {
     result.path = conf[STORAGES_CONF.PATH]
 
   if (port != undefined)
-    result.port = parseInt(port);
+    result.port = parseInt(port, 10);
 
   if (conf[STORAGES_CONF.BASE_URL] != undefined)
     result.baseURL = conf[STORAGES_CONF.BASE_URL]
@@ -100,9 +103,10 @@ const loadEnvironmentConf = (conf: any = process.env) : DeepPartial<Config> => {
   return result;
 }
 
-export async function startupConfiguration(conf: any = process.env): Promise<Config> {
+export async function startupConfiguration(conf: Record<string,string|undefined> = process.env): Promise<Config> {
+  const configPath = conf[STORAGES_CONF.CONF_PATH];
   return mergeDeep(
-      await import((conf[STORAGES_CONF.CONF_PATH] !== undefined) ? conf[STORAGES_CONF.CONF_PATH] : './config.json')
+      await import(configPath !== undefined ? configPath : './config.json')
         .then(({default: startupConfig}) => startupConfig),
       loadEnvironmentConf(conf)
   );

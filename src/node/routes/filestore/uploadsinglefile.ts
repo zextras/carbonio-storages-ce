@@ -52,7 +52,7 @@ export default function (filesystem: FilesystemAccessor, urls: Urls): (fastify: 
 					500: ErrorType
 				}
 			},
-			handler: async function (req, reply) {
+			async handler (req, reply) {
 				const identifier: Identifier = parse(req.query)
 
 				if (await filesystem.fileExists(identifier) && req.method === 'POST') {
@@ -82,7 +82,7 @@ export default function (filesystem: FilesystemAccessor, urls: Urls): (fastify: 
 							statusCode: 404,
 							error: 'NotFound',
 							message: `Could not found ${JSON.stringify(identifier)}`
-						})	
+						})
 					}
 				}
 			},

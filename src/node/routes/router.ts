@@ -10,17 +10,17 @@ import getsinglefile from "./filestore/getsinglefile"
 import deletesinglefile from "./filestore/deletesinglefile";
 import { FilesystemAccessor } from "../filesystem/FilesystemAccessor";
 import { Urls } from "../urls";
-import getloglevel from "./config/getloglevel";
-import { LoggerTransports } from "../LoggerTransports";
-import setloglevel from "./config/setloglevel";
 import getconfig from "./config/getconfig";
 import uploadsinglefile from "./filestore/uploadsinglefile";
 import copy from "./filestore/copy";
 import bulkDelete from "./filestore/bulkDelete"
+import { getLogLevel } from "./config/getloglevel";
+import { setLogLevel } from "./config/setloglevel";
+import pino from "pino";
 
-export default function (config: Config, filesystem: FilesystemAccessor, transports: LoggerTransports) : (fastify : FastifyInstance) => Promise<void> {
+export default function (config: Config, filesystem: FilesystemAccessor, logger: pino.Logger | undefined) : (fastify : FastifyInstance) => Promise<void> {
   return async fastify => {
-    const base = { prefix: config.baseURL.length == 0 ? "" : "/" + config.baseURL }
+    const base = { prefix: config.baseURL.length === 0 ? "" : "/" + config.baseURL }
 
     await fastify.register(livenessCheck, base);
     await fastify.register(stats(filesystem), base);
@@ -33,7 +33,7 @@ export default function (config: Config, filesystem: FilesystemAccessor, transpo
     await fastify.register(bulkDelete(filesystem), base);
 
     await fastify.register(getconfig(config), base);
-    await fastify.register(getloglevel(transports), base);
-    await fastify.register(setloglevel(transports), base);
+    await fastify.register(getLogLevel, base);
+    await fastify.register(setLogLevel(logger), base);
   }
 }

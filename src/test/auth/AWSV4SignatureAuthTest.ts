@@ -8,7 +8,7 @@ import {testApplication} from "../TestApplication";
 
 const node = "443c815e-6b88-47b1-800f-d74d2d3004bf"
 const version = "29"
-const query = {node: node, version: version}
+const query = {node, version}
 const accessKey = "AKIAIOSFODNN7EXAMPLE"
 const secret = "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
 const url = `/slimstore/upload?node=${node}&version=${version}`
@@ -24,7 +24,7 @@ const headers = {
   "host": "localhost:5794",
   "x-amz-content-sha256": payloadHash,
   "x-amz-date": longDate,
-  authorization: authorization
+  authorization
 }
 
 tap.test("parse authentication header", async t => {

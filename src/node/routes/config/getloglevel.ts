@@ -3,11 +3,9 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 import {FastifyInstance} from "fastify";
-import {LoggerTransports} from "../../LoggerTransports";
-import {LogLevelResponseType} from "../types";
+import { LogLevelResponseType } from "../types";
 
-export default function(transports: LoggerTransports): (fastify: FastifyInstance) => FastifyInstance {
-  return fastify => {
+export const getLogLevel: (fastify: FastifyInstance) => FastifyInstance  = fastify => {
     return fastify.route({
       method: "GET",
       url: "/loglevel",
@@ -18,9 +16,8 @@ export default function(transports: LoggerTransports): (fastify: FastifyInstance
           200: LogLevelResponseType
         }
       },
-      handler: async function (__, reply) {
-        reply.send({level: transports.getLevel()})
+      async handler (__, reply) {
+        reply.send({level: fastify.log.level})
       },
     })
   };
-}

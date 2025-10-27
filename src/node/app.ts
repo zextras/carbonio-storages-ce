@@ -2,55 +2,47 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-only
 
-import fastify, { FastifyBaseLogger, FastifyInstance, FastifyTypeProviderDefault } from 'fastify'
+import fastify from 'fastify'
 import fastifyMultipart from "@fastify/multipart"
 import fastifySwagger from "@fastify/swagger"
 import router from "./routes/router";
-import {Config} from "./config/configuration";
+import {Config, LoggingOptions} from "./config/configuration";
 import oasSchema from "./oasSchema";
 import {LocalFilesystemAccessor} from "./filesystem/LocalFilesystemAcessor";
 import {LocalPathStrategy} from "./filesystem/FilePathStategy";
-import winston, {Logger} from "winston";
-import 'winston-daily-rotate-file';
-import {FastifyReply} from "fastify";
-import {LoggerTransports} from "./LoggerTransports";
 import {GzipWrapperFilesystemAccessor} from "./filesystem/GzipWrapperFilesystemAccessor";
 import {FastifyRequest} from "fastify/types/request";
-import {createContext, logRequestError, logRequestReceived} from "./loggingutils";
+import {createContext} from "./loggingutils";
 import * as fs from "fs";
 import {AuthFactory} from "./auth/AuthFactory";
 import {AuthError} from "./auth/AuthError";
 import os from "os"
-import { Http2SecureServer, Http2ServerRequest, Http2ServerResponse } from 'http2';
 import fastifySwaggerUi from '@fastify/swagger-ui';
+import * as rfs from "rotating-file-stream";
 
-export type DefaultFastifyInstance = FastifyInstance<Http2SecureServer, Http2ServerRequest, Http2ServerResponse, FastifyBaseLogger, FastifyTypeProviderDefault>
+import pino from 'pino';
+import pretty from 'pino-pretty'
 
-export async function createApp(config: Config):Promise<DefaultFastifyInstance> {
+export async function createApp(config: Config) {
 
   const pathStrategy = new LocalPathStrategy(config)
   const localfilesystem = new LocalFilesystemAccessor(config, pathStrategy)
 
   const filesystem = config.compress? new GzipWrapperFilesystemAccessor(localfilesystem) : localfilesystem
 
-  const loggerTransports = LoggerTransports.createTransports(config)
-  const winstonLogger: Logger = createLogger(config, loggerTransports);
+  const logger = config.logging && createLogger(config.logging) ;
 
-  // fastify basic common configuration
-  let fastifyConfig: any = {logger: winstonLogger}
-
-  // enables https on fastify
-  if (config.https && Object.keys(config.https).length > 0) {
-    fastifyConfig = {
-      ... fastifyConfig,
-      https: {
-        key: fs.readFileSync(config.https.keyPath),
-        cert: fs.readFileSync(config.https.certPath)
-      }
+  const https = (config.https && Object.keys(config.https).length > 0) ? {
+    https: {
+      key: fs.readFileSync(config.https.keyPath),
+      cert: fs.readFileSync(config.https.certPath)
     }
-  }
+  } : {};
 
-  const server = fastify(fastifyConfig)
+  const server = fastify({
+      loggerInstance: logger,
+      ...https
+    })
 
   server.setNotFoundHandler((request, reply) => {
     server.log.warn('Route not found: ' +  request.url)
@@ -58,13 +50,13 @@ export async function createApp(config: Config):Promise<DefaultFastifyInstance> 
   })
 
   const auth = AuthFactory.create(config)
-  server.addHook('onRequest', async (request: FastifyRequest, reply: FastifyReply) => {
-    logRequestReceived(server, request, "Request received")
+  server.addHook('onRequest', async (request, reply) => {
+    request.log.info(`[${createContext(request)}] Request received`)
     try {
-      await auth.check(server, request)
+      await auth.check(request)
     } catch(e) {
       if (e instanceof AuthError) {
-        server.log.error(`[${createContext(request)}] Authentication failed`)
+        request.log.error(`[${createContext(request)}] Authentication failed`)
         reply.status(401).send()
       }
       else {
@@ -74,7 +66,7 @@ export async function createApp(config: Config):Promise<DefaultFastifyInstance> 
   });
 
   server.addHook('onError', async (request: FastifyRequest, __: any, error: Error) => {
-    logRequestError(server, request, error)
+    request.log.error(`[${createContext(request)}] ${error}`)
   })
 
   server.ready(async (err:any) => {
@@ -99,58 +91,56 @@ export async function createApp(config: Config):Promise<DefaultFastifyInstance> 
       parts: Infinity
     }
   });
-  
+
   await server.register(fastifySwagger, oasSchema(config.servingURLPrefix, config.baseURL, config.bindAddress));
   await server.register(fastifySwaggerUi, swaggerUiOptions);
 
-  await server.register(router(config, filesystem, loggerTransports));
+  await server.register(router(config, filesystem, logger));
 
   return server;
 }
 
-function censor(obj: any) {
-  let i = 0;
-
-  return function(_key: any, value: any) {
-    if(i !== 0 && typeof(obj) === 'object' && typeof(value) == 'object' && obj == value)
-      return '[Circular]';
-
-    if(i >= 29) // seems to be a harded maximum of 30 serialized objects?
-      return '[Unknown]';
-
-    ++i; // so we know we aren't using the original object anymore
-
-    return value;
-  }
+function createLogger(logging: LoggingOptions) : pino.Logger<never, boolean> {
+  const fileStream = createFileLogger(logging)
+  const consoleStream = pretty({
+    colorize: true,
+    messageFormat: '{msg}',
+    translateTime: 'SYS:standard',
+    ignore: 'hostname',
+  });
+  const stream = pino.multistream([
+    { stream: fileStream, level: logging.defaultLevel },
+    { stream: consoleStream, level: logging.defaultLevel }
+  ])
+  return pino({
+    level: logging.defaultLevel,
+    timestamp: pino.stdTimeFunctions.isoTime,
+    formatters: {
+      level(label) {
+        return { level: label };
+      }
+    }
+  }, stream)
 }
 
-function createLogger(config: Config, loggerTransports: LoggerTransports) {
-  return winston.createLogger({
-    // Define levels required by Fastify (by default winston has verbose level and does not have trace)
-    levels: {
-      fatal: 0,
-      error: 1,
-      warn: 2,
-      info: 3,
-      trace: 4,
-      debug: 5
-    },
-    level: config.logging.defaultLevel,
-    /**
-     * Documentation for winston.format:
-     * https://github.com/winstonjs/logform#readme
-     */
-    format: winston.format.combine(
-      winston.format.timestamp(),
-      winston.format.errors(),
-      winston.format.printf(
-          ({ message, timestamp, level }) => {
-            const messageStr = (typeof message === 'object') ?
-                JSON.stringify(message, censor(message)) : message;
-            return `[${timestamp}] [${level}] ${messageStr}`;
-          })
-    ),
-    transports: loggerTransports.transports
+function createFileLogger(logging: LoggingOptions) {
+  const formatter = new Intl.DateTimeFormat('en-US', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
   });
+  const fileNameGenerator = (time: number | Date): string => {
+    const currentTime = (time === undefined || time === null) ? new Date() :
+      (typeof time === "number" ? new Date(time) : time);
+    const formattedDate = formatter.formatToParts(currentTime).filter(p => p.type !== 'literal').map(p => p.value).join('-');
+    return logging.filename.replace( "%DATE%", formattedDate );
+  };
+  const fileLoggingProperties: rfs.Options = logging.zippedArchive === true ?
+    { compress: 'gzip' } : {};
+  return rfs.createStream(fileNameGenerator, {
+      interval: '1d',
+      path: logging.dirname,
+      ...fileLoggingProperties
+  })
 }
 

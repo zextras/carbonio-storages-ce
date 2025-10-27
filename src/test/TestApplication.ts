@@ -3,12 +3,16 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 import * as fs from "fs";
-import { DefaultFastifyInstance, createApp } from "../node/app";
+import { createApp } from "../node/app";
 import { Config, read } from "../node/config/configuration";
 import { Test } from "./TestUtils";
 import { DeepPartial, mergeDeep } from "../node/utils/mergeDeep";
+import { FastifyInstance, FastifyTypeProviderDefault, RawServerDefault } from "fastify/fastify";
+import { IncomingMessage, ServerResponse } from "http";
 
-export async function testApplication(t:Test, configPatch: DeepPartial<Config> = {}):Promise<DefaultFastifyInstance> {
+export type TestServer = FastifyInstance<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, any, FastifyTypeProviderDefault>
+
+export async function testApplication(t:Test, configPatch: DeepPartial<Config> = {}):Promise<TestServer> {
 
   const defaultTestConfig: Config = {... await read()}
 
@@ -20,10 +24,8 @@ export async function testApplication(t:Test, configPatch: DeepPartial<Config> =
 
   const testDir: string = await mkTempFolder("storagesCETests");
   defaultTestConfig.path = `${testDir}/store`
-  const testDirLog: string = await mkTempFolder("storagesCETestsLog");
-  defaultTestConfig.logging.dirname = `${testDirLog}/logs`
 
-  defaultTestConfig.logging.defaultLevel = "fatal"
+  defaultTestConfig.logging = undefined;
 
   const testConfig: Config = mergeDeep({... defaultTestConfig}, {... configPatch})
 
@@ -35,7 +37,7 @@ export async function testApplication(t:Test, configPatch: DeepPartial<Config> =
   return server
 }
 
-async function mkTempFolder(prefix:string): Promise<string> {
+export async function mkTempFolder(prefix:string): Promise<string> {
   const folder = await fs.promises.mkdtemp(`/tmp/${prefix}`)
   await fs.promises.mkdir(folder, { recursive: true });
   return folder;

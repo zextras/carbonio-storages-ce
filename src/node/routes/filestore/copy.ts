@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-only
 
-import {FastifyInstance, FastifyReply, RawServerDefault} from "fastify";
+import {FastifyInstance, FastifyReply, RawServerBase, RouteGenericInterface} from "fastify";
 import {CopyParameters, CopyParametersType, ErrorType} from "../types";
 import {FilesystemAccessor} from "../../filesystem/FilesystemAccessor";
 import {Static, Type} from "@sinclair/typebox";
@@ -11,7 +11,8 @@ import StreamHash from "../../filesystem/utils/StreamHash";
 import util from 'util';
 import { pipeline } from 'stream';
 import { Urls } from "../../urls";
-import { IncomingMessage, ServerResponse } from "http";
+import { IncomingMessage } from "http";
+import { Http2ServerRequest } from "http2";
 
 const pump = util.promisify(pipeline)
 
@@ -42,17 +43,17 @@ export default function(filesystem: FilesystemAccessor, urls: Urls): (fastify: F
           500: ErrorType
         },
       },
-      handler: async function (req, reply) {
-        const sourceQuery = parseQueryString(req.query.type, req.query.sourceNode, req.query.sourceVersion); 
-        
+      async handler (req, reply) {
+        const sourceQuery = parseQueryString(req.query.type, req.query.sourceNode, req.query.sourceVersion);
+
         if (sourceQuery === undefined) {
           return replyError(reply, {
             statusCode : 400,
             error : "Bad Request",
             message : `Invalid request ${JSON.stringify(req.query)}`
           })
-        } 
-        
+        }
+
         const sourceIdentifier = parse(sourceQuery);
         if (!(await filesystem.fileExists(sourceIdentifier))) {
           return replyError(reply, {
@@ -62,7 +63,7 @@ export default function(filesystem: FilesystemAccessor, urls: Urls): (fastify: F
           })
         } else {
           const destinationQuery = parseQueryString(req.query.type, req.query.destinationNode, req.query.destinationVersion);
-          
+
           if (destinationQuery === undefined) {
             return replyError(reply, {
               statusCode : 400,
@@ -85,7 +86,7 @@ export default function(filesystem: FilesystemAccessor, urls: Urls): (fastify: F
               message: `Identifier ${JSON.stringify(destinationIdentifier)} already exists`
             })
           } else {
-            
+
             const sourceStream = await filesystem.openReadStream(sourceIdentifier)
             const hashTransform = new StreamHash();
 
@@ -113,7 +114,7 @@ type ErrorResponse = {
   message: string
 }
 
-function replyError(reply: FastifyReply<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>>, errorResponse: ErrorResponse) {
+function replyError(reply: FastifyReply<RouteGenericInterface, RawServerBase, IncomingMessage | Http2ServerRequest>, errorResponse: ErrorResponse) {
   return reply.status(errorResponse.statusCode)
     .type('application/json')
     .send(errorResponse);

@@ -18,7 +18,7 @@ export default function(config: Config): (fastify: FastifyInstance) => FastifyIn
           200: Type.Object({}, {additionalProperties: true})
         }
       },
-      handler: async function (__, reply) {
+      async handler (__, reply) {
         const incompleteConfig: any = {... config}
         // remove awsv4signature access-keys and secrets for security
         delete incompleteConfig.awsv4signature

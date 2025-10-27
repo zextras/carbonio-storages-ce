@@ -49,7 +49,7 @@ export default function(filesystem: FilesystemAccessor): (fastify: FastifyInstan
           404: ErrorType,
         }
       },
-      handler: async function (req, reply) {
+      async handler (req, reply) {
         const identifier: Identifier = parse(req.query)
         const fileName = identifier.toFilename();
 
