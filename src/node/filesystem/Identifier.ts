@@ -7,6 +7,8 @@ import {QueryString} from "../routes/types";
 import {FilesIdentifier} from "./FilesIdentifier";
 import {ChatsIdentifier} from "./ChatsIdentifier";
 import {MailboxIncomingMessageIdentifier} from "./MailboxIncomingMessageIdentifier";
+import {MailboxStagedMessageIdentifier} from "./MailboxStagedMessageIdentifier";
+import {MailboxMessageIdentifier} from "./MailboxMessageIdentifier";
 
 export interface Identifier {
   path(): PathLike
@@ -15,8 +17,12 @@ export interface Identifier {
 
 export function parse(queryString: QueryString): Identifier {
   switch (queryString.type) {
-    case "generic":
+    case "mail-incoming":
       return new MailboxIncomingMessageIdentifier(queryString)
+    case "mail-staged":
+      return new MailboxStagedMessageIdentifier(queryString)
+    case "mail":
+      return new MailboxMessageIdentifier(queryString)
     case "files":
       return new FilesIdentifier(queryString)
     case "chats":
