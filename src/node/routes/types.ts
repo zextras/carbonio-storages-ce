@@ -6,6 +6,7 @@ import {Static, Type} from "@sinclair/typebox";
 
 export const ChatsType = Type.Literal("chats")
 export const FilesType = Type.Literal("files")
+export const NodeType = Type.Literal("node")
 export const IncomingMailType = Type.Literal("mail-incoming")
 export const StagedMailType = Type.Literal("mail-staged")
 export const MailItemType = Type.Literal("mail")
@@ -26,6 +27,10 @@ export const ChatsQueryStringType = Type.Object({
   type: ChatsType,
   node: NodeIdType
 })
+export const NodeQueryStringType = Type.Object({
+  type: NodeType,
+  node: NodeIdType
+})
 export const MailboxIncomingMessageQueryStringType = Type.Object({
   type: IncomingMailType,
   node: NodeIdType
@@ -43,7 +48,7 @@ export const MailboxMessageQueryStringType = Type.Object({
   revision: RevisionIdType
 })
 
-export const QueryStringType = Type.Union([FilesQueryStringType, ChatsQueryStringType, MailboxIncomingMessageQueryStringType, MailboxStagedMessageQueryStringType, MailboxMessageQueryStringType])
+export const QueryStringType = Type.Union([FilesQueryStringType, ChatsQueryStringType, NodeQueryStringType])
 
 export type QueryString = Static<typeof QueryStringType>
 export type FilesQueryString = Static<typeof FilesQueryStringType>
@@ -51,6 +56,7 @@ export type ChatsQueryString = Static<typeof ChatsQueryStringType>
 export type MailboxIncomingMessageQueryString = Static<typeof MailboxIncomingMessageQueryStringType>
 export type MailboxStagedMessageQueryString = Static<typeof MailboxStagedMessageQueryStringType>
 export type MailboxMessageQueryString = Static<typeof MailboxMessageQueryStringType>
+export type NodeQueryString = Static<typeof NodeQueryStringType>
 
 export const ErrorType = Type.Object({
   statusCode: Type.Number(),
