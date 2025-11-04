@@ -6,6 +6,7 @@ import {PathLike} from "fs";
 import {QueryString} from "../routes/types";
 import {FilesIdentifier} from "./FilesIdentifier";
 import {ChatsIdentifier} from "./ChatsIdentifier";
+import {GenericIdentifier} from "./GenericIdentifier";
 
 export interface Identifier {
   path(): PathLike
@@ -14,6 +15,8 @@ export interface Identifier {
 
 export function parse(queryString: QueryString): Identifier {
   switch (queryString.type) {
+    case "generic":
+      return new GenericIdentifier(queryString)
     case "files":
       return new FilesIdentifier(queryString)
     case "chats":

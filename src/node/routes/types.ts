@@ -6,6 +6,7 @@ import {Static, Type} from "@sinclair/typebox";
 
 export const ChatsType = Type.Literal("chats")
 export const FilesType = Type.Literal("files")
+export const GenericType = Type.Literal("generic")
 
 export const NodeIdType = Type.String({pattern: '^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$'})
 
@@ -19,12 +20,17 @@ export const ChatsQueryStringType = Type.Object({
   type: ChatsType,
   node: NodeIdType
 })
+export const GenericQueryStringType = Type.Object({
+  type: GenericType,
+  node: NodeIdType
+})
 
-export const QueryStringType = Type.Union([FilesQueryStringType, ChatsQueryStringType])
+export const QueryStringType = Type.Union([FilesQueryStringType, ChatsQueryStringType, GenericQueryStringType])
 
 export type QueryString = Static<typeof QueryStringType>
 export type FilesQueryString = Static<typeof FilesQueryStringType>
 export type ChatsQueryString = Static<typeof ChatsQueryStringType>
+export type GenericQueryString = Static<typeof GenericQueryStringType>
 
 export const ErrorType = Type.Object({
   statusCode: Type.Number(),
