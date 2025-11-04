@@ -16,6 +16,7 @@ export const ItemIdType = Type.Integer()
 export const RevisionIdType = Type.Integer()
 
 export const NodeIdType = Type.String({pattern: '^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$'})
+export const GenericNodeIdType = Type.String()
 
 export const FilesQueryStringType = Type.Object({
   type: FilesType,
@@ -29,7 +30,7 @@ export const ChatsQueryStringType = Type.Object({
 })
 export const NodeQueryStringType = Type.Object({
   type: NodeType,
-  node: NodeIdType
+  node: GenericNodeIdType
 })
 export const MailboxIncomingMessageQueryStringType = Type.Object({
   type: IncomingMailType,

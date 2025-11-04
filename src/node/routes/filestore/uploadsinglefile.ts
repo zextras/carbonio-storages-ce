@@ -34,11 +34,10 @@ export default function (filesystem: FilesystemAccessor, urls: Urls): (fastify: 
 					properties: {
 						type: {
 							type: "string",
-							enum: ["files", "chats"],
+							enum: ["files", "chats", "node"],
 						},
 						node : {
-							type: 'string',
-							format: 'uuid'
+							type: 'string'
 						},
 						version : {
 							type: 'number'

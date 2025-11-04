@@ -36,6 +36,11 @@ export function parseQueryString(type:QueryString["type"], node:string, version:
       type,
       node
     }
+  } else if (type=== "node") {
+    return {
+      type,
+      node
+    }
   } else {
     return undefined;
   }

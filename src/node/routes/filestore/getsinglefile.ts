@@ -29,11 +29,10 @@ export default function(filesystem: FilesystemAccessor): (fastify: FastifyInstan
           properties: {
             type: {
               type: "string",
-              enum: ["files", "chats"],
+              enum: ["files", "chats", "node"],
             },
             node : {
-              type: 'string',
-              format: 'uuid'
+              type: 'string'
             },
             version : {
               type: 'number'
