@@ -37,6 +37,13 @@ export default function (filesystem: FilesystemAccessor, urls: Urls): (fastify: 
 							enum: ["files", "chats", "node"],
 						},
 						node : {
+							type: 'string',
+							format: 'uuid'
+						},
+						fileName : {
+							type: 'string'
+						},
+						basePath : {
 							type: 'string'
 						},
 						version : {

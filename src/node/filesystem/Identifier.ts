@@ -25,23 +25,24 @@ export function parse(queryString: QueryString): Identifier {
 }
 
 export function parseQueryString(type:QueryString["type"], node:string, version:undefined | number):undefined | QueryString {
-  if (version !== undefined) {
-    return {
-      type,
-      node,
-      version
-    }
-  } else if (version === undefined && type=== "chats") {
+  if (type=== "chats") {
     return {
       type,
       node
     }
-  } else if (type=== "node") {
+  } else if (version && type === "files") {
+      return {
+        type,
+        node,
+        version
+    }
+  } else if (type === "node") {
+    // TODO: implement copy of node if needed
     return {
       type,
-      node
-    }
-  } else {
-    return undefined;
+      basePath: "",
+      fileName: ""
+    };
   }
+  return undefined;
 }

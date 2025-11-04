@@ -7,10 +7,10 @@ export class NodeIdentifier implements Identifier{
   }
 
   toFilename(): string {
-    return this.query.node;
+    return this.query.fileName;
   }
 
   path(): PathLike {
-    return this.query.node;
+    return this.query.basePath;
   }
 }

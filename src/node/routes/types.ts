@@ -11,6 +11,8 @@ export const IncomingMailType = Type.Literal("mail-incoming")
 export const StagedMailType = Type.Literal("mail-staged")
 export const MailItemType = Type.Literal("mail")
 
+export const BasePathType = Type.String()
+export const FilenameType = Type.String()
 export const AccountIdType = Type.String()
 export const ItemIdType = Type.Integer()
 export const RevisionIdType = Type.Integer()
@@ -30,7 +32,8 @@ export const ChatsQueryStringType = Type.Object({
 })
 export const NodeQueryStringType = Type.Object({
   type: NodeType,
-  node: GenericNodeIdType
+  fileName: FilenameType,
+  basePath: BasePathType,
 })
 export const MailboxIncomingMessageQueryStringType = Type.Object({
   type: IncomingMailType,
