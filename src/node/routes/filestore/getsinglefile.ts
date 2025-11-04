@@ -24,7 +24,7 @@ export default function(filesystem: FilesystemAccessor): (fastify: FastifyInstan
         description: 'Downloads from Storages-CE the node described by node-id and version (if needed) passed as query string parameters',
         querystring: {
           type: 'object',
-          required: ['type', 'node'],
+          required: ['type'],
           additionalProperties: false,
           properties: {
             type: {

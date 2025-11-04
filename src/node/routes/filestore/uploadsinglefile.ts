@@ -29,7 +29,7 @@ export default function (filesystem: FilesystemAccessor, urls: Urls): (fastify: 
 				description: 'Creates a resource node (if not existent) using the node-id and version passed as query string parameters and the ',
 				querystring: {
 					type: 'object',
-					required: ['type', 'node'],
+					required: ['type'],
 					additionalProperties: false,
 					properties: {
 						type: {
