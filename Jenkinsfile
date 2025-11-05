@@ -11,6 +11,10 @@ library(
     ])
 )
 
+boolean isBuildingTag() {
+    return env.TAG_NAME ? true : false
+}
+
 pipeline {
     agent {
         node {
@@ -56,11 +60,8 @@ pipeline {
 
         stage('Build and Publish Docker Image') {
             when {
-                not {
-                    anyOf {
-                        buildingTag()
-                        expression { env.BRANCH_NAME.startsWith("PR-") }
-                    }
+                expression {
+                    return isBuildingTag() || env.BRANCH_NAME == 'devel'
                 }
             }
             steps {
