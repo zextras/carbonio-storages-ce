@@ -1,0 +1,14 @@
+{
+  "bindAddress" : "0.0.0.0",
+  "path": "/opt/zextras/carbonio-storages",
+  "port": 5794,
+  "baseURL": "",
+  "servingURLPrefix": "http://0.0.0.0:5794",
+  "compress": false,
+  "logging": {
+    "defaultLevel": "warn",
+    "filename": "carbonio-storages-%DATE%.log",
+    "dirname": "/var/log/carbonio/storages/",
+    "zippedArchive": true
+  }
+}

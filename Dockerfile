@@ -44,6 +44,7 @@ COPY --chown=node:node --from=node_modules_builder /usr/src/app/node_modules/ ./
 COPY --chown=node:node . .
 
 EXPOSE 5794
+ENV STORAGES_CONF_PATH="/home/node/app/config-docker.json"
 
 RUN npm run build
 ENTRYPOINT ["npm", "run", "start"]
