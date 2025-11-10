@@ -99,7 +99,7 @@ postinst__apt() {
   echo "Only one Storages-CE is allowed in a multiserver environment"
   echo "Installed, you must now run as root:"
   echo "pending-setups"
-  cat >/etc/zextras/pending-setups.d/carbonio-storages-setup.sh <<EOF
+  cat >/etc/zextras/pending-setups.d/421-carbonio-storages-setup.sh <<EOF
 #!/usr/bin/env bash
 /usr/bin/carbonio-storages setup
 EOF
@@ -135,7 +135,7 @@ postinst__yum() {
   echo "Only one Storages-CE is allowed in a multiserver environment"
   echo "Installed, you must now run as root:"
   echo "pending-setups"
-  cat >/etc/zextras/pending-setups.d/carbonio-storages-setup.sh <<EOF
+  cat >/etc/zextras/pending-setups.d/421-carbonio-storages-setup.sh <<EOF
 #!/usr/bin/env bash
 carbonio-storages setup
 EOF
@@ -152,7 +152,7 @@ prerm() {
 
 postrm() {
   rm -f /etc/zextras/carbonio-storages/token
-  rm -f /etc/zextras/pending-setups.d/carbonio-storages-setup.sh
+  rm -f /etc/zextras/pending-setups.d/421-carbonio-storages-setup.sh
 
   if [ -d /run/systemd/system ]; then
     systemctl daemon-reload >/dev/null 2>&1 || :
