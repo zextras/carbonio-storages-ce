@@ -1,6 +1,6 @@
 {
   "name": "carbonio-storages",
-  "version": "1.0.14",
+  "version": "1.0.15",
   "description": "",
   "bin": "dist/node/index.js",
   "type": "commonjs",
