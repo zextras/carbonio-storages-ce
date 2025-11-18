@@ -1,5 +1,5 @@
 pkgname="carbonio-storages-ce"
-pkgver="1.0.14"
+pkgver="1.0.15"
 pkgrel="1"
 pkgdesc="External store for Carbonio CE"
 arch=('x86_64')
