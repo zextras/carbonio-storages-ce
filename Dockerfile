@@ -29,7 +29,7 @@ RUN npm ci && npm audit fix && npm cache clean --force && npm run build && npm r
 FROM debian:bookworm-slim
 
 WORKDIR /home/node/app
-
+RUN mkdir -p /var/log/carbonio/storages/
 COPY --from=builder /usr/src/app/carbonio-storages carbonio-storages
 
 ENV STORAGES_PORT=10000
