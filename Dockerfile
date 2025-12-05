@@ -4,7 +4,7 @@
 
 ARG NODE_IMAGE_VERSION=22
 
-FROM node:${NODE_IMAGE_VERSION} AS node_modules_builder_production
+FROM node:${NODE_IMAGE_VERSION} AS dependencies
 
 WORKDIR /usr/src/app
 
@@ -14,37 +14,26 @@ COPY package-lock.json ./
 # install production dependencies here, for better reuse of layers
 RUN npm ci --omit=dev
 
-FROM node:${NODE_IMAGE_VERSION} AS node_modules_builder
+FROM node:${NODE_IMAGE_VERSION} AS builder
 
 WORKDIR /usr/src/app
 
-COPY package.json ./
-COPY package-lock.json ./
+COPY . .
 
-COPY --from=node_modules_builder_production \
+COPY --from=dependencies \
   /usr/src/app/node_modules /usr/src/app/node_modules
 
 # install dependencies here, for better reuse of layers
-RUN npm ci && npm audit fix && npm cache clean --force
+RUN npm ci && npm audit fix && npm cache clean --force && npm run build && npm run pkg
 
-FROM node:${NODE_IMAGE_VERSION} AS builder
-
-RUN mkdir -p /home/node/app
-RUN chown -R node:node /home/node/app
-RUN mkdir -p /var/log/carbonio/storages/
-RUN chown -R node:node /var/log/carbonio/storages/
-RUN mkdir -p /opt/zextras/carbonio-storages
-RUN chown -R node:node /opt/zextras/carbonio-storages
-
-USER node
+FROM debian:bookworm-slim
 
 WORKDIR /home/node/app
+RUN mkdir -p /var/log/carbonio/storages/
+COPY --from=builder /usr/src/app/carbonio-storages carbonio-storages
 
-COPY --chown=node:node --from=node_modules_builder /usr/src/app/node_modules/ ./node_modules
-COPY --chown=node:node . .
+ENV STORAGES_PORT=10000
+ENV STORAGES_BIND_ADDRESS=0.0.0.0
+EXPOSE 10000
 
-EXPOSE 5794
-ENV STORAGES_CONF_PATH="/home/node/app/config-docker.json"
-
-RUN npm run build
-ENTRYPOINT ["npm", "run", "start"]
+ENTRYPOINT ["/home/node/app/carbonio-storages"]
