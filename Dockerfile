@@ -32,8 +32,8 @@ WORKDIR /home/node/app
 
 COPY --from=builder /usr/src/app/carbonio-storages carbonio-storages
 
-ENV STORAGES_PORT=5794
+ENV STORAGES_PORT=10000
 ENV STORAGES_BIND_ADDRESS=0.0.0.0
-EXPOSE 5794
+EXPOSE 10000
 
 ENTRYPOINT ["/home/node/app/carbonio-storages"]
