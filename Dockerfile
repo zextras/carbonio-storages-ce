@@ -31,9 +31,7 @@ FROM debian:bookworm-slim
 WORKDIR /home/node/app
 
 COPY --from=builder /usr/src/app/carbonio-storages carbonio-storages
-COPY config-docker.json config-docker.json
 
-ENV STORAGES_CONF_PATH="/home/node/app/config-docker.json"
 ENV STORAGES_PORT=5794
 ENV STORAGES_BIND_ADDRESS=0.0.0.0
 EXPOSE 5794
