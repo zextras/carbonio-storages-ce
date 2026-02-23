@@ -9,7 +9,7 @@ import {Response as LightMyRequestResponse} from "light-my-request";
 describe("LogTest", () => {
   it("get config", async () => {
     // tslint:disable-next-line: no-empty
-    const server = await testApplication({teardown: () => {}})
+    const server = await testApplication()
     const response = await server.inject({
       method: "GET",
       url: "config"
@@ -34,7 +34,7 @@ describe("LogTest", () => {
   it("set & get log level", async () => {
     const testDirLog: string = await mkTempFolder("storagesCETestsLog");
     // tslint:disable-next-line: no-empty
-    const server = await testApplication({teardown: () => {}}, {
+    const server = await testApplication({
       logging: {
         filename:"carbonio-storages-%DATE%.log",
         defaultLevel: "debug",
@@ -53,7 +53,7 @@ describe("LogTest", () => {
   it("set wrong log level", async () => {
     const testDirLog: string = await mkTempFolder("storagesCETestsLog");
     // tslint:disable-next-line: no-empty
-    const server = await testApplication({teardown: () => {}}, {
+    const server = await testApplication({
       logging: {
         filename:"carbonio-storages-%DATE%.log",
         defaultLevel: "debug",

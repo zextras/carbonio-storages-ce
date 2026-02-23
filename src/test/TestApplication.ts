@@ -8,12 +8,11 @@ import { Config, read } from "../node/config/configuration";
 import { DeepPartial, mergeDeep } from "../node/utils/mergeDeep";
 import { FastifyInstance, FastifyTypeProviderDefault, RawServerDefault } from "fastify/fastify";
 import { IncomingMessage, ServerResponse } from "http";
+import { onTestFinished } from "vitest";
 
 export type TestServer = FastifyInstance<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, any, FastifyTypeProviderDefault>
 
-export async function testApplication(t: {
-  teardown: (fn: () => Promise<void>) => void;
-}, configPatch: DeepPartial<Config> = {}): Promise<TestServer> {
+export async function testApplication(configPatch: DeepPartial<Config> = {}): Promise<TestServer> {
 
   const defaultTestConfig: Config = {... await read()}
 
@@ -29,7 +28,7 @@ export async function testApplication(t: {
   const testConfig: Config = mergeDeep({... defaultTestConfig}, {... configPatch})
 
   const server = await createApp(testConfig)
-  t.teardown(async () => {
+  onTestFinished(async () => {
     await server.close()
     await fs.promises.rm(testDir, {recursive: true})
   })

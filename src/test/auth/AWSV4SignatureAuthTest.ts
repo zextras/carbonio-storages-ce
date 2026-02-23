@@ -122,7 +122,7 @@ describe("AWSV4SignatureAuthTest", () => {
         const credentials: any = {}
         credentials[accessKey] = secret
         // tslint:disable-next-line: no-empty
-        const server = await testApplication({teardown: () => {}}, {awsv4signature: credentials});
+        const server = await testApplication({awsv4signature: credentials});
         const response = await server.inject({
           method: "GET",
           url: `download?node=${node}&version=${version}`,

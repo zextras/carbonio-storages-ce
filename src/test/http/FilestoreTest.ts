@@ -124,10 +124,10 @@ export async function streamToString (stream: Readable): Promise<string> {
 const testEnvironmentProviders: [string, (configPatch?: any) => Promise<TestServer>][] = [
   [" with default configuration", (configPatch) => {
     // tslint:disable-next-line: no-empty
-    return testApplication({teardown: () => {}}, configPatch)}],
+    return testApplication(configPatch)}],
   [" with compressed store", (configPatch) => {
     // tslint:disable-next-line: no-empty
-    return testApplication({teardown: () => {}}, {compress: true, ...configPatch})}],
+    return testApplication({compress: true, ...configPatch})}],
 ]
 
 const sampleNode1: string = "443c815e-6b88-47b1-800f-d74d2d3004bf"

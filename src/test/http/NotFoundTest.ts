@@ -16,7 +16,7 @@ describe("NotFoundTest", () => {
 
   it("not found url", async () => {
     // tslint:disable-next-line: no-empty
-    const server = await testApplication({teardown: () => {}})
+    const server = await testApplication()
 
     const response = await unknownUrl(server);
     expect(response.statusCode).toBe(404)

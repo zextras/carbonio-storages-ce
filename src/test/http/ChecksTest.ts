@@ -8,7 +8,7 @@ import { testApplication } from "../TestApplication";
 describe("ChecksTest", () => {
   it("liveness check", async () => {
     // tslint:disable-next-line: no-empty
-    const server = await testApplication({teardown: () => {}})
+    const server = await testApplication()
     const response = await server.inject({
       method: "GET",
       url: "health/live"
@@ -18,7 +18,7 @@ describe("ChecksTest", () => {
 
   it("stats check", async () => {
     // tslint:disable-next-line: no-empty
-    const server = await testApplication({teardown: () => {}})
+    const server = await testApplication()
     const response = await server.inject({
       method: "GET",
       url: "stats"
