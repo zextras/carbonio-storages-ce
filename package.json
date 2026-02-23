@@ -51,5 +51,8 @@
     "pino-pretty": "^13.1.2",
     "rotating-file-stream": "^3.2.7",
     "save-dev": "^0.0.1-security"
+  },
+  "overrides": {
+    "minimatch": "^10.2.1"
   }
 }

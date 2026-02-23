@@ -14,9 +14,9 @@ export class LocalFilesystemAccessor implements FilesystemAccessor {
 
   constructor(readonly config: Config, readonly pathStrategy: FilePathStrategy) {}
 
-  private static async exists (path: fs.PathLike): Promise<boolean> {
+  private static async exists (pth: fs.PathLike): Promise<boolean> {
     try {
-      await fs.promises.access(path)
+      await fs.promises.access(pth)
       return true
     } catch (e) {
       return false

@@ -61,6 +61,7 @@ const awsEnvConf = (conf: any) => {
     return {
       [key]: value
     }
+  // tslint:disable-next-line:triple-equals
   } else if (key == undefined && value == undefined) {
     return undefined
   } else {
@@ -73,22 +74,29 @@ const loadEnvironmentConf = (conf: Record<string,string|undefined> = process.env
 
   const result: DeepPartial<Config> = {}
 
+  // tslint:disable-next-line:triple-equals
   if (conf[STORAGES_CONF.BIND_ADDRESS] != undefined)
     result.bindAddress = conf[STORAGES_CONF.BIND_ADDRESS]
 
+  // tslint:disable-next-line:triple-equals
   if (conf[STORAGES_CONF.PATH] != undefined)
     result.path = conf[STORAGES_CONF.PATH]
 
+  // tslint:disable-next-line:triple-equals
   if (port != undefined)
     result.port = parseInt(port, 10);
 
+  // tslint:disable-next-line:triple-equals
   if (conf[STORAGES_CONF.BASE_URL] != undefined)
     result.baseURL = conf[STORAGES_CONF.BASE_URL]
 
+  // tslint:disable-next-line:triple-equals
   if (conf[STORAGES_CONF.LOGGING.DIRNAME] != undefined)
     result.logging = {dirname: conf[STORAGES_CONF.LOGGING.DIRNAME]}
 
+  // tslint:disable-next-line:triple-equals
   if (conf[STORAGES_CONF.HTTPS.KEY_PATH] != undefined &&
+  // tslint:disable-next-line:triple-equals
       conf[STORAGES_CONF.HTTPS.CERT_PATH] != undefined) {
     result.https = {
       keyPath: conf[STORAGES_CONF.HTTPS.KEY_PATH],
@@ -97,6 +105,7 @@ const loadEnvironmentConf = (conf: Record<string,string|undefined> = process.env
   }
 
   const extractedAwsConf = awsEnvConf(conf)
+  // tslint:disable-next-line:triple-equals
   if (extractedAwsConf != undefined)
     result.awsv4signature = extractedAwsConf
 
@@ -119,6 +128,7 @@ export async function read( startupConf: Promise<Config> = startupConfiguration(
 
   await validator.validate(ConfigType, config);
 
+  // tslint:disable-next-line:triple-equals
   if (validator.errors == undefined) {
     if (config.https !== undefined) {
       const { keyPath, certPath } = config.https;
