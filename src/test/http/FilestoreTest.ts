@@ -123,10 +123,8 @@ export async function streamToString (stream: Readable): Promise<string> {
 
 const testEnvironmentProviders: [string, (configPatch?: any) => Promise<TestServer>][] = [
   [" with default configuration", (configPatch) => {
-    // tslint:disable-next-line: no-empty
     return testApplication(configPatch)}],
   [" with compressed store", (configPatch) => {
-    // tslint:disable-next-line: no-empty
     return testApplication({compress: true, ...configPatch})}],
 ]
 

@@ -121,7 +121,6 @@ describe("AWSV4SignatureAuthTest", () => {
       it("should return 401", async () => {
         const credentials: any = {}
         credentials[accessKey] = secret
-        // tslint:disable-next-line: no-empty
         const server = await testApplication({awsv4signature: credentials});
         const response = await server.inject({
           method: "GET",
