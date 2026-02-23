@@ -2,25 +2,27 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-only
 
-import tap from "tap";
+import {describe, it, expect} from 'vitest';
 import {parse} from "../node/filesystem/Identifier";
 
-tap.test("parse files identifier", async t => {
-  const node = "443c815e-6b88-47b1-800f-d74d2d3004bf"
-  const version = 1
+describe("IdentifierTest", () => {
+  it("parse files identifier", async () => {
+    const node = "443c815e-6b88-47b1-800f-d74d2d3004bf"
+    const version = 1
 
-  const identifier = parse({ node, version, type: "files" });
+    const identifier = parse({ node, version, type: "files" });
 
-  t.equal(identifier.toFilename(), node + "-" + version)
-  t.equal(identifier.path(), `blobs/${node.substring(0,2)}`)
-})
+    expect(identifier.toFilename()).toBe(node + "-" + version)
+    expect(identifier.path()).toBe(`blobs/${node.substring(0,2)}`)
+  })
 
-tap.test("parse chats identifier", async t => {
-  const type = "chats"
-  const node = "443c815e-6b88-47b1-800f-d74d2d3004bf"
+  it("parse chats identifier", async () => {
+    const type = "chats"
+    const node = "443c815e-6b88-47b1-800f-d74d2d3004bf"
 
-  const identifier = parse({ type, node });
+    const identifier = parse({ type, node });
 
-  t.equal(identifier.toFilename(), node + "-0")
-  t.equal(identifier.path(), `blobs/${node.substring(0,2)}`)
+    expect(identifier.toFilename()).toBe(node + "-0")
+    expect(identifier.path()).toBe(`blobs/${node.substring(0,2)}`)
+  })
 })

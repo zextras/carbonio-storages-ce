@@ -2,21 +2,24 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-only
 
-import tap from "tap";
+import {describe, it, expect} from 'vitest';
 import {testApplication, TestServer} from "../TestApplication";
 import {Response as LightMyRequestResponse} from "light-my-request";
 
-export async function unknownUrl(app: TestServer): Promise<LightMyRequestResponse> {
-  return await app.inject({
-    method: "GET",
-    url: "test-unknown-url"
-  });
-}
+describe("NotFoundTest", () => {
+  async function unknownUrl(app: TestServer): Promise<LightMyRequestResponse> {
+    return await app.inject({
+      method: "GET",
+      url: "test-unknown-url"
+    });
+  }
 
-tap.test("not found url", async t => {
-  const server = await testApplication(t)
+  it("not found url", async () => {
+    // tslint:disable-next-line: no-empty
+    const server = await testApplication({teardown: () => {}})
 
-  const response = await unknownUrl(server);
-  t.equal(response.statusCode, 404)
-  t.equal(JSON.parse(response.body).message, 'Not found')
+    const response = await unknownUrl(server);
+    expect(response.statusCode).toBe(404)
+    expect(JSON.parse(response.body).message).toBe('Not found')
+  })
 })

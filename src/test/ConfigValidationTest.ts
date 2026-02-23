@@ -3,15 +3,16 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 import {startupConfiguration, read, STORAGES_CONF} from "../node/config/configuration";
-import tap                            from "tap";
+import {describe, it, expect} from 'vitest';
 
-tap.test('config validation', async t => {
+describe('ConfigValidationTest', () => {
+  it('config validation', async () => {
     const c = await read();
-    t.equal(c !== undefined, true);
-})
+    expect(c !== undefined).toBe(true);
+  })
 
-tap.test('reject invalid log level', async t => {
-    await t.rejects(read( Promise.resolve<any>({
+  it('reject invalid log level', async () => {
+    await expect(read( Promise.resolve<any>({
             "bindAddress": "0.0.0.0",
             "path": "/tmp/storages/store",
             "port": 5794,
@@ -25,11 +26,11 @@ tap.test('reject invalid log level', async t => {
               "zippedArchive": true
             }
           }))
-    );
-})
+    ).rejects.toThrow()
+  })
 
-tap.test('reject missing non existing certpath', async t => {
-  await t.rejects(read( Promise.resolve({
+  it('reject missing non existing certpath', async () => {
+    await expect(read( Promise.resolve({
             "bindAddress": "0.0.0.0",
             "path": "/tmp/storages/store",
             "port": 5794,
@@ -47,33 +48,34 @@ tap.test('reject missing non existing certpath', async t => {
               "certPath": "./bla.json"
             }
         }))
-    );
-})
+    ).rejects.toThrow()
+  })
 
-tap.test('custom logging dirname', async t => {
-  const c = {
-    "STORAGES_LOGGING_DIRNAME": 'bla'
-  };
+  it('custom logging dirname', async () => {
+    const c = {
+      "STORAGES_LOGGING_DIRNAME": 'bla'
+    };
 
-  const configuration = await startupConfiguration(c);
+    const configuration = await startupConfiguration(c);
 
-  t.equal(configuration.logging?.dirname, 'bla');
-});
+    expect(configuration.logging?.dirname).toBe('bla');
+  });
 
-tap.test('expect error if custom Aws conf incomplete', async t => {
-  const c = {
-    [STORAGES_CONF.AUTH.AWS4_ACCESS_KEY]: 'bla'
-  };
-  await startupConfiguration(c).then(() => t.fail("config is valid")).catch(() => {});
-})
+  it('expect error if custom Aws conf incomplete', async () => {
+    const c = {
+      [STORAGES_CONF.AUTH.AWS4_ACCESS_KEY]: 'bla'
+    };
+    await expect(startupConfiguration(c)).rejects.toThrow()
+  })
 
-tap.test('custom Aws conf valid', async t => {
-  const c = {
-    [STORAGES_CONF.AUTH.AWS4_ACCESS_KEY]: 'bla',
-    [STORAGES_CONF.AUTH.AWS4_ACCESS_SECRET]: 'bla'
-  };
+  it('custom Aws conf valid', async () => {
+    const c = {
+      [STORAGES_CONF.AUTH.AWS4_ACCESS_KEY]: 'bla',
+      [STORAGES_CONF.AUTH.AWS4_ACCESS_SECRET]: 'bla'
+    };
 
-  const configuration = await startupConfiguration(c);
+    const configuration = await startupConfiguration(c);
 
-  t.not(configuration, null);
+    expect(configuration).not.toBeNull();
+  })
 })

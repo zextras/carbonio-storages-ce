@@ -2,71 +2,66 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-only
 
-import tap from "tap"
+import {describe, it, expect} from 'vitest'
 import {mkTempFolder, testApplication, TestServer} from "../TestApplication";
 import {Response as LightMyRequestResponse} from "light-my-request";
 
-tap.test("get config", async t => {
-  const server = await testApplication(t)
-  const response = await server.inject({
-    method: "GET",
-    url: "config"
-  });
-  t.equal(200, response.statusCode)
-})
-
-function getLogLevelURL() {
-  return `loglevel`
-}
-
-function setLogLevelURL(level: string) {
-  return `loglevel?level=${level}`
-}
-
-export async function getLogLevel(app: TestServer): Promise<LightMyRequestResponse> {
-  return await app.inject({
-    method: "GET",
-    url: getLogLevelURL()
-  });
-}
-
-export async function setLogLevel(app: TestServer, level: string): Promise<LightMyRequestResponse> {
-  return await app.inject({
-    method: "PUT",
-    url: setLogLevelURL(level)
-  });
-}
-
-tap.test("set & get log level", async t => {
-  const testDirLog: string = await mkTempFolder("storagesCETestsLog");
-  // defaultTestConfig.logging.dirname = `${testDirLog}/logs`
-  // defaultTestConfig.logging.defaultLevel = "fatal"
-  const server = await testApplication(t, {
-    logging: {
-      filename:"carbonio-storages-%DATE%.log",
-      defaultLevel: "debug",
-      dirname: `${testDirLog}/logs`
-    }
+describe("LogTest", () => {
+  it("get config", async () => {
+    // tslint:disable-next-line: no-empty
+    const server = await testApplication({teardown: () => {}})
+    const response = await server.inject({
+      method: "GET",
+      url: "config"
+    });
+    expect(response.statusCode).toBe(200)
   })
 
-  const setLogLevelResponse = await setLogLevel(server, 'error');
-  t.equal(200, setLogLevelResponse.statusCode)
+  async function getLogLevel(app: TestServer): Promise<LightMyRequestResponse> {
+    return await app.inject({
+      method: "GET",
+      url: `loglevel`
+    });
+  }
 
-  const getLogLevelResponse = await getLogLevel(server);
-  t.equal(200, getLogLevelResponse.statusCode)
-  t.equal('error', JSON.parse(getLogLevelResponse.body).level)
-})
+  async function setLogLevel(app: TestServer, level: string): Promise<LightMyRequestResponse> {
+    return await app.inject({
+      method: "PUT",
+      url: `loglevel?level=${level}`
+    });
+  }
 
-tap.test("set wrong log level", async t => {
-  const testDirLog: string = await mkTempFolder("storagesCETestsLog");
-  const server = await testApplication(t, {
-    logging: {
-      filename:"carbonio-storages-%DATE%.log",
-      defaultLevel: "debug",
-      dirname: `${testDirLog}/logs`
-    }
+  it("set & get log level", async () => {
+    const testDirLog: string = await mkTempFolder("storagesCETestsLog");
+    // tslint:disable-next-line: no-empty
+    const server = await testApplication({teardown: () => {}}, {
+      logging: {
+        filename:"carbonio-storages-%DATE%.log",
+        defaultLevel: "debug",
+        dirname: `${testDirLog}/logs`
+      }
+    })
+
+    const setLogLevelResponse = await setLogLevel(server, 'error');
+    expect(setLogLevelResponse.statusCode).toBe(200)
+
+    const getLogLevelResponse = await getLogLevel(server);
+    expect(getLogLevelResponse.statusCode).toBe(200)
+    expect(JSON.parse(getLogLevelResponse.body).level).toBe('error')
   })
 
-  const setLogLevelResponse = await setLogLevel(server, 'fischi');
-  t.equal(400, setLogLevelResponse.statusCode)
+  it("set wrong log level", async () => {
+    const testDirLog: string = await mkTempFolder("storagesCETestsLog");
+    // tslint:disable-next-line: no-empty
+    const server = await testApplication({teardown: () => {}}, {
+      logging: {
+        filename:"carbonio-storages-%DATE%.log",
+        defaultLevel: "debug",
+        dirname: `${testDirLog}/logs`
+      }
+    })
+
+    const setLogLevelResponse = await setLogLevel(server, 'fischi');
+    expect(setLogLevelResponse.statusCode).toBe(400)
+  })
 })

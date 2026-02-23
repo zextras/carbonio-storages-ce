@@ -21,7 +21,8 @@
     "noImplicitThis": true,
     "noUnusedParameters": true,
     "noImplicitReturns": true,
-    "noUnusedLocals": true
+    "noUnusedLocals": true,
+    "skipLibCheck": true
   },
   "include": [
     "src/**/*",

@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-only
 
-import tap from "tap";
+import {describe, it, expect} from 'vitest';
 import {AWSV4SignatureAuth} from "../../node/auth/AWSV4SignatureAuth";
 import {Config} from "../../node/config/configuration";
 import {Auth} from "../../node/auth/Auth";
@@ -18,7 +18,9 @@ const testEnvironmentProviders: [string, Partial<Config>, (auth: Auth) => boolea
 for(const environmentProviderConfig of testEnvironmentProviders) {
   const [description, configuration, typeVerifier] = environmentProviderConfig
 
-  tap.test(`check auth creation from config ${description}`, async t => {
-    t.equal(typeVerifier(AuthFactory.create(configuration)), true)
+  describe(`AuthFactoryTest: check auth creation from config ${description}`, () => {
+    it("should create correct auth type", () => {
+      expect(typeVerifier(AuthFactory.create(configuration))).toBe(true)
+    })
   })
 }
