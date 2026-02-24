@@ -109,8 +109,8 @@ pipeline {
                         ],
                         'rocky': [
                             preBuildScript: '''
-                                yum install https://rpm.nodesource.com/pub_16.x/nodistro/repo/nodesource-release-nodistro-1.noarch.rpm -y
-                                yum install nodejs -y --setopt=nodesource-nodejs.module_hotfixes=1
+                                curl -fsSL https://rpm.nodesource.com/setup_22.x | bash -
+                                yum install -y nodejs
                             '''
                         ]
                     ]

@@ -2,14 +2,13 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-only
 
-import tap from "tap"
+import {describe, it, expect} from 'vitest'
 import { testApplication, TestServer } from "../TestApplication";
 import * as fs from "fs";
 import FormData from "form-data"
 import { Response as LightMyRequestResponse } from "light-my-request";
 import { Readable } from "stream";
 import { CopyParameters } from "../../node/routes/types";
-import { Test } from "../TestUtils";
 
 function uploadURL(node: string, version: number) {
   return `upload?node=${node}&version=${version}&type=files`
@@ -122,9 +121,11 @@ export async function streamToString (stream: Readable): Promise<string> {
   })
 }
 
-const testEnvironmentProviders: [string, (t: Test) => Promise<TestServer>][] = [
-  [" with default configuration", (t: Test) => testApplication(t)],
-  [" with compressed store", (t: Test) => testApplication(t, {compress: true})],
+const testEnvironmentProviders: [string, (configPatch?: any) => Promise<TestServer>][] = [
+  [" with default configuration", (configPatch) => {
+    return testApplication(configPatch)}],
+  [" with compressed store", (configPatch) => {
+    return testApplication({compress: true, ...configPatch})}],
 ]
 
 const sampleNode1: string = "443c815e-6b88-47b1-800f-d74d2d3004bf"
@@ -134,273 +135,294 @@ const sampleVersion: number = 2
 for(const environmentProviderConfig of testEnvironmentProviders) {
   const [description, provider] = environmentProviderConfig
 
-  tap.test(`upload & download ${description}`, async t => {
-    const server = await provider(t)
-    const filePath = `${process.cwd()}/src/test/resources/file.txt`
-
-    const uploadResponse = await postFile(server, filePath, sampleNode1, sampleVersion);
-    t.equal(200, uploadResponse.statusCode)
-
-    const downloadResponse = await downloadFile(server, sampleNode1, sampleVersion);
-    t.equal(200, downloadResponse.statusCode)
-    const body = downloadResponse.body;
-    t.equal(body, await streamToString(fs.createReadStream(filePath)))
-  })
-
-  tap.test(`upload & delete`, async t => {
-    const server = await provider(t)
-    const filePath = `${process.cwd()}/src/test/resources/file.txt`
-
-    const uploadResponse = await postFile(server, filePath, sampleNode1, sampleVersion);
-    t.equal(200, uploadResponse.statusCode)
-
-    const deleteResponse = await deleteFile(server, sampleNode1, sampleVersion);
-    t.equal(200, deleteResponse.statusCode)
-  })
-
-  tap.test(`upload & copy`, async t => {
-    const server = await provider(t)
-    const filePath = `${process.cwd()}/src/test/resources/file.txt`
-
-    const uploadResponse = await postFile(server, filePath, sampleNode2, sampleVersion);
-    t.equal(200, uploadResponse.statusCode)
-
-    const copyResponse = await copy(server, {
-      type: "files",
-      sourceNode: sampleNode2,
-      sourceVersion: sampleVersion,
-      destinationNode: sampleNode1,
-      destinationVersion: sampleVersion
-    });
-    t.equal(200, copyResponse.statusCode)
-
-    const downloadResponse1 = await downloadFile(server, sampleNode2, sampleVersion);
-    t.equal(200, downloadResponse1.statusCode)
-
-    const downloadResponse2 = await downloadFile(server, sampleNode1, sampleVersion);
-    t.equal(200, downloadResponse2.statusCode)
-  })
-
-  tap.test(`upload & copy`, async t => {
-    const server = await provider(t)
-    const filePath = `${process.cwd()}/src/test/resources/file.txt`
-    const uploadResponse = await postFile(server, filePath, sampleNode2, sampleVersion);
-    t.equal(200, uploadResponse.statusCode)
-
-    const copyResponse = await copy(server, {
-      type: "files",
-      sourceNode: sampleNode2,
-      sourceVersion: sampleVersion,
-      destinationNode: sampleNode1,
-      destinationVersion: sampleVersion
-    });
-    t.equal(200, copyResponse.statusCode)
-
-    const downloadResponse1 = await downloadFile(server, sampleNode2, sampleVersion);
-    t.equal(200, downloadResponse1.statusCode)
-
-    const downloadResponse2 = await downloadFile(server, sampleNode1, sampleVersion);
-    t.equal(200, downloadResponse2.statusCode)
-  })
-
-  tap.test(`upload & copy chats`, async t => {
-    const server = await provider(t)
-    const filePath = `${process.cwd()}/src/test/resources/file.txt`
-
-    const uploadResponse = await postChatsAttachment(server, filePath, sampleNode2);
-    t.equal(200, uploadResponse.statusCode)
-
-    const copyResponse = await copy(server, {
-      type: "chats",
-      sourceNode: sampleNode2,
-      destinationNode: sampleNode1,
-    });
-    t.equal(200, copyResponse.statusCode)
-
-    const downloadResponse1 = await downloadChatsAttachment(server, sampleNode2);
-    t.equal(200, downloadResponse1.statusCode)
-
-    const downloadResponse2 = await downloadChatsAttachment(server, sampleNode1);
-    t.equal(200, downloadResponse2.statusCode)
-  })
-
-  tap.test(`upload & copy with override`, async t => {
-    const server = await provider(t)
-    const filePath = `${process.cwd()}/src/test/resources/file.txt`
-
-    const uploadResponse1 = await postFile(server, filePath, sampleNode1, sampleVersion);
-    t.equal(200, uploadResponse1.statusCode)
-
-    const uploadResponse2 = await postFile(server, filePath, sampleNode2, sampleVersion);
-    t.equal(200, uploadResponse2.statusCode)
-
-    const copyResponse = await copy(server, {
-      type: "files",
-      sourceNode: sampleNode2,
-      sourceVersion: sampleVersion,
-      destinationNode: sampleNode1,
-      destinationVersion: sampleVersion,
-      override: true
-    });
-    t.equal(200, copyResponse.statusCode)
-  })
-
-  tap.test(`upload & copy fail becouse of override=false`, async t => {
-    const server = await provider(t)
-    const filePath = `${process.cwd()}/src/test/resources/file.txt`
-
-    const uploadResponse1 = await postFile(server, filePath, sampleNode1, sampleVersion);
-    t.equal(200, uploadResponse1.statusCode)
-
-    const uploadResponse2 = await postFile(server, filePath, sampleNode2, sampleVersion);
-    t.equal(200, uploadResponse2.statusCode)
-
-    const copyResponse = await copy(server, {
-      type: "files",
-      sourceNode: sampleNode2,
-      sourceVersion: sampleVersion,
-      destinationNode: sampleNode1,
-      destinationVersion: sampleVersion,
-      override: false
-    });
-    t.equal(409, copyResponse.statusCode)
-
-    const copyResponse1 = await copy(server, {
-      type: "files",
-      sourceNode: sampleNode2,
-      sourceVersion: sampleVersion,
-      destinationNode: sampleNode1,
-      destinationVersion: sampleVersion,
-      override: undefined
-    });
-    t.equal(409, copyResponse1.statusCode)
-  })
-
-  tap.test(`copy fail becouse source does not exists`, async t => {
-    const server = await provider(t)
-
-    const copyResponse = await copy(server, {
-      type: "files",
-      sourceNode: sampleNode2,
-      sourceVersion: sampleVersion,
-      destinationNode: sampleNode1,
-      destinationVersion: sampleVersion,
-      override: false
-    });
-    t.equal(404, copyResponse.statusCode)
-  })
-
-  tap.test(`POST: expect 409 error for same node/version`, async t => {
-    const server = await provider(t)
-    const filePath = `${process.cwd()}/src/test/resources/file.txt`
-
-    const uploadResponse = await postFile(server, filePath, sampleNode1, sampleVersion);
-    t.equal(200, uploadResponse.statusCode)
-
-    const upload2Response = await postFile(server, filePath, sampleNode1, sampleVersion);
-    t.equal(409, upload2Response.statusCode)
-  })
-
-  tap.test(`PUT: upload twice the same node/version`, async t => {
-    const server = await provider(t)
-    const filePath = `${process.cwd()}/src/test/resources/file.txt`
-
-    const uploadResponse = await putFile(server, filePath, sampleNode1, sampleVersion);
-    t.equal(200, uploadResponse.statusCode)
-
-    const upload2Response = await putFile(server, filePath, sampleNode1, sampleVersion);
-    t.equal(200, upload2Response.statusCode)
-  })
-
-  const calls = [putFile, postFile];
-  for (const c of calls){
-    tap.test('upload file response contains hash and size', async t => {
-      const server = await provider(t)
+  describe(`FilestoreTest: upload & download ${description}`, () => {
+    it("upload & download", async () => {
+      const server = await provider()
       const filePath = `${process.cwd()}/src/test/resources/file.txt`
 
-      const uploadResponse = await c(server, filePath, sampleNode1, sampleVersion);
-      t.equal(uploadResponse.statusCode, 200)
-      const responseBody = JSON.parse(uploadResponse.body);
-      const digest = responseBody.digest
-      t.equal(digest, '4f5937de8e24e473df43503273b78e6e')
+      const uploadResponse = await postFile(server, filePath, sampleNode1, sampleVersion);
+      expect(uploadResponse.statusCode).toBe(200)
 
-      const size = responseBody.size
-      t.equal(size, 17)
+      const downloadResponse = await downloadFile(server, sampleNode1, sampleVersion);
+      expect(downloadResponse.statusCode).toBe(200)
+      const body = downloadResponse.body;
+      expect(body).toBe(await streamToString(fs.createReadStream(filePath)))
     })
-  }
-
-  tap.test(`download missing resource`, async t => {
-    const server = await provider(t)
-
-    const downloadResponse = await downloadFile(server, sampleNode1, sampleVersion);
-    t.equal(404, downloadResponse.statusCode)
   })
 
-  tap.test(`delete missing resource`, async t => {
-    const server = await provider(t)
+  describe(`FilestoreTest: upload & delete ${description}`, () => {
+    it("upload & delete", async () => {
+      const server = await provider()
+      const filePath = `${process.cwd()}/src/test/resources/file.txt`
 
-    const deleteResponse = await deleteFile(server, sampleNode1, sampleVersion);
-    t.equal(200, deleteResponse.statusCode)
+      const uploadResponse = await postFile(server, filePath, sampleNode1, sampleVersion);
+      expect(uploadResponse.statusCode).toBe(200)
+
+      const deleteResponse = await deleteFile(server, sampleNode1, sampleVersion);
+      expect(deleteResponse.statusCode).toBe(200)
+    })
   })
 
-  tap.test(`uploads & bulk delete`, async t => {
-    const server = await provider(t)
-    const filePath = `${process.cwd()}/src/test/resources/file.txt`
+  describe(`FilestoreTest: upload & copy ${description}`, () => {
+    it("upload & copy", async () => {
+      const server = await provider()
+      const filePath = `${process.cwd()}/src/test/resources/file.txt`
 
-    const ids = [...Array(9).keys()].map( d => ({
-      node:`443c815e-6b88-47b1-800f-d74d2d3004b${d}`,
-      version: sampleVersion
-    }))
-    for await (const {node:id, version} of ids) {
-      const uploadResponse = await postFile(server, filePath, id, version);
-      if (uploadResponse.statusCode !== 200) {
-        t.fail(`Upload failed ${JSON.stringify(uploadResponse, null, 2)}`)
+      const uploadResponse = await postFile(server, filePath, sampleNode2, sampleVersion);
+      expect(uploadResponse.statusCode).toBe(200)
+
+      const copyResponse = await copy(server, {
+        type: "files",
+        sourceNode: sampleNode2,
+        sourceVersion: sampleVersion,
+        destinationNode: sampleNode1,
+        destinationVersion: sampleVersion
+      });
+      expect(copyResponse.statusCode).toBe(200)
+
+      const downloadResponse1 = await downloadFile(server, sampleNode2, sampleVersion);
+      expect(downloadResponse1.statusCode).toBe(200)
+
+      const downloadResponse2 = await downloadFile(server, sampleNode1, sampleVersion);
+      expect(downloadResponse2.statusCode).toBe(200)
+    })
+
+    it("upload & copy again", async () => {
+      const server = await provider()
+      const filePath = `${process.cwd()}/src/test/resources/file.txt`
+      const uploadResponse = await postFile(server, filePath, sampleNode2, sampleVersion);
+      expect(uploadResponse.statusCode).toBe(200)
+
+      const copyResponse = await copy(server, {
+        type: "files",
+        sourceNode: sampleNode2,
+        sourceVersion: sampleVersion,
+        destinationNode: sampleNode1,
+        destinationVersion: sampleVersion
+      });
+      expect(copyResponse.statusCode).toBe(200)
+
+      const downloadResponse1 = await downloadFile(server, sampleNode2, sampleVersion);
+      expect(downloadResponse1.statusCode).toBe(200)
+
+      const downloadResponse2 = await downloadFile(server, sampleNode1, sampleVersion);
+      expect(downloadResponse2.statusCode).toBe(200)
+    })
+  })
+
+  describe(`FilestoreTest: upload & copy chats ${description}`, () => {
+    it("upload & copy chats", async () => {
+      const server = await provider()
+      const filePath = `${process.cwd()}/src/test/resources/file.txt`
+
+      const uploadResponse = await postChatsAttachment(server, filePath, sampleNode2);
+      expect(uploadResponse.statusCode).toBe(200)
+
+      const copyResponse = await copy(server, {
+        type: "chats",
+        sourceNode: sampleNode2,
+        destinationNode: sampleNode1,
+      });
+      expect(copyResponse.statusCode).toBe(200)
+
+      const downloadResponse1 = await downloadChatsAttachment(server, sampleNode2);
+      expect(downloadResponse1.statusCode).toBe(200)
+
+      const downloadResponse2 = await downloadChatsAttachment(server, sampleNode1);
+      expect(downloadResponse2.statusCode).toBe(200)
+    })
+  })
+
+  describe(`FilestoreTest: upload & copy with override ${description}`, () => {
+    it("upload & copy with override", async () => {
+      const server = await provider()
+      const filePath = `${process.cwd()}/src/test/resources/file.txt`
+
+      const uploadResponse1 = await postFile(server, filePath, sampleNode1, sampleVersion);
+      expect(uploadResponse1.statusCode).toBe(200)
+
+      const uploadResponse2 = await postFile(server, filePath, sampleNode2, sampleVersion);
+      expect(uploadResponse2.statusCode).toBe(200)
+
+      const copyResponse = await copy(server, {
+        type: "files",
+        sourceNode: sampleNode2,
+        sourceVersion: sampleVersion,
+        destinationNode: sampleNode1,
+        destinationVersion: sampleVersion,
+        override: true
+      });
+      expect(copyResponse.statusCode).toBe(200)
+    })
+  })
+
+  describe(`FilestoreTest: upload & copy fail because of override=false ${description}`, () => {
+    it("upload & copy fail because of override=false", async () => {
+      const server = await provider()
+      const filePath = `${process.cwd()}/src/test/resources/file.txt`
+
+      const uploadResponse1 = await postFile(server, filePath, sampleNode1, sampleVersion);
+      expect(uploadResponse1.statusCode).toBe(200)
+
+      const uploadResponse2 = await postFile(server, filePath, sampleNode2, sampleVersion);
+      expect(uploadResponse2.statusCode).toBe(200)
+
+      const copyResponse = await copy(server, {
+        type: "files",
+        sourceNode: sampleNode2,
+        sourceVersion: sampleVersion,
+        destinationNode: sampleNode1,
+        destinationVersion: sampleVersion,
+        override: false
+      });
+      expect(copyResponse.statusCode).toBe(409)
+
+      const copyResponse1 = await copy(server, {
+        type: "files",
+        sourceNode: sampleNode2,
+        sourceVersion: sampleVersion,
+        destinationNode: sampleNode1,
+        destinationVersion: sampleVersion,
+        override: undefined
+      });
+      expect(copyResponse1.statusCode).toBe(409)
+    })
+  })
+
+  describe(`FilestoreTest: copy fail because source does not exists ${description}`, () => {
+    it("copy fail because source does not exists", async () => {
+      const server = await provider()
+
+      const copyResponse = await copy(server, {
+        type: "files",
+        sourceNode: sampleNode2,
+        sourceVersion: sampleVersion,
+        destinationNode: sampleNode1,
+        destinationVersion: sampleVersion,
+        override: false
+      });
+      expect(copyResponse.statusCode).toBe(404)
+    })
+  })
+
+  describe(`FilestoreTest: POST ${description}`, () => {
+    it("expect 409 error for same node/version", async () => {
+      const server = await provider()
+      const filePath = `${process.cwd()}/src/test/resources/file.txt`
+
+      const uploadResponse = await postFile(server, filePath, sampleNode1, sampleVersion);
+      expect(uploadResponse.statusCode).toBe(200)
+
+      const upload2Response = await postFile(server, filePath, sampleNode1, sampleVersion);
+      expect(upload2Response.statusCode).toBe(409)
+    })
+
+    it("PUT: upload twice the same node/version", async () => {
+      const server = await provider()
+      const filePath = `${process.cwd()}/src/test/resources/file.txt`
+
+      const uploadResponse = await putFile(server, filePath, sampleNode1, sampleVersion);
+      expect(uploadResponse.statusCode).toBe(200)
+
+      const upload2Response = await putFile(server, filePath, sampleNode1, sampleVersion);
+      expect(upload2Response.statusCode).toBe(200)
+    })
+  })
+
+  describe(`FilestoreTest: upload file response contains hash and size ${description}`, () => {
+    const calls = [putFile, postFile];
+    for (const c of calls){
+      it('upload file response contains hash and size', async () => {
+        const server = await provider()
+        const filePath = `${process.cwd()}/src/test/resources/file.txt`
+
+        const uploadResponse = await c(server, filePath, sampleNode1, sampleVersion);
+        expect(uploadResponse.statusCode).toBe(200)
+        const responseBody = JSON.parse(uploadResponse.body);
+        const digest = responseBody.digest
+        expect(digest).toBe('4f5937de8e24e473df43503273b78e6e')
+
+        const size = responseBody.size
+        expect(size).toBe(17)
+      })
+    }
+  })
+
+  describe(`FilestoreTest: download missing resource ${description}`, () => {
+    it("download missing resource", async () => {
+      const server = await provider()
+
+      const downloadResponse = await downloadFile(server, sampleNode1, sampleVersion);
+      expect(downloadResponse.statusCode).toBe(404)
+    })
+
+    it("delete missing resource", async () => {
+      const server = await provider()
+
+      const deleteResponse = await deleteFile(server, sampleNode1, sampleVersion);
+      expect(deleteResponse.statusCode).toBe(200)
+    })
+  })
+
+  describe(`FilestoreTest: uploads & bulk delete ${description}`, () => {
+    it("uploads & bulk delete", async () => {
+      const server = await provider()
+      const filePath = `${process.cwd()}/src/test/resources/file.txt`
+
+      const ids = [...Array(9).keys()].map( d => ({
+        node:`443c815e-6b88-47b1-800f-d74d2d3004b${d}`,
+        version: sampleVersion
+      }))
+      for await (const {node:id, version} of ids) {
+        const uploadResponse = await postFile(server, filePath, id, version);
+        if (uploadResponse.statusCode !== 200) {
+          throw new Error(`Upload failed ${JSON.stringify(uploadResponse, null, 2)}`)
+        }
       }
-    }
 
-    const deleteResponse = await deleteBulk(server, ids);
-    t.equal(200, deleteResponse.statusCode)
+      const deleteResponse = await deleteBulk(server, ids);
+      expect(deleteResponse.statusCode).toBe(200)
 
-    for await (const id of ids) {
-      const downloadResponse = await downloadFile(server, id.node, id.version);
-      t.equal(404, downloadResponse.statusCode)
-    }
-  })
-
-  tap.test(`uploads & bulk delete, one file is not stored`, async t => {
-    const server = await provider(t)
-    const filePath = `${process.cwd()}/src/test/resources/file.txt`
-
-    const ids = [...Array(5).keys()].map( d => ({
-      node:`443c815e-6b88-47b1-800f-d74d2d3004b${d}`,
-      version: sampleVersion
-    }))
-    for await (const {node:id, version} of ids) {
-      const uploadResponse = await postFile(server, filePath, id, version);
-      if (uploadResponse.statusCode !== 200) {
-        t.fail(`Upload failed ${JSON.stringify(uploadResponse, null, 2)}`)
+      for await (const id of ids) {
+        const downloadResponse = await downloadFile(server, id.node, id.version);
+        expect(downloadResponse.statusCode).toBe(404)
       }
-    }
+    })
 
-    const notStoredId = `443c815e-6b88-47b1-800f-d74d2d3004b7`;
-    const notStored = [{
-      node:notStoredId,
-      version: sampleVersion
-    }]
+    it("uploads & bulk delete, one file is not stored", async () => {
+      const server = await provider()
+      const filePath = `${process.cwd()}/src/test/resources/file.txt`
 
-    const deleteResponse = await deleteBulk(server, ids.concat(notStored));
-    t.equal(200, deleteResponse.statusCode)
-    const respBody = deleteResponse.json()
+      const ids = [...Array(5).keys()].map( d => ({
+        node:`443c815e-6b88-47b1-800f-d74d2d3004b${d}`,
+        version: sampleVersion
+      }))
+      for await (const {node:id, version} of ids) {
+        const uploadResponse = await postFile(server, filePath, id, version);
+        if (uploadResponse.statusCode !== 200) {
+          throw new Error(`Upload failed ${JSON.stringify(uploadResponse, null, 2)}`)
+        }
+      }
 
-    t.equal(respBody.ids.length, 1)
-    const item = respBody.ids[0];
-    t.equal(item.type, "files")
-    t.equal(item.node, notStoredId)
+      const notStoredId = `443c815e-6b88-47b1-800f-d74d2d3004b7`;
+      const notStored = [{
+        node:notStoredId,
+        version: sampleVersion
+      }]
 
-    for await (const id of ids) {
-      const downloadResponse = await downloadFile(server, id.node, id.version);
-      t.equal(404, downloadResponse.statusCode)
-    }
+      const deleteResponse = await deleteBulk(server, ids.concat(notStored));
+      expect(deleteResponse.statusCode).toBe(200)
+      const respBody = deleteResponse.json()
+
+      expect(respBody.ids.length).toBe(1)
+      const item = respBody.ids[0];
+      expect(item.type).toBe("files")
+      expect(item.node).toBe(notStoredId)
+
+      for await (const id of ids) {
+        const downloadResponse = await downloadFile(server, id.node, id.version);
+        expect(downloadResponse.statusCode).toBe(404)
+      }
+    })
   })
-
 }

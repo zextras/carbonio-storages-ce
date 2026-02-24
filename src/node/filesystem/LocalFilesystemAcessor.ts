@@ -5,7 +5,7 @@
 import * as fs from 'fs';
 import { Identifier } from "./Identifier";
 import { Config } from "../config/configuration";
-import * as path from "path";
+import {join} from "path";
 import { FilesystemAccessor } from "./FilesystemAccessor";
 import { FilePathStrategy } from "./FilePathStategy";
 import checkDiskSpace from 'check-disk-space';
@@ -50,11 +50,11 @@ export class LocalFilesystemAccessor implements FilesystemAccessor {
   }
 
   private calculateFileParent(identifier: Identifier): string {
-    return path.join(this.config.path, identifier.path().toString())
+    return join(this.config.path, identifier.path().toString())
   }
 
   calculateFilePath(identifier: Identifier): fs.PathLike {
-    return path.join(this.calculateFileParent(identifier), identifier.toFilename())
+    return join(this.calculateFileParent(identifier), identifier.toFilename())
   }
 
   async availableSpace() : Promise<number> {
