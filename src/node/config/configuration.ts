@@ -28,8 +28,7 @@ const ConfigType = Type.Object({
   https: Type.Optional(Type.Object({
     keyPath: Type.String(),
     certPath: Type.String()
-  })),
-  awsv4signature: Type.Optional(Type.Object({}, {additionalProperties: true}))
+  }))
 })
 
 export type Config = Static<typeof ConfigType>
@@ -46,26 +45,6 @@ export const STORAGES_CONF = {
   HTTPS: {
     KEY_PATH: "STORAGES_HTTPS_KEY_PATH",
     CERT_PATH: "STORAGES_HTTPS_CERT_PATH"
-  },
-  AUTH: {
-    AWS4_ACCESS_KEY: "STORAGES_AUTH_AWSV4SIGNATURE_ACCESS_KEY",
-    AWS4_ACCESS_SECRET: "STORAGES_AUTH_AWSV4SIGNATURE_ACCESS_SECRET"
-  }
-}
-
-const awsEnvConf = (conf: any) => {
-  const key = conf[STORAGES_CONF.AUTH.AWS4_ACCESS_KEY];
-  const value = conf[STORAGES_CONF.AUTH.AWS4_ACCESS_SECRET];
-
-  if (key && value) {
-    return {
-      [key]: value
-    }
-  // tslint:disable-next-line:triple-equals
-  } else if (key == undefined && value == undefined) {
-    return undefined
-  } else {
-    throw new Error(`Aws: Invalid key: ${key} or value: ${value}`)
   }
 }
 
@@ -103,11 +82,6 @@ const loadEnvironmentConf = (conf: Record<string,string|undefined> = process.env
       certPath: conf[STORAGES_CONF.HTTPS.CERT_PATH]
     }
   }
-
-  const extractedAwsConf = awsEnvConf(conf)
-  // tslint:disable-next-line:triple-equals
-  if (extractedAwsConf != undefined)
-    result.awsv4signature = extractedAwsConf
 
   return result;
 }

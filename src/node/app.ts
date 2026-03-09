@@ -14,8 +14,6 @@ import {GzipWrapperFilesystemAccessor} from "./filesystem/GzipWrapperFilesystemA
 import {FastifyRequest} from "fastify/types/request";
 import {createContext} from "./loggingutils";
 import * as fs from "fs";
-import {AuthFactory} from "./auth/AuthFactory";
-import {AuthError} from "./auth/AuthError";
 import os from "os"
 import fastifySwaggerUi from '@fastify/swagger-ui';
 import * as rfs from "rotating-file-stream";
@@ -48,22 +46,6 @@ export async function createApp(config: Config) {
     server.log.warn('Route not found: ' +  request.url)
     reply.status(404).send({ message: 'Not found' })
   })
-
-  const auth = AuthFactory.create(config)
-  server.addHook('onRequest', async (request, reply) => {
-    request.log.info(`[${createContext(request)}] Request received`)
-    try {
-      await auth.check(request)
-    } catch(e) {
-      if (e instanceof AuthError) {
-        request.log.error(`[${createContext(request)}] Authentication failed`)
-        reply.status(401).send()
-      }
-      else {
-        throw e
-      }
-    }
-  });
 
   server.addHook('onError', async (request: FastifyRequest, __: any, error: Error) => {
     request.log.error(`[${createContext(request)}] ${error}`)
