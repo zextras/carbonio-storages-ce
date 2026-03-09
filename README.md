@@ -5,93 +5,138 @@ SPDX-License-Identifier: AGPL-3.0-only
 -->
 
 <div align="center">
-  <h1>Storages-CE</h1>
+  <h1>Carbonio Storages CE</h1>
 </div>
 
 <p align="center">
-  <a href="https://github.com/zextras/storages-ce/graphs/contributors" alt="Contributors">
-  <img src="https://img.shields.io/github/contributors/zextras/storages-ce" /></a>
-  <a href="https://github.com/zextras/storages-ce/pulse" alt="Activity">
-  <img src="https://img.shields.io/github/commit-activity/m/zextras/storages-ce" /></a>
+  <a href="https://github.com/zextras/carbonio-storages-ce/graphs/contributors" alt="Contributors">
+  <img src="https://img.shields.io/github/contributors/zextras/carbonio-storages-ce" /></a>
+  <a href="https://github.com/zextras/carbonio-storages-ce/pulse" alt="Activity">
+  <img src="https://img.shields.io/github/commit-activity/m/zextras/carbonio-storages-ce" /></a>
   <img src="https://img.shields.io/badge/license-AGPL%203-green" alt="License AGPL 3">
   <img src="https://img.shields.io/badge/project-carbonio-informational" alt="Project Carbonio">
-  <a href="https://twitter.com/intent/follow?screen_name=zextras">
-  <img src="https://img.shields.io/twitter/follow/zextras?style=social&logo=twitter" alt="Follow on Twitter"></a>
 </p>
 
-<p>
-  External files store application for [Carbonio CE](https://www.zextras.com/carbonio-community-edition/)
-</p>
+External files storage service for [Carbonio CE](https://www.zextras.com/carbonio-community-edition/). This Node.js application provides a REST API for storing, retrieving, and managing files, with Swagger documentation available at the root endpoint.
 
-<h2>Getting started</h2>
+## Quick Start
 
-<h3>Build the application from source code</h3>
+### Prerequisites
 
-<h4>Prerequisites</h4>
+- Docker or Podman installed
+- Make
 
-Node 22 is required to build the application, alternatively [nvm](https://github.com/nvm-sh/nvm) may be used:
+### Building Packages
 
-```sh
-$ nvm install
+```bash
+# Build packages for Ubuntu 22.04
+make build TARGET=ubuntu-jammy
+
+# Build packages for Rocky Linux 9
+make build TARGET=rocky-9
+
+# Build packages for Ubuntu 24.04
+make build TARGET=ubuntu-noble
 ```
 
-<h4>Start the application</h4>
+### Supported Targets
 
-Server can be started using:
+- `ubuntu-jammy` - Ubuntu 22.04 LTS
+- `ubuntu-noble` - Ubuntu 24.04 LTS
+- `rocky-8` - Rocky Linux 8
+- `rocky-9` - Rocky Linux 9
 
-`npm run build && npm run start`
+### Build Configuration
 
-Then Storages-CE server will be available at `http://localhost:5794/`
+You can customize the build by setting environment variables:
 
-<h3>Docker</h3>
+```bash
+# Use a specific container runtime
+make build TARGET=ubuntu-jammy CONTAINER_RUNTIME=docker
 
-A docker image is available on [Docker Hub](https://hub.docker.com/r/zextras/storages-ce).
+# Use a different output directory
+make build TARGET=rocky-9 OUTPUT_DIR=./my-packages
+```
+
+## Local Development
+
+### Prerequisites
+
+Node 22 is required to build the application. Alternatively, [nvm](https://github.com/nvm-sh/nvm) may be used:
+
+```sh
+nvm install
+```
+
+### Build and Run from Source
+
+```bash
+npm ci
+npm run build
+npm run start
+```
+
+The Storages CE server will be available at `http://localhost:5794/`.
+
+### Testing
+
+```bash
+npm run test
+npm run test:watch
+npm run test:coverage
+```
+
+## Container Image
+
+A container image is available on [Docker Hub](https://hub.docker.com/r/zextras/storages-ce).
+
 To run the application:
 
-`docker run -it --rm -d -p 5794:5794 -e STORAGES_BIND_ADDRESS="0.0.0.0" --name storages-ce zextras/storages-ce`
+```bash
+docker run -it --rm -d -p 5794:10000 -e STORAGES_BIND_ADDRESS="0.0.0.0" --name storages-ce zextras/storages-ce
+```
 
-<h2>Configuration</h2>
+## Server Configuration
 
-The following environment variables can be provided when starting the Storages-CE server
+The following environment variables can be provided when starting the Storages CE server:
 
-- `STORAGES_CONF_PATH`
+| Variable | Description | Default |
+|---|---|---|
+| `STORAGES_CONF_PATH` | Path to the configuration file | |
+| `STORAGES_BIND_ADDRESS` | Address on which Storages CE will listen for API calls | `127.0.0.1` |
+| `STORAGES_PATH` | Folder inside which all files are stored | |
+| `STORAGES_PORT` | Port the server listens on for HTTP connections | |
+| `STORAGES_BASE_URL` | Suffix path at which the server is served | |
+| `STORAGES_LOGGING_DIRNAME` | Folder for log files produced by Storages CE | |
+| `STORAGES_HTTPS_KEY_PATH` | Path to HTTPS private key | |
+| `STORAGES_HTTPS_CERT_PATH` | Path to HTTPS certificate | |
 
-The path to the configuration file
+The full URL is constructed as: `(http|https)://0.0.0.0:${STORAGES_PORT}/${STORAGES_BASE_URL}`
 
-- `STORAGES_BIND_ADDRESS`
+## API Documentation
 
-Address on which Storages-CE will listen for API calls (default 127.0.0.1)
+Once the application is started, Swagger documentation is available at: `http://localhost:5794/`
 
-- `STORAGES_PATH`
+## Installation
 
-The folder inside which all file are stored
+This package is distributed as part of the [Carbonio platform](https://zextras.com/carbonio). To install:
 
-- `STORAGES_PORT`
+### Ubuntu (Jammy/Noble)
 
-The port the Storages-CE is listening for http connections.
+```bash
+apt-get install carbonio-storages-ce
+```
 
-- `STORAGES_BASE_URL`
+### Rocky Linux (8/9)
 
-The suffix path at which the Storages-CE is served.
-The full url is constructed in the following way:
+```bash
+yum install carbonio-storages-ce
+```
 
-`(http|https)://0.0.0.0:${STORAGES_PORT}/${STORAGES_BASE_URL}`
+## Contributing
 
-- `STORAGES_LOGGING_DIRNAME`
+See [CONTRIBUTING.md](CONTRIBUTING.md) for information on how to contribute to this project.
 
-Folder including log files produced by Storages-CE
+## License
 
-- `STORAGES_HTTPS_KEY_PATH`
-- `STORAGES_HTTPS_CERT_PATH`
-
-Cerificates informations
-
-<h2>Api documentation</h2>
-
-Once the application is started, swagger documentation is available at: `http://localhost:5794/`
-
-<h2>License</h2>
-
-<p>
-Storages-CE is released under the <a href="https://www.gnu.org/licenses/agpl-3.0.en.html" alt="GNU Affero General Public License">GNU Affero General Public License</a>, see `LICENSE.txt` for further details.
-</p>
+This project is licensed under the GNU Affero General Public License v3.0 - see the [LICENSE.md](LICENSE.md) file for details.
