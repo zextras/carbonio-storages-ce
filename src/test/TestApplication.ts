@@ -18,8 +18,6 @@ export async function testApplication(configPatch: DeepPartial<Config> = {}): Pr
 
   delete defaultTestConfig.https
 
-  delete defaultTestConfig.awsv4signature
-
   const testDir: string = await mkTempFolder("storagesCETests");
   defaultTestConfig.path = `${testDir}/store`
 

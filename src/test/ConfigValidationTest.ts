@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-only
 
-import {startupConfiguration, read, STORAGES_CONF} from "../node/config/configuration";
+import {startupConfiguration, read} from "../node/config/configuration";
 import {describe, it, expect} from 'vitest';
 
 describe('ConfigValidationTest', () => {
@@ -60,22 +60,4 @@ describe('ConfigValidationTest', () => {
 
     expect(configuration.logging?.dirname).toBe('bla');
   });
-
-  it('expect error if custom Aws conf incomplete', async () => {
-    const c = {
-      [STORAGES_CONF.AUTH.AWS4_ACCESS_KEY]: 'bla'
-    };
-    await expect(startupConfiguration(c)).rejects.toThrow()
-  })
-
-  it('custom Aws conf valid', async () => {
-    const c = {
-      [STORAGES_CONF.AUTH.AWS4_ACCESS_KEY]: 'bla',
-      [STORAGES_CONF.AUTH.AWS4_ACCESS_SECRET]: 'bla'
-    };
-
-    const configuration = await startupConfiguration(c);
-
-    expect(configuration).not.toBeNull();
-  })
 })
