@@ -15,6 +15,10 @@ coverage/
 storages-ce
 carbonio-storages
 
+# Build artifacts
+artifacts/
+fetched-*
+
 # Compiled Java class files
 *.class
 
