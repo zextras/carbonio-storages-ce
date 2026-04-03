@@ -9,6 +9,9 @@
 
 # Node artifact files
 node_modules/
+
+# pnpm
+.pnpm-store/
 dist/
 coverage/
 .nyc_output/

@@ -30,6 +30,7 @@
   "scripts": {
     "build": "rimraf dist && tsc --build",
     "pkg": "pkg -t node22-linux -C Brotli .",
+    "reset": "node ./scripts/reset.js",
     "start": "STORAGES_LOGGING_DIRNAME=/tmp/storages-ce-log STORAGES_PATH=/tmp/storages-ce-store node dist/node/index.js",
     "test": "vitest run",
     "test:watch": "vitest",
@@ -52,7 +53,12 @@
     "rotating-file-stream": "^3.2.7",
     "save-dev": "^0.0.1-security"
   },
-  "overrides": {
-    "minimatch": "^10.2.1"
+  "pnpm": {
+    "overrides": {
+      "minimatch": "^10.2.1"
+    },
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ]
   }
 }

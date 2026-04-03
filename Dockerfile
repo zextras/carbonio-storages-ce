@@ -9,10 +9,12 @@ FROM node:${NODE_IMAGE_VERSION} AS dependencies
 WORKDIR /usr/src/app
 
 COPY package.json ./
-COPY package-lock.json ./
+COPY pnpm-lock.yaml ./
+
+RUN corepack enable && corepack prepare pnpm@latest --activate
 
 # install production dependencies here, for better reuse of layers
-RUN npm ci --omit=dev
+RUN pnpm install --prod --frozen-lockfile
 
 FROM node:${NODE_IMAGE_VERSION} AS builder
 
@@ -23,8 +25,10 @@ COPY . .
 COPY --from=dependencies \
   /usr/src/app/node_modules /usr/src/app/node_modules
 
+RUN corepack enable && corepack prepare pnpm@latest --activate
+
 # install dependencies here, for better reuse of layers
-RUN npm ci && npm audit fix && npm cache clean --force && npm run build && npm run pkg
+RUN pnpm install --frozen-lockfile && pnpm audit fix && pnpm store prune && pnpm run build && pnpm run pkg
 
 FROM debian:bookworm-slim
 
