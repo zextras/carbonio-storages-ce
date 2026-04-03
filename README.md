@@ -68,12 +68,19 @@ Node 22 is required to build the application. Alternatively, [nvm](https://githu
 nvm install
 ```
 
+[pnpm](https://pnpm.io) is used as the package manager (managed via [corepack](https://nodejs.org/api/corepack.html)):
+
+```sh
+corepack enable
+corepack prepare pnpm@latest --activate
+```
+
 ### Build and Run from Source
 
 ```bash
-npm ci
-npm run build
-npm run start
+pnpm install --frozen-lockfile
+pnpm run build
+pnpm run start
 ```
 
 The Storages CE server will be available at `http://localhost:5794/`.
@@ -81,9 +88,9 @@ The Storages CE server will be available at `http://localhost:5794/`.
 ### Testing
 
 ```bash
-npm run test
-npm run test:watch
-npm run test:coverage
+pnpm run test
+pnpm run test:watch
+pnpm run test:coverage
 ```
 
 ## Container Image
