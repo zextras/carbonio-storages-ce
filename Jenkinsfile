@@ -44,7 +44,6 @@ pipeline {
             steps {
                 container('nodejs-22') {
                     sh '''
-                        corepack enable && corepack prepare pnpm@latest --activate
                         pnpm install --frozen-lockfile && pnpm run build && pnpm run test
                     '''
                 }
