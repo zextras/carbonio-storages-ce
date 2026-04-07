@@ -32,9 +32,10 @@ sha256sums=(
 
 build() {
   export PKG_CACHE_PATH="."
-  npm ci
-  npm run build
-  npm run pkg
+  corepack enable && corepack prepare pnpm@latest --activate
+  pnpm install --frozen-lockfile
+  pnpm run build
+  pnpm run pkg
 
   # ugly workaround to disable rpm system-wide stripping
   # please don't execute outside of the build agent
