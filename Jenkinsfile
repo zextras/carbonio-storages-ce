@@ -94,6 +94,7 @@ pipeline {
                 buildStage([
                     rockySinglePkg: true,
                     ubuntuSinglePkg: true,
+                    buildFlags: '-ds',
                     overrides: [
                         'ubuntu': [
                             preBuildScript: '''
