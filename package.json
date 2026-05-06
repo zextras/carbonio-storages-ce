@@ -9,7 +9,7 @@
     "@sinclair/typebox": "^0.34.48",
     "@types/busboy": "^0.2.4",
     "@types/crypto-js": "^4.2.2",
-    "@types/node": "^22.19.15",
+    "@types/node": "^22.19.17",
     "@vitest/coverage-v8": "^3.2.4",
     "@yao-pkg/pkg": "^6.14.1",
     "light-my-request": "^6.5.0",
