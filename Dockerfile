@@ -28,7 +28,7 @@ COPY --from=dependencies \
 RUN corepack enable && corepack prepare pnpm@latest --activate
 
 # install dependencies here, for better reuse of layers
-RUN pnpm install --frozen-lockfile && pnpm audit fix && pnpm store prune && pnpm run build && pnpm run pkg
+RUN pnpm install --frozen-lockfile && pnpm store prune && pnpm run build && pnpm run pkg
 
 FROM debian:bookworm-slim
 
