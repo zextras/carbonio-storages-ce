@@ -13,10 +13,6 @@ library(
 
 properties(defaultPipelineProperties())
 
-boolean isBuildingTag() {
-    return env.TAG_NAME ? true : false
-}
-
 pipeline {
     agent {
         node {
@@ -52,38 +48,15 @@ pipeline {
         }
 
         stage('Build and Publish Docker Image') {
-            when {
-                expression {
-                    return isBuildingTag() || env.BRANCH_NAME == 'devel'
-                }
-            }
             steps {
-                container('dind') {
-                    withDockerRegistry([
-                        credentialsId: 'private-registry',
-                        url: 'https://registry.dev.zextras.com'
-                    ]) {
-                        script {
-                            String branchTag = env.BRANCH_NAME.replaceAll('/', '-').toLowerCase()
-                            Set<String> imageTags = [ branchTag ]
-
-                            if (env.BRANCH_NAME == 'devel') {
-                                imageTags.add('latest')
-                            } else if (buildingTag() && env.TAG_NAME?.trim()) {
-                                imageTags.add(env.TAG_NAME?.startsWith('v') ? env.TAG_NAME.substring(1) : env.TAG_NAME)
-                            }
-
-                            dockerHelper.buildImage([
-                                imageName: 'registry.dev.zextras.com/dev/carbonio-storages-ce',
-                                imageTags: imageTags,
-                                ocLabels: [
-                                    title: 'Carbonio storages CE',
-                                    description: 'Carbonio storages CE',
-                                    version: branchTag
-                                ]
-                            ])
-                        }
-                    }
+                script {
+                    dockerStage(
+                        imageName: 'carbonio-storages-ce',
+                        ocLabels: [
+                            title: 'Carbonio storages CE',
+                            description: 'Carbonio storages CE',
+                        ]
+                    )
                 }
             }
         }
