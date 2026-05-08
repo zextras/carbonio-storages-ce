@@ -6,7 +6,7 @@
   "type": "commonjs",
   "packageManager": "pnpm@10.33.0",
   "devDependencies": {
-    "@sinclair/typebox": "^0.34.48",
+    "@sinclair/typebox": "^0.34.49",
     "@types/busboy": "^0.2.4",
     "@types/crypto-js": "^4.2.2",
     "@types/node": "^22.19.15",
