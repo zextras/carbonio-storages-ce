@@ -6,15 +6,11 @@
     "target": "es6",
     "noImplicitAny": true,
     "moduleResolution": "node",
+    "ignoreDeprecations": "6.0",
     "resolveJsonModule": true,
     "sourceMap": true,
+    "rootDir": "src",
     "outDir": "dist",
-    "baseUrl": ".",
-    "paths": {
-      "*": [
-        "node_modules/*",
-      ]
-    },
     "strict": true,
     "strictNullChecks": true,
     "strictFunctionTypes": true,
