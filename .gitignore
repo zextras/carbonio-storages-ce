@@ -70,3 +70,4 @@ Thumbs.db
 #reuse
 .reuse/
 LICENSES/
+/tsconfig.tsbuildinfo

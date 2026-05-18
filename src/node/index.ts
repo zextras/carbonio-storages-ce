@@ -19,7 +19,6 @@ const start = async () => {
 start()
   .catch( e =>
     {
-      // tslint:disable-next-line:no-console
       console.error(`Error starting application ${e}`);
       process.exitCode = 1;
     });

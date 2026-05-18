@@ -18,7 +18,7 @@ export class LocalFilesystemAccessor implements FilesystemAccessor {
     try {
       await fs.promises.access(path)
       return true
-    } catch (e) {
+    } catch {
       return false
     }
   }
