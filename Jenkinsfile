@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 library(
-    identifier: 'jenkins-lib-common@1.7.5',
+    identifier: 'jenkins-lib-common@v2.9.2',
     retriever: modernSCM([
         $class: 'GitSCMSource',
         credentialsId: 'jenkins-integration-with-github-account',
@@ -53,7 +53,8 @@ pipeline {
                         ocLabels: [
                             title: 'Carbonio storages CE',
                             description: 'Carbonio storages CE',
-                        ]
+                        ],
+                        platforms: ['linux/amd64', 'linux/arm64'] as Set,
                     )
                 }
             }
@@ -65,28 +66,8 @@ pipeline {
                 buildStage([
                     rockySinglePkg: true,
                     ubuntuSinglePkg: true,
-                    buildFlags: '-ds',
-                    overrides: [
-                        'ubuntu': [
-                            preBuildScript: '''
-                                apt-get update
-                                apt-get install -y ca-certificates curl gnupg
-                                mkdir -p /etc/apt/keyrings
-                                curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key \
-                                    | sudo gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg
-                                echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_22.x nodistro main" \
-                                    | sudo tee /etc/apt/sources.list.d/nodesource.list
-                                apt-get update
-                                apt-get install -y nodejs
-                            '''
-                        ],
-                        'rocky': [
-                            preBuildScript: '''
-                                curl -fsSL https://rpm.nodesource.com/setup_22.x | bash -
-                                yum install -y nodejs
-                            '''
-                        ]
-                    ]
+                    prepareFlags: '--repo \'name=nodesource,url=https://deb.nodesource.com/node_20.x,suite=nodistro,components=main,distros=ubuntu\' --repo \'name=nodesource,url=https://rpm.nodesource.com/pub_20.x/nodistro/nodejs/x86_64,format=rpm,distros=rocky\'',
+                    buildFlags: '--repo \'name=nodesource,url=https://deb.nodesource.com/node_20.x,suite=nodistro,components=main,distros=ubuntu\' --repo \'name=nodesource,url=https://rpm.nodesource.com/pub_20.x/nodistro/nodejs/x86_64,format=rpm,distros=rocky\'',
                 ])
             }
         }
@@ -97,7 +78,6 @@ pipeline {
             }
             steps {
                 uploadStage(
-                    packages: yapHelper.resolvePackageNames(),
                     rockySinglePkg: true,
                     ubuntuSinglePkg: true,
                 )
