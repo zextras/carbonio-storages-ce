@@ -9,10 +9,12 @@ section="libs"
 priority="important"
 options=('!strip')
 depends=(
+  "jq"
   "pending-setups"
   "service-discover"
-  "jq"
+  "service-discover-base"
 )
+makedepends=("nodejs")
 source=(
   "carbonio-storages.sh"
   "carbonio-storages.hcl"
