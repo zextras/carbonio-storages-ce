@@ -33,6 +33,7 @@ sha256sums=(
 )
 
 build() {
+  cd "${repodir}"
   export PKG_CACHE_PATH="."
   corepack enable && corepack prepare pnpm@10.33.0 --activate
   pnpm install --frozen-lockfile
@@ -45,6 +46,7 @@ build() {
 }
 
 package() {
+  cd "${repodir}"
   install -Dm755 "${srcdir}/carbonio-storages.sh" \
     "${pkgdir}/usr/bin/carbonio-storages"
   install -Dm755 "${srcdir}/carbonio-storages.service" \
