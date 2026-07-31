@@ -34,7 +34,7 @@ sha256sums=(
 
 build() {
   export PKG_CACHE_PATH="."
-  corepack enable && corepack prepare pnpm@latest --activate
+  corepack enable && corepack prepare pnpm@10.33.0 --activate
   pnpm install --frozen-lockfile
   pnpm run build
   pnpm run pkg
