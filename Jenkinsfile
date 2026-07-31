@@ -68,6 +68,17 @@ pipeline {
                     ubuntuSinglePkg: true,
                     prepareFlags: '--repo \'name=nodesource,url=https://deb.nodesource.com/node_20.x,suite=nodistro,components=main,distros=ubuntu\' --repo \'name=nodesource,url=https://rpm.nodesource.com/pub_20.x/nodistro/nodejs/x86_64,format=rpm,distros=rocky\'',
                     buildFlags: '--repo \'name=nodesource,url=https://deb.nodesource.com/node_20.x,suite=nodistro,components=main,distros=ubuntu\' --repo \'name=nodesource,url=https://rpm.nodesource.com/pub_20.x/nodistro/nodejs/x86_64,format=rpm,distros=rocky\'',
+                    preStashScript: '''
+                        set -e
+                        tar czf package/carbonio-storages-src.tar.gz \
+                            --exclude='.git' \
+                            --exclude='package' \
+                            --exclude='node_modules' \
+                            --exclude='dist' \
+                            --exclude='.pnpm-store' \
+                            --exclude='coverage' \
+                            .
+                    ''',
                 ])
             }
         }
