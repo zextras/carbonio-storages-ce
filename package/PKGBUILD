@@ -22,6 +22,7 @@ source=(
   "carbonio-storages-sidecar.service"
   "intentions.json"
   "service-protocol.json"
+  "carbonio-storages-src.tar.gz"
 )
 sha256sums=(
   '5bf54df7a315ddfa3b13365f7bdc906e401d9895d1402e9f37c18ef9ca381fcf'
@@ -30,11 +31,12 @@ sha256sums=(
   '494455f0e3bc8fef41ba4e27b9dd1cc57f8e4eddf9fae47d08b32ce46fe664e0'
   '7b912fbc263e31aa3541ffd750a339bb641bab0a31e4be96f3ad225c1bf9a195'
   '1078726118b7329de7640fafdb732d631f867912172cc78a466fa9eacc8b440e'
+  'SKIP'
 )
 
 build() {
   export PKG_CACHE_PATH="."
-  corepack enable && corepack prepare pnpm@latest --activate
+  corepack enable && corepack prepare pnpm@10.33.0 --activate
   pnpm install --frozen-lockfile
   pnpm run build
   pnpm run pkg

@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 library(
-    identifier: 'jenkins-lib-common@v2.10.0',
+    identifier: 'jenkins-lib-common@v4.1.4',
     retriever: modernSCM([
         $class: 'GitSCMSource',
         credentialsId: 'jenkins-integration-with-github-account',
@@ -68,6 +68,17 @@ pipeline {
                     ubuntuSinglePkg: true,
                     prepareFlags: '--repo \'name=nodesource,url=https://deb.nodesource.com/node_20.x,suite=nodistro,components=main,distros=ubuntu\' --repo \'name=nodesource,url=https://rpm.nodesource.com/pub_20.x/nodistro/nodejs/x86_64,format=rpm,distros=rocky\'',
                     buildFlags: '--repo \'name=nodesource,url=https://deb.nodesource.com/node_20.x,suite=nodistro,components=main,distros=ubuntu\' --repo \'name=nodesource,url=https://rpm.nodesource.com/pub_20.x/nodistro/nodejs/x86_64,format=rpm,distros=rocky\'',
+                    preStashScript: '''
+                        set -e
+                        tar czf package/carbonio-storages-src.tar.gz \
+                            --exclude='.git' \
+                            --exclude='package' \
+                            --exclude='node_modules' \
+                            --exclude='dist' \
+                            --exclude='.pnpm-store' \
+                            --exclude='coverage' \
+                            .
+                    ''',
                 ])
             }
         }
