@@ -33,7 +33,7 @@
     "pkg": "pkg -t node22-linux -C Brotli .",
     "reset": "node ./scripts/reset.js",
     "start": "STORAGES_LOGGING_DIRNAME=/tmp/storages-ce-log STORAGES_PATH=/tmp/storages-ce-store node dist/node/index.js",
-    "test": "vitest run",
+    "test": "vitest run --maxWorkers=2",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "test:single": "vitest run",
