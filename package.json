@@ -4,7 +4,7 @@
   "description": "",
   "bin": "dist/node/index.js",
   "type": "commonjs",
-  "packageManager": "pnpm@10.33.0",
+  "packageManager": "pnpm@10.34.5",
   "devDependencies": {
     "@sinclair/typebox": "^0.34.49",
     "@types/node": "^22.20.1",
