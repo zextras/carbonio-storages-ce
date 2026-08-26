@@ -50,7 +50,7 @@
     "fastify": "^5.8.5",
     "pino": "^10.3.1",
     "pino-pretty": "^13.1.2",
-    "rotating-file-stream": "^3.2.7"
+    "rotating-file-stream": "^3.2.10"
   },
   "pnpm": {
     "overrides": {
