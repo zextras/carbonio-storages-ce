@@ -34,6 +34,12 @@ pipeline {
             }
         }
 
+        stage('Skip CI') {
+            steps {
+                script { semanticRelease.guard() }
+            }
+        }
+
         stage('Launch tests') {
             steps {
                 container('nodejs-22') {
@@ -92,6 +98,14 @@ pipeline {
                     rockySinglePkg: true,
                     ubuntuSinglePkg: true,
                 )
+            }
+        }
+
+        stage('Bump version') {
+            steps {
+                script {
+                    semanticRelease()
+                }
             }
         }
     }
