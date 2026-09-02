@@ -103,8 +103,10 @@ pipeline {
 
         stage('Bump version') {
             steps {
-                script {
-                    semanticRelease()
+                container('nodejs-22') {
+                    script {
+                        semanticRelease()
+                    }
                 }
             }
         }
