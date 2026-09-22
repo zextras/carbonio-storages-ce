@@ -56,7 +56,7 @@ importers:
         specifier: ^10.8.0
         version: 10.11.0
       form-data:
-        specifier: ^4.0.0
+        specifier: ^4.0.6
         version: 4.0.6
       light-my-request:
         specifier: ^6.6.0
