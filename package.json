@@ -6,7 +6,7 @@
   "type": "commonjs",
   "packageManager": "pnpm@10.33.0",
   "devDependencies": {
-    "@sinclair/typebox": "^0.34.49",
+    "@sinclair/typebox": "^0.34.52",
     "@types/node": "^22.20.1",
     "@vitest/coverage-v8": "^4.1.10",
     "@yao-pkg/pkg": "^6.22.0",

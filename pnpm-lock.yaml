@@ -41,7 +41,7 @@ importers:
         version: 3.2.10
     devDependencies:
       '@sinclair/typebox':
-        specifier: ^0.34.49
+        specifier: ^0.34.52
         version: 0.34.52
       '@types/node':
         specifier: ^22.20.1
