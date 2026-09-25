@@ -1,0 +1,24 @@
+# SPDX-FileCopyrightText: 2026 Zextras <https://www.zextras.com>
+#
+# SPDX-License-Identifier: AGPL-3.0-only
+
+# carbonio-storages.sh writes the token here but never creates the dir.
+FROM --platform=$BUILDPLATFORM docker.io/library/busybox AS prep
+RUN mkdir -p /staging/etc/zextras/carbonio-storages/
+
+FROM registry.dev.zextras.com/dev/carbonio-sidecar:devel
+
+# Service registration
+COPY package/carbonio-storages.hcl /consul/config/
+
+# Setup files
+COPY package/service-protocol.json /etc/carbonio/storages/service-discover/service-protocol.json
+COPY package/intentions.json       /etc/carbonio/storages/service-discover/intentions.json
+COPY --from=prep /staging/etc /etc
+
+# Setup script
+COPY --chmod=755 package/carbonio-storages.sh /usr/local/bin/carbonio-storages
+
+ENV SERVICE_NAME=carbonio-storages
+ENV SETUP_SCRIPT="carbonio-storages setup"
+ENV TOKEN_FILE=/etc/zextras/carbonio-storages/token
