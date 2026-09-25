@@ -62,6 +62,15 @@ pipeline {
                         ],
                         platforms: ['linux/amd64', 'linux/arm64'] as Set,
                     )
+                    dockerStage(
+                        dockerfile: 'Dockerfile-sidecar',
+                        imageName: 'carbonio-storages-ce-sidecar',
+                        ocLabels: [
+                            title: 'Carbonio storages CE Sidecar',
+                            description: 'Carbonio storages Community Edition Sidecar',
+                        ],
+                        platforms: ['linux/amd64', 'linux/arm64'] as Set,
+                    )
                 }
             }
         }
