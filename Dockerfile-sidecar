@@ -3,10 +3,11 @@
 # SPDX-License-Identifier: AGPL-3.0-only
 
 # carbonio-storages.sh writes the token here but never creates the dir.
+ARG SIDECAR_IMAGE=registry.dev.zextras.com/dev/carbonio-sidecar:main
 FROM --platform=$BUILDPLATFORM docker.io/library/busybox AS prep
 RUN mkdir -p /staging/etc/zextras/carbonio-storages/
 
-FROM registry.dev.zextras.com/dev/carbonio-sidecar:devel
+FROM ${SIDECAR_IMAGE}
 
 # Service registration
 COPY package/carbonio-storages.hcl /consul/config/
