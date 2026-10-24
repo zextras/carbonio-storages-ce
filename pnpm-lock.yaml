@@ -25,8 +25,8 @@ importers:
         specifier: ^8.17.1
         version: 8.20.0
       check-disk-space:
-        specifier: ^3.4.0
-        version: 3.4.0
+        specifier: ^4.0.0
+        version: 4.0.0
       fastify:
         specifier: ^5.8.5
         version: 5.12.7
@@ -797,9 +797,8 @@ packages:
     resolution: {integrity: sha512-XWAtwJ6OHO+tj0EKCs0Y2UamnyOxseZWltU4x2U2wh8g4AigdjwvtUjvLP2tqkA/avxHEtzxNaqGq/YGNwckKg==}
     engines: {node: '>=18'}
 
-  check-disk-space@3.4.0:
-    resolution: {integrity: sha512-drVkSqfwA+TvuEhFipiR1OC9boEGZL5RrWvVsOthdcvQNXyCCuKkEiTOTXZ7qxSf/GLwq4GvzfrQD/Wz325hgw==}
-    engines: {node: '>=16'}
+  check-disk-space@4.0.0:
+    resolution: {integrity: sha512-IopHYYq3Y+QOZpJJ2OiqNqrA9nS0FSB0B6kDgC52cWAOGC7WnsaIJoUCxpQ/980Z1Cox2FhtKXeaJBx3Yv7ncA==}
 
   chownr@1.1.4:
     resolution: {integrity: sha512-jJ0bqzaylmJtVnNgzTeSOs8DPavpbYgEr/b0YL8/2GO3xJEhInFmhKMUnEJQjZumK7KXGFhUy89PrsJWlakBVg==}
@@ -2622,7 +2621,7 @@ snapshots:
 
   chai@6.3.0: {}
 
-  check-disk-space@3.4.0: {}
+  check-disk-space@4.0.0: {}
 
   chownr@1.1.4: {}
 
