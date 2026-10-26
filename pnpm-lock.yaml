@@ -22,7 +22,7 @@ importers:
         specifier: ^5.2.6
         version: 5.2.6
       ajv:
-        specifier: ^8.17.1
+        specifier: ^8.20.0
         version: 8.20.0
       check-disk-space:
         specifier: ^3.4.0
