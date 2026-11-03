@@ -1,5 +1,5 @@
 pkgname="carbonio-storages-ce"
-pkgver="1.1.0"
+pkgver="1.1.1"
 pkgrel="1"
 pkgdesc="External store for Carbonio CE"
 arch=('any')

@@ -1,3 +1,9 @@
+## [1.1.1](https://github.com/zextras/carbonio-storages-ce/compare/v1.1.0...v1.1.1) (2026-11-03)
+
+### Bug Fixes
+
+* **setup:** reuse a deterministic Consul token per node - CO-3612 ([#312](https://github.com/zextras/carbonio-storages-ce/issues/312)) ([a6cef31](https://github.com/zextras/carbonio-storages-ce/commit/a6cef316f3a1832f23f1bb05d2e77baf81d27abc))
+
 ## [1.1.0](https://github.com/zextras/carbonio-storages-ce/compare/1.0.17...1.1.0) (2026-09-17)
 
 ### Features
