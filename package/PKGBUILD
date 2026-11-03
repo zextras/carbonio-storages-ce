@@ -25,7 +25,7 @@ source=(
   "carbonio-storages-src.tar.gz"
 )
 sha256sums=(
-  '5bf54df7a315ddfa3b13365f7bdc906e401d9895d1402e9f37c18ef9ca381fcf'
+  '6f99ee89fa2f418edf3f95e56da63aa994932e19706d96b3ff6fef52ce490a25'
   '19b113b2c4ce428514e62c1b06d59d805ae7db05dd2a76a8aac93fe4ac6c9cd6'
   '9ff0d8ca695232fba7ed75b9ed6e6d1f9d38b5c63b90ac7956119db7704bad81'
   '494455f0e3bc8fef41ba4e27b9dd1cc57f8e4eddf9fae47d08b32ce46fe664e0'
