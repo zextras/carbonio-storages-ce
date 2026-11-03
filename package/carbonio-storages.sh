@@ -70,22 +70,22 @@ consul config write /etc/carbonio/storages/service-discover/service-protocol.jso
 # Allow other services to contact this service
 consul config write /etc/carbonio/storages/service-discover/intentions.json
 
-if [[ ! -f "/etc/zextras/carbonio-storages/token" ]]; then
-  # create the token
-  touch /etc/zextras/carbonio-storages/token
-  consul acl token create -format json -policy-name "${POLICY_NAME}" -description "Token for carbonio-storages/$(hostname)" |
-    jq -r '.SecretID' > /etc/zextras/carbonio-storages/token
+# create or reuse the deterministic token of this node (idempotent)
+if ! service-discover service-token ensure --service carbonio-storages --policy "${POLICY_NAME}" \
+  --token-file /etc/zextras/carbonio-storages/token; then
+  echo "Setup failed: Cannot create the service token for carbonio-storages"
+  exit 1
+fi
 
-  # to pass the token to consul-template we need to inject it to a env. variable
-  # since it doesn't accept a file as an argument
-  mkdir -p /etc/systemd/system/carbonio-storages.service.d/
-  cat >/etc/systemd/system/carbonio-storages.service.d/override.conf <<EOF
+# to pass the token to consul-template we need to inject it to a env. variable
+# since it doesn't accept a file as an argument
+mkdir -p /etc/systemd/system/carbonio-storages.service.d/
+cat >/etc/systemd/system/carbonio-storages.service.d/override.conf <<EOF
 [Service]
 Environment="CONSUL_HTTP_TOKEN=$(cat /etc/zextras/carbonio-storages/token)"
 EOF
-  chmod 0600 /etc/systemd/system/carbonio-storages.service.d/override.conf
-  systemctl daemon-reload
-fi
+chmod 0600 /etc/systemd/system/carbonio-storages.service.d/override.conf
+systemctl daemon-reload
 chown carbonio-storages:zextras /etc/zextras/carbonio-storages/token
 chmod 0600 /etc/zextras/carbonio-storages/token
 
@@ -105,8 +105,11 @@ chown carbonio-storages:zextras ${STORE_DIR}
 
 consul reload
 
-# limit token visibility as much as possible
-export -n CONSUL_HTTP_TOKEN
-
 systemctl restart carbonio-storages.service
 systemctl restart carbonio-storages-sidecar.service
+
+# remove the tokens leaked by previous setups (needs the bootstrap token)
+service-discover service-token prune-legacy --service carbonio-storages --policy "${POLICY_NAME}"
+
+# limit token visibility as much as possible
+export -n CONSUL_HTTP_TOKEN
