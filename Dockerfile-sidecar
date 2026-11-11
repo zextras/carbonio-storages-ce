@@ -9,6 +9,8 @@ RUN mkdir -p /staging/etc/zextras/carbonio-storages/
 
 FROM ${SIDECAR_IMAGE}
 
+RUN useradd -r -U zextras && useradd -r -U carbonio-storages
+
 # Service registration
 COPY package/carbonio-storages.hcl /consul/config/
 
