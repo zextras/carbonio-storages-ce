@@ -9,7 +9,7 @@ import {Static, Type} from "@sinclair/typebox";
 import {parse, parseQueryString} from "../../filesystem/Identifier";
 import StreamHash from "../../filesystem/utils/StreamHash";
 import util from 'util';
-import { pipeline } from 'stream';
+import { pipeline, Readable } from 'stream';
 import { Urls } from "../../urls";
 import { IncomingMessage } from "http";
 import { Http2ServerRequest } from "http2";
@@ -87,12 +87,29 @@ export default function(filesystem: FilesystemAccessor, urls: Urls): (fastify: F
             })
           } else {
 
-            const sourceStream = await filesystem.openReadStream(sourceIdentifier)
             const hashTransform = new StreamHash();
 
-            hashTransform.pipe(await filesystem.openWriterStream(destinationIdentifier, true))
+            const writer = await filesystem.openWriterStream(destinationIdentifier, Boolean(req.query.override))
 
-            await pump(sourceStream, hashTransform);
+            try {
+              let sourceStream: Readable
+              try {
+                sourceStream = await filesystem.openReadStream(sourceIdentifier)
+              } catch (e) {
+                writer.destroy()
+                throw e
+              }
+              await pump(sourceStream, hashTransform, writer);
+            } catch (e) {
+              if ((e as NodeJS.ErrnoException).code === 'EEXIST') {
+                return replyError(reply, {
+                  statusCode: 409,
+                  error: 'Conflict',
+                  message: `Identifier ${JSON.stringify(destinationIdentifier)} already exists`
+                })
+              }
+              throw e
+            }
 
             reply.status(200).send({
               query: destinationQuery,

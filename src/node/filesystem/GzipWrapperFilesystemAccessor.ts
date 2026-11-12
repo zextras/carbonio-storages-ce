@@ -4,9 +4,40 @@
 
 import {Identifier} from "./Identifier";
 import {FilesystemAccessor} from "./FilesystemAccessor";
-import {Readable, Writable} from "stream";
+import {finished, pipeline, Readable, Writable} from "stream";
 import * as zlib from "node:zlib";
 
+export class GzipWriter extends Writable {
+  private readonly gzip = zlib.createGzip()
+
+  constructor(private readonly inner: Writable) {
+    super()
+    pipeline(this.gzip, inner, err => {
+      if (err) {
+        this.destroy(err)
+      }
+    })
+  }
+
+  override _write(chunk: Buffer, _encoding: BufferEncoding, callback: (error?: Error | null) => void): void {
+    if (this.gzip.write(chunk)) {
+      callback()
+    } else {
+      this.gzip.once('drain', () => callback())
+    }
+  }
+
+  override _final(callback: (error?: Error | null) => void): void {
+    finished(this.inner, err => callback(err))
+    this.gzip.end()
+  }
+
+  override _destroy(error: Error | null, callback: (error?: Error | null) => void): void {
+    this.gzip.destroy()
+    this.inner.destroy()
+    callback(error)
+  }
+}
 
 export class GzipWrapperFilesystemAccessor implements FilesystemAccessor {
 
@@ -19,15 +50,13 @@ export class GzipWrapperFilesystemAccessor implements FilesystemAccessor {
   async openReadStream(identifier: Identifier): Promise<Readable> {
     const readable = await this.filesystem.openReadStream(identifier);
     const gunzip = zlib.createGunzip();
-    readable.pipe(gunzip)
+    pipeline(readable, gunzip, () => {})
     return gunzip
   }
 
   async openWriterStream(identifier: Identifier, overwrite: boolean = true): Promise<Writable> {
     const writable = await this.filesystem.openWriterStream(identifier, overwrite);
-    const gzip = zlib.createGzip();
-    gzip.pipe(writable)
-    return gzip
+    return new GzipWriter(writable)
   }
 
   async deleteFile(identifier: Identifier): Promise<boolean> {
