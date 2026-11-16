@@ -5,6 +5,11 @@ Requires=network-online.target
 Requires=carbonio-storages.service
 After=network-online.target
 After=carbonio-storages.service
+PartOf=carbonio-storages.service
+# The token is written by the pending setup ("carbonio-storages setup") once
+# Consul is bootstrapped. Without it the sidecar cannot start: skip it
+# instead of failing every 15 s and holding up units ordered after it.
+ConditionPathExists=/etc/zextras/carbonio-storages/token
 
 [Service]
 User=carbonio-storages
