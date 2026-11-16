@@ -1,3 +1,10 @@
+## [1.1.2](https://github.com/zextras/carbonio-storages-ce/compare/v1.1.1...v1.1.2) (2026-11-16)
+
+### Bug Fixes
+
+* **docker:** create sidecar system users - CO-3612 ([#321](https://github.com/zextras/carbonio-storages-ce/issues/321)) ([a460085](https://github.com/zextras/carbonio-storages-ce/commit/a460085dc6dc2caba2d4ae2013b954386cc6dc10))
+* **filestore:** write blobs atomically and handle write errors ([#322](https://github.com/zextras/carbonio-storages-ce/issues/322)) ([7207008](https://github.com/zextras/carbonio-storages-ce/commit/7207008d5dea9825500fe8a379b5639986f52512))
+
 ## [1.1.1](https://github.com/zextras/carbonio-storages-ce/compare/v1.1.0...v1.1.1) (2026-11-03)
 
 ### Bug Fixes
