@@ -66,9 +66,28 @@ export default function (filesystem: FilesystemAccessor, urls: Urls): (fastify: 
 					if (data !== undefined) {
 						const hashTransform = new StreamHash();
 
-						hashTransform.pipe(await filesystem.openWriterStream(identifier, true))
-
-						await pump(data.file, hashTransform);
+						let conflict = false
+						try {
+							const writer = await filesystem.openWriterStream(identifier, req.method === 'PUT')
+							try {
+								await pump(data.file, hashTransform, writer);
+							} catch (e) {
+								if ((e as NodeJS.ErrnoException).code !== 'EEXIST') {
+									throw e
+								}
+								conflict = true
+							}
+						} catch (e) {
+							reply.header('Connection', 'close')
+							throw e
+						}
+						if (conflict) {
+							return reply.code(409).send({
+								statusCode: 409,
+								error: 'Conflict',
+								message: `Identifier ${JSON.stringify(identifier)} already exists`
+							})
+						}
 
 						reply.send({
 							query: req.query,

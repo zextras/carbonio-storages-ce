@@ -8,6 +8,8 @@ import { Config } from "../config/configuration";
 import {join} from "path";
 import { FilesystemAccessor } from "./FilesystemAccessor";
 import { FilePathStrategy } from "./FilePathStategy";
+import { Writable } from "stream";
+import { AtomicFileWriter } from "./AtomicFileWriter";
 import checkDiskSpace from 'check-disk-space';
 
 export class LocalFilesystemAccessor implements FilesystemAccessor {
@@ -31,14 +33,9 @@ export class LocalFilesystemAccessor implements FilesystemAccessor {
     return fs.createReadStream(this.calculateFilePath(identifier))
   }
 
-  async openWriterStream(identifier: Identifier, overwrite: boolean = true): Promise<fs.WriteStream> {
-    const parent: fs.PathLike = this.calculateFileParent(identifier);
-    if (!await LocalFilesystemAccessor.exists(parent)) {
-      await fs.promises.mkdir(parent, {recursive: true})
-    } else if (overwrite && await this.fileExists(identifier)) {
-      await this.deleteFile(identifier)
-    }
-    return fs.createWriteStream(this.calculateFilePath(identifier))
+  async openWriterStream(identifier: Identifier, overwrite: boolean = true): Promise<Writable> {
+    await fs.promises.mkdir(this.calculateFileParent(identifier), {recursive: true})
+    return new AtomicFileWriter(this.calculateFilePath(identifier).toString(), overwrite)
   }
 
   async deleteFile(identifier: Identifier): Promise<boolean> {
