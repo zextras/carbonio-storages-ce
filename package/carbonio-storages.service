@@ -2,6 +2,9 @@
 Description=Carbonio Storages-CE daemon
 Requires=network-online.target
 After=network-online.target
+# Starting the service pulls in its sidecar. Wants only: a sidecar skipped
+# for a missing token must not block the service.
+Wants=carbonio-storages-sidecar.service
 
 [Service]
 Type=simple
