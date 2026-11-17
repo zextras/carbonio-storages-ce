@@ -1,3 +1,9 @@
+## [1.1.3](https://github.com/zextras/carbonio-storages-ce/compare/v1.1.2...v1.1.3) (2026-11-17)
+
+### Bug Fixes
+
+* [CO-3502] bind the storages sidecar to carbonio-storages lifecycle ([#324](https://github.com/zextras/carbonio-storages-ce/issues/324)) ([07d91d7](https://github.com/zextras/carbonio-storages-ce/commit/07d91d73d25569d99da1c01b22ddaaaf47b084c9))
+
 ## [1.1.2](https://github.com/zextras/carbonio-storages-ce/compare/v1.1.1...v1.1.2) (2026-11-16)
 
 ### Bug Fixes
