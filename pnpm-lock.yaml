@@ -50,7 +50,7 @@ importers:
         specifier: ^4.1.12
         version: 4.1.12(vitest@4.1.12)
       '@yao-pkg/pkg':
-        specifier: ^6.25.0
+        specifier: ^6.26.0
         version: 6.26.0(bare-buffer@3.7.3)
       eslint:
         specifier: ^10.14.0
