@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: AGPL-3.0-only
 
-ARG NODE_IMAGE_VERSION=22
+ARG NODE_IMAGE_VERSION=24
 
 # All build stages run natively on the CI builder (BUILDPLATFORM, amd64) — no
 # QEMU. @yao-pkg/pkg cross-bundles the Node base binary for the requested
