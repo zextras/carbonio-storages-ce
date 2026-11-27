@@ -53,7 +53,7 @@ importers:
         specifier: ^6.26.0
         version: 6.26.0(bare-buffer@3.7.3)
       eslint:
-        specifier: ^10.14.0
+        specifier: ^10.15.0
         version: 10.15.0
       form-data:
         specifier: ^4.0.6
